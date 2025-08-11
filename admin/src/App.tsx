@@ -7,6 +7,7 @@ const Bookings = React.lazy(() => import('./pages/admin/Bookings'));
 const Pricing = React.lazy(() => import('./pages/admin/Pricing'));
 const Zones = React.lazy(() => import('./pages/admin/Zones'));
 const PricingPreview = React.lazy(() => import('./pages/admin/PricingPreview'));
+const Payments = React.lazy(() => import('./pages/admin/Payments'));
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/admin/pricing" element={<Pricing />} />
           <Route path="/admin/zones" element={<Zones />} />
           <Route path="/admin/pricing-preview" element={<PricingPreview />} />
+          <Route path="/admin/payments" element={<Payments />} />
         </Routes>
       </React.Suspense>
     </Router>

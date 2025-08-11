@@ -15,7 +15,7 @@ async function apiFetch(path: string, options: RequestInit = {}) {
     ...(options.headers as any),
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || `Request failed: ${res.status}`);
@@ -37,6 +37,24 @@ export const ZonesAPI = {
   create: (payload: any) => apiFetch('/api/zones', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
   update: (id: string, payload: any) => apiFetch(`/api/zones/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
   remove: (id: string) => apiFetch(`/api/zones/${id}`, { method: 'DELETE' }) as Promise<{ success: boolean }>,
+};
+
+export const AdminAPI = {
+  stats: () => apiFetch('/api/admin/stats') as Promise<{ success: boolean; data: { users: number; rides: number; vehicles: number } }>,
+  users: () => apiFetch('/api/admin/users') as Promise<{ success: boolean; data: any[] }>,
+  updateUser: (id: string, payload: any) => apiFetch(`/api/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+};
+
+export const DriverAPI = {
+  setVerification: (id: string, status: 'pending'|'approved'|'rejected') => apiFetch(`/api/driver/${id}/verification`, { method: 'PATCH', body: JSON.stringify({ status }) }) as Promise<{ success: boolean; data: any }>,
+};
+
+export const PaymentsAPI = {
+  intent: (payload: any) => apiFetch('/api/payments/intent', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  authorize: (payload: any) => apiFetch('/api/payments/authorize', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  capture: (payload: any) => apiFetch('/api/payments/capture', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  refund: (payload: any) => apiFetch('/api/payments/refund', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  receiptUrl: (paymentId: string) => `${API_URL}/api/payments/receipt/${paymentId}.pdf`,
 };
 
 export const setToken = (token: string) => {
