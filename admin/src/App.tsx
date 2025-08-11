@@ -8,6 +8,7 @@ const Pricing = React.lazy(() => import('./pages/admin/Pricing'));
 const Zones = React.lazy(() => import('./pages/admin/Zones'));
 const PricingPreview = React.lazy(() => import('./pages/admin/PricingPreview'));
 const Payments = React.lazy(() => import('./pages/admin/Payments'));
+const Users = React.lazy(() => import('./pages/admin/Users'));
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/admin/zones" element={<Zones />} />
           <Route path="/admin/pricing-preview" element={<PricingPreview />} />
           <Route path="/admin/payments" element={<Payments />} />
+          <Route path="/admin/users" element={<Users />} />
         </Routes>
       </React.Suspense>
     </Router>
