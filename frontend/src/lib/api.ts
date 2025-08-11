@@ -37,3 +37,8 @@ export const RidesAPI = {
   updateStatus: (id: string, status: string) => apiFetch(`/api/rides/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }) as Promise<{ success: boolean; data: any }>,
   history: () => apiFetch('/api/rides/history') as Promise<{ success: boolean; data: any[] }>,
 };
+
+export const LiveAPI = {
+  heartbeat: (lng: number, lat: number) => apiFetch('/api/live/driver/heartbeat', { method: 'POST', body: JSON.stringify({ lng, lat }) }) as Promise<{ success: boolean }>,
+  setAvailability: (available: boolean) => apiFetch('/api/live/driver/availability', { method: 'POST', body: JSON.stringify({ available }) }) as Promise<{ success: boolean }>,
+};

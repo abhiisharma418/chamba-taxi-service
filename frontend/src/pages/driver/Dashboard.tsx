@@ -1,13 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
 import { Car, Power, MapPin, Clock, DollarSign, Star, Bell } from 'lucide-react';
+import { LiveAPI, RidesAPI } from '../../lib/api';
+import { io } from 'socket.io-client';
 
 const DriverDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { bookings, acceptBooking, updateBookingStatus } = useBooking();
+  const { bookings, updateBookingStatus, getBookingHistory } = useBooking();
   const [isOnline, setIsOnline] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    let hbTimer: any;
+    const startHb = async () => {
+      try { await LiveAPI.setAvailability(true); } catch {}
+      hbTimer = setInterval(() => { LiveAPI.heartbeat(77.1734, 31.1048).catch(()=>{}); }, 10000);
+    };
+    const stopHb = async () => {
+      try { await LiveAPI.setAvailability(false); } catch {}
+      if (hbTimer) clearInterval(hbTimer);
+    };
+    if (isOnline) startHb(); else stopHb();
+    return () => { stopHb(); };
+  }, [isOnline, user]);
+
+  useEffect(() => { getBookingHistory().catch(()=>{}); }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const sock = io((import.meta as any).env?.VITE_API_URL || 'http://localhost:5000', { auth: { driverId: user.id } });
+    return () => { sock.disconnect(); };
+  }, [user]);
 
   const driverBookings = bookings.filter(booking => booking.driverId === user?.id);
   const pendingRequests = bookings.filter(booking => booking.status === 'requested');
@@ -20,14 +45,14 @@ const DriverDashboard: React.FC = () => {
     )
     .reduce((sum, booking) => sum + (booking.fare.actual || booking.fare.estimated), 0);
 
-  const handleAcceptRide = (bookingId: string) => {
-    if (user) {
-      acceptBooking(bookingId, user.id);
-    }
+  const handleAcceptRide = async (bookingId: string) => {
+    await RidesAPI.updateStatus(bookingId, 'accepted');
+    await getBookingHistory();
   };
 
-  const handleStatusUpdate = (bookingId: string, status: 'on-trip' | 'completed') => {
-    updateBookingStatus(bookingId, status);
+  const handleStatusUpdate = async (bookingId: string, status: 'on-trip' | 'completed') => {
+    await RidesAPI.updateStatus(bookingId, status);
+    await getBookingHistory();
   };
 
   return (
@@ -40,20 +65,9 @@ const DriverDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Welcome, {user?.name}!</h1>
-              <p className="text-gray-600">
-                You are currently <span className={isOnline ? 'text-green-600' : 'text-red-600'}>
-                  {isOnline ? 'ONLINE' : 'OFFLINE'}
-                </span>
-              </p>
+              <p className="text-gray-600">You are currently <span className={isOnline ? 'text-green-600' : 'text-red-600'}>{isOnline ? 'ONLINE' : 'OFFLINE'}</span></p>
             </div>
-            <button
-              onClick={() => setIsOnline(!isOnline)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-colors duration-200 ${
-                isOnline 
-                  ? 'bg-red-600 hover:bg-red-700 text-white' 
-                  : 'bg-green-600 hover:bg-green-700 text-white'
-              }`}
-            >
+            <button onClick={() => setIsOnline(!isOnline)} className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-colors duration-200 ${isOnline ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}>
               <Power className="h-5 w-5" />
               <span>{isOnline ? 'Go Offline' : 'Go Online'}</span>
             </button>
@@ -65,44 +79,21 @@ const DriverDashboard: React.FC = () => {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  {activeRide.status === 'accepted' ? 'Accepted Ride' : 'Current Trip'}
-                </h3>
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">{activeRide.status === 'accepted' ? 'Accepted Ride' : 'Current Trip'}</h3>
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">{activeRide.pickup.address}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">{activeRide.destination.address}</span>
-                  </div>
+                  <div className="flex items-center space-x-2"><div className="w-2 h-2 bg-green-500 rounded-full"></div><span className="text-sm text-gray-700">{activeRide.pickup.address}</span></div>
+                  <div className="flex items-center space-x-2"><div className="w-2 h-2 bg-red-500 rounded-full"></div><span className="text-sm text-gray-700">{activeRide.destination.address}</span></div>
                 </div>
-                <div className="mt-4 flex items-center space-x-4">
-                  <span className="text-sm text-blue-700">Fare: ₹{activeRide.fare.estimated}</span>
-                  <span className="text-sm text-blue-700 capitalize">{activeRide.vehicleType}</span>
-                </div>
+                <div className="mt-4 flex items-center space-x-4"><span className="text-sm text-blue-700">Fare: ₹{activeRide.fare.estimated}</span><span className="text-sm text-blue-700 capitalize">{activeRide.vehicleType}</span></div>
               </div>
               <div className="flex flex-col space-y-2">
                 {activeRide.status === 'accepted' && (
-                  <button
-                    onClick={() => handleStatusUpdate(activeRide.id, 'on-trip')}
-                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
-                  >
-                    Start Trip
-                  </button>
+                  <button onClick={() => handleStatusUpdate(activeRide.id, 'on-trip')} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">Start Trip</button>
                 )}
                 {activeRide.status === 'on-trip' && (
-                  <button
-                    onClick={() => handleStatusUpdate(activeRide.id, 'completed')}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
-                  >
-                    Complete Trip
-                  </button>
+                  <button onClick={() => handleStatusUpdate(activeRide.id, 'completed')} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">Complete Trip</button>
                 )}
-                <button className="px-4 py-2 border border-blue-300 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors duration-200">
-                  Navigate
-                </button>
+                <button className="px-4 py-2 border border-blue-300 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors duration-200">Navigate</button>
               </div>
             </div>
           </div>
