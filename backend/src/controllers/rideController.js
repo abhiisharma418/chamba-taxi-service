@@ -14,7 +14,7 @@ export const estimateFare = async (req, res) => {
   if (error) return res.status(400).json({ success: false, message: error.message });
 
   const { computeEstimate } = await import('../services/pricingService.js');
-  const result = computeEstimate({ pickup: value.pickup, destination: value.destination, vehicleType: value.vehicleType });
+  const result = await computeEstimate({ pickup: value.pickup, destination: value.destination, vehicleType: value.vehicleType });
   res.json({ success: true, data: result });
 };
 
