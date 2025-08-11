@@ -1,0 +1,9 @@
+export { default as authRoutes } from './authRoutes.js';
+export { default as bookingRoutes } from './bookingRoutes.js';
+export { default as rideRoutes } from './rideRoutes.js';
+export { default as vehicleRoutes } from './vehicleRoutes.js';
+export { default as paymentRoutes } from './paymentRoutes.js';
+export { default as reviewRoutes } from './reviewRoutes.js';
+export { default as ticketRoutes } from './ticketRoutes.js';
+export { default as adminRoutes } from './adminRoutes.js';
+export { default as pricingRoutes } from './pricingRoutes.js';
