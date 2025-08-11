@@ -1,7 +1,8 @@
 import Joi from 'joi';
-import { setDriverLocation, setDriverAvailability, getNearbyAvailableDrivers, pushDispatchQueue, popNextDriverFromQueue, setPendingOffer, getPendingOffer, clearPendingOffer, lockDriverForDispatch, unlockDriver, isDriverAlive } from '../utils/liveStore.js';
+import { setDriverLocation, setDriverAvailability, getNearbyAvailableDrivers, pushDispatchQueue, popNextDriverFromQueue, setPendingOffer, getPendingOffer, clearPendingOffer, lockDriverForDispatch, unlockDriver, isDriverAlive, getDriverPosition, addActiveDispatchRide, removeActiveDispatchRide } from '../utils/liveStore.js';
 import { Ride } from '../models/rideModel.js';
 import { notifyDriver, notifyUser, notifyRide } from '../services/notifyService.js';
+import { getDistanceAndDuration } from '../services/distanceService.js';
 
 export const driverHeartbeat = async (req, res) => {
   const schema = Joi.object({ lng: Joi.number().required(), lat: Joi.number().required() });
@@ -19,6 +20,16 @@ export const driverSetAvailability = async (req, res) => {
   res.json({ success: true });
 };
 
+async function offerToDriver(ride, driverId) {
+  const driverPos = await getDriverPosition(driverId);
+  let eta = null;
+  if (driverPos) {
+    try { const r = await getDistanceAndDuration({ coordinates: [driverPos.lng, driverPos.lat] }, ride.pickup); eta = r.durationMin; } catch {}
+  }
+  await setPendingOffer(ride.id, driverId, 20);
+  notifyDriver(driverId, 'dispatch:offer', { rideId: ride.id, pickup: ride.pickup, destination: ride.destination, eta });
+}
+
 export const dispatchNearestDriver = async (req, res) => {
   const schema = Joi.object({ pickup: Joi.object({ coordinates: Joi.array().items(Joi.number()).length(2).required() }).required(), radiusKm: Joi.number().default(10), rideId: Joi.string().optional() });
   const { error, value } = schema.validate(req.body);
@@ -26,7 +37,6 @@ export const dispatchNearestDriver = async (req, res) => {
   const [lng, lat] = value.pickup.coordinates;
   const nearby = await getNearbyAvailableDrivers(lng, lat, value.radiusKm, 5);
 
-  // If rideId provided, start auto-assign flow; else return list
   if (!value.rideId) {
     return res.json({ success: true, data: nearby });
   }
@@ -35,20 +45,19 @@ export const dispatchNearestDriver = async (req, res) => {
   if (!ride) return res.status(404).json({ success: false, message: 'Ride not found' });
   if (ride.status !== 'requested') return res.status(400).json({ success: false, message: 'Ride not dispatchable' });
 
+  await addActiveDispatchRide(ride.id);
   await pushDispatchQueue(ride.id, nearby.map(d => d.driverId));
   const next = await popNextDriverFromQueue(ride.id);
-  if (!next) return res.json({ success: true, data: { assigned: false, reason: 'no-drivers' } });
+  if (!next) { notifyUser(ride.customerId, 'dispatch:failed', { rideId: ride.id }); await removeActiveDispatchRide(ride.id); return res.json({ success: true, data: { assigned: false, reason: 'no-drivers' } }); }
   const locked = await lockDriverForDispatch(next);
   if (!locked || !(await isDriverAlive(next))) {
     const n2 = await popNextDriverFromQueue(ride.id);
-    if (!n2) return res.json({ success: true, data: { assigned: false, reason: 'no-drivers' } });
-    if (!(await lockDriverForDispatch(n2))) return res.json({ success: true, data: { assigned: false, reason: 'no-drivers' } });
-    await setPendingOffer(ride.id, n2, 20);
-    notifyDriver(n2, 'dispatch:offer', { rideId: ride.id, pickup: ride.pickup, destination: ride.destination, eta: null });
+    if (!n2) { notifyUser(ride.customerId, 'dispatch:failed', { rideId: ride.id }); await removeActiveDispatchRide(ride.id); return res.json({ success: true, data: { assigned: false, reason: 'no-drivers' } }); }
+    if (!(await lockDriverForDispatch(n2))) { notifyUser(ride.customerId, 'dispatch:failed', { rideId: ride.id }); await removeActiveDispatchRide(ride.id); return res.json({ success: true, data: { assigned: false, reason: 'no-drivers' } }); }
+    await offerToDriver(ride, n2);
     return res.json({ success: true, data: { assigned: false, pendingDriverId: n2 } });
   }
-  await setPendingOffer(ride.id, next, 20);
-  notifyDriver(next, 'dispatch:offer', { rideId: ride.id, pickup: ride.pickup, destination: ride.destination, eta: null });
+  await offerToDriver(ride, next);
   return res.json({ success: true, data: { assigned: false, pendingDriverId: next } });
 };
 
@@ -67,19 +76,18 @@ export const driverRespondToOffer = async (req, res) => {
     ride.status = 'accepted';
     await ride.save();
     await clearPendingOffer(ride.id);
+    await removeActiveDispatchRide(ride.id);
     notifyUser(ride.customerId, 'ride:status', { rideId: ride.id, status: 'accepted', driverId: req.user.id });
     notifyRide(ride.id, 'ride:status', { status: 'accepted', driverId: req.user.id });
     return res.json({ success: true, data: { status: 'accepted' } });
   }
-  // decline: clear and try next
   await clearPendingOffer(ride.id);
-  // Try next driver in queue
   const next = await popNextDriverFromQueue(ride.id);
   if (!next) {
     notifyUser(ride.customerId, 'dispatch:failed', { rideId: ride.id });
+    await removeActiveDispatchRide(ride.id);
     return res.json({ success: true, data: { status: 'declined', nextOffered: null } });
   }
-  await setPendingOffer(ride.id, next, 20);
-  notifyDriver(next, 'dispatch:offer', { rideId: ride.id, pickup: ride.pickup, destination: ride.destination, eta: null });
+  await offerToDriver(ride, next);
   return res.json({ success: true, data: { status: 'declined', nextOffered: next } });
 };

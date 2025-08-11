@@ -2,11 +2,20 @@ import { getRedis } from './redis.js';
 
 const GEO_KEY = 'drivers:geo';
 const AVAIL_SET = 'drivers:available';
+const ACTIVE_SET = 'dispatch:active';
 
 export const setDriverLocation = async (driverId, lng, lat) => {
   const redis = getRedis();
   await redis.geoadd(GEO_KEY, lng, lat, String(driverId));
   await redis.setex(`driver:hb:${driverId}`, 30, '1');
+};
+
+export const getDriverPosition = async (driverId) => {
+  const redis = getRedis();
+  const pos = await redis.geopos(GEO_KEY, String(driverId));
+  const p = pos?.[0];
+  if (!p || p[0] == null || p[1] == null) return null;
+  return { lng: Number(p[0]), lat: Number(p[1]) };
 };
 
 export const setDriverAvailability = async (driverId, available) => {
@@ -59,7 +68,7 @@ export const pushDispatchQueue = async (rideId, driverIds) => {
   const redis = getRedis();
   const key = `dispatch:queue:${rideId}`;
   if (driverIds.length > 0) await redis.rpush(key, ...driverIds.map(String));
-  await redis.expire(key, 60); // queue expires in 60s
+  await redis.expire(key, 60);
 };
 
 export const popNextDriverFromQueue = async (rideId) => {
@@ -107,4 +116,20 @@ export const unlockDriver = async (driverId) => {
   const redis = getRedis();
   const key = `driver:lock:${driverId}`;
   await redis.del(key);
+};
+
+export const addActiveDispatchRide = async (rideId) => {
+  const redis = getRedis();
+  await redis.sadd(ACTIVE_SET, String(rideId));
+};
+
+export const removeActiveDispatchRide = async (rideId) => {
+  const redis = getRedis();
+  await redis.srem(ACTIVE_SET, String(rideId));
+};
+
+export const getActiveDispatchRides = async () => {
+  const redis = getRedis();
+  const ids = await redis.smembers(ACTIVE_SET);
+  return ids.map(String);
 };
