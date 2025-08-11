@@ -13,6 +13,7 @@ export interface Booking {
   status: 'requested' | 'accepted' | 'on-trip' | 'completed' | 'cancelled' | 'arriving';
   fare: { estimated: number; actual?: number };
   paymentStatus?: 'none' | 'created' | 'authorized' | 'captured' | 'refunded' | 'failed';
+  paymentId?: string;
   createdAt: Date;
   completedAt?: Date;
   rating?: number;
