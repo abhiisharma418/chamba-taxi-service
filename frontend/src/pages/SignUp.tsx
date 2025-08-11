@@ -11,7 +11,7 @@ const Signup: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
-  const [userType, setUserType] = useState<'customer' | 'driver' | 'admin'>('customer');
+  const [userType, setUserType] = useState<'customer' | 'driver'>('customer');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
@@ -20,8 +20,12 @@ const Signup: React.FC = () => {
   const [searchParams] = useSearchParams();
 
   React.useEffect(() => {
-    const type = searchParams.get('type') as 'customer' | 'driver' | 'admin';
-    if (type) {
+    const type = searchParams.get('type') as 'customer' | 'driver' | 'admin' | null;
+    if (type === 'admin') {
+      window.location.href = (import.meta as any).env?.VITE_ADMIN_URL || 'http://localhost:5174';
+      return;
+    }
+    if (type === 'customer' || type === 'driver') {
       setUserType(type);
     }
   }, [searchParams]);
@@ -55,17 +59,12 @@ const Signup: React.FC = () => {
         type: userType,
         password: formData.password
       });
-      
-      // Redirect based on user type
       switch (userType) {
         case 'customer':
           navigate('/customer/dashboard');
           break;
         case 'driver':
           navigate('/driver/dashboard');
-          break;
-        case 'admin':
-          navigate('/admin/dashboard');
           break;
       }
     } catch (err) {
@@ -108,17 +107,6 @@ const Signup: React.FC = () => {
               }`}
             >
               Driver
-            </button>
-            <button
-              type="button"
-              onClick={() => setUserType('admin')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
-                userType === 'admin'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Admin
             </button>
           </div>
 

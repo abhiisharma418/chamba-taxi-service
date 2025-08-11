@@ -6,7 +6,7 @@ import { Car, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userType, setUserType] = useState<'customer' | 'driver' | 'admin'>('customer');
+  const [userType, setUserType] = useState<'customer' | 'driver'>('customer');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
@@ -14,8 +14,12 @@ const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
 
   React.useEffect(() => {
-    const type = searchParams.get('type') as 'customer' | 'driver' | 'admin';
-    if (type) {
+    const type = searchParams.get('type') as 'customer' | 'driver' | 'admin' | null;
+    if (type === 'admin') {
+      window.location.href = (import.meta as any).env?.VITE_ADMIN_URL || 'http://localhost:5174';
+      return;
+    }
+    if (type === 'customer' || type === 'driver') {
       setUserType(type);
     }
   }, [searchParams]);
@@ -26,17 +30,12 @@ const Login: React.FC = () => {
 
     try {
       await login(email, password, userType);
-      
-      // Redirect based on user type
       switch (userType) {
         case 'customer':
           navigate('/customer/dashboard');
           break;
         case 'driver':
           navigate('/driver/dashboard');
-          break;
-        case 'admin':
-          window.location.href = (import.meta as any).env?.VITE_ADMIN_URL || 'http://localhost:5174';
           break;
       }
     } catch (err) {
@@ -79,17 +78,6 @@ const Login: React.FC = () => {
               }`}
             >
               Driver
-            </button>
-            <button
-              type="button"
-              onClick={() => setUserType('admin')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
-                userType === 'admin'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Admin
             </button>
           </div>
 
@@ -179,7 +167,6 @@ const Login: React.FC = () => {
           <div className="text-xs text-gray-500 space-y-1">
             <div>Customer: customer@demo.com / password</div>
             <div>Driver: driver@demo.com / password</div>
-            <div>Admin: admin@demo.com / password</div>
           </div>
         </div>
       </div>

@@ -24,8 +24,8 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
 }
 
 export const AuthAPI = {
-  login: (payload: { email: string; password: string; userType: 'customer'|'driver'|'admin' }) => apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: payload.email, password: payload.password }) }) as Promise<{ success: boolean; data: { token: string; refresh: string; user: { id: string; name: string; role: string; email: string } } }>,
-  register: (payload: { name: string; email: string; phone: string; role: 'customer'|'driver'|'admin'; password: string }) => apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: { token: string; refresh: string } }>,
+  login: (payload: { email: string; password: string; userType: 'customer'|'driver' }) => apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: payload.email, password: payload.password }) }) as Promise<{ success: boolean; data: { token: string; refresh: string; user: { id: string; name: string; role: string; email: string } } }>,
+  register: (payload: { name: string; email: string; phone: string; role: 'customer'|'driver'; password: string }) => apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: { token: string; refresh: string } }>,
   refresh: () => apiFetch('/api/auth/refresh', { method: 'POST', body: JSON.stringify({}) }) as Promise<{ success: boolean; data: { token: string; refresh: string } }>,
   logout: () => apiFetch('/api/auth/logout', { method: 'POST', body: JSON.stringify({}) }) as Promise<{ success: boolean }>,
 };

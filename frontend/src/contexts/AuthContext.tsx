@@ -6,13 +6,13 @@ interface User {
   name: string;
   email: string;
   phone?: string;
-  type: 'customer' | 'driver' | 'admin';
+  type: 'customer' | 'driver';
   avatar?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, userType: 'customer' | 'driver' | 'admin') => Promise<void>;
+  login: (email: string, password: string, userType: 'customer' | 'driver') => Promise<void>;
   signup: (userData: Omit<User, 'id'> & { password: string }) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     bootstrap();
   }, []);
 
-  const login = async (email: string, password: string, userType: 'customer' | 'driver' | 'admin') => {
+  const login = async (email: string, password: string, userType: 'customer' | 'driver') => {
     setIsLoading(true);
     try {
       const res = await AuthAPI.login({ email, password, userType });
