@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ZonesAPI, getToken, setToken } from '../../lib/api';
+import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface Zone {
   _id?: string;
@@ -79,6 +81,15 @@ const Zones: React.FC = () => {
           <button onClick={onSave} className="bg-emerald-600 text-white px-4 py-2 rounded">{editingId ? 'Update' : 'Create'}</button>
           {editingId && <button onClick={()=>{setEditingId(null); setForm(empty); setPolygonText(JSON.stringify(empty.polygon, null, 2));}} className="px-4 py-2 rounded border">Cancel</button>}
         </div>
+      </div>
+
+      <div className="bg-white border rounded p-4 mb-6" style={{height: 400}}>
+        <MapContainer center={[31.1048, 77.1734] as any} zoom={9 as any} style={{height: '100%', width: '100%'}}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {list.filter(z=>z.active).map(z => (
+            <Polygon key={z._id} positions={z.polygon.coordinates[0].map(([lng,lat])=>[lat,lng]) as any} pathOptions={{ color: z.region === 'hill' ? 'green' : 'blue' }} />
+          ))}
+        </MapContainer>
       </div>
 
       <div className="bg-white border rounded">
