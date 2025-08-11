@@ -8,8 +8,7 @@ import {
   X, 
   LogOut,
   MapPin,
-  Clock,
-  Shield
+  Clock
 } from 'lucide-react';
 
 const Navigation: React.FC = () => {
@@ -37,12 +36,6 @@ const Navigation: React.FC = () => {
         return [
           { path: '/driver/dashboard', label: 'Dashboard', icon: User },
           { path: '/driver/rides', label: 'My Rides', icon: MapPin }
-        ];
-      case 'admin':
-        return [
-          { path: '/admin/dashboard', label: 'Dashboard', icon: Shield },
-          { path: '/admin/drivers', label: 'Drivers', icon: User },
-          { path: '/admin/bookings', label: 'Bookings', icon: Car }
         ];
       default:
         return [];
