@@ -13,15 +13,9 @@ export const estimateFare = async (req, res) => {
   const { error, value } = createRideSchema.validate(req.body);
   if (error) return res.status(400).json({ success: false, message: error.message });
 
-  // Simplified distance calc placeholder
-  const distanceKm = 10; // TODO: replace with real distance service
-  const perKm = value.regionType === 'hill' ? 20 : 12; // defaults if vehicle pricing not provided
-  const perMinute = 2;
-  const durationMin = Math.ceil(distanceKm * 3);
-  const baseFare = 50;
-  const estimated = Math.round((baseFare + distanceKm * perKm + durationMin * perMinute));
-
-  res.json({ success: true, data: { estimated, currency: 'INR', distanceKm, durationMin } });
+  const { computeEstimate } = await import('../services/pricingService.js');
+  const result = computeEstimate({ pickup: value.pickup, destination: value.destination, vehicleType: value.vehicleType });
+  res.json({ success: true, data: result });
 };
 
 export const createRide = async (req, res) => {

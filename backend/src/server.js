@@ -19,10 +19,28 @@ import adminRoutes from './routes/adminRoutes.js';
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
+import path from 'path';
+import fs from 'fs';
 
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
+
+// Preserve raw body for Stripe webhooks
+app.use('/api/payments/webhook/stripe', (req, res, next) => {
+  let data = '';
+  req.setEncoding('utf8');
+  req.on('data', (chunk) => { data += chunk; });
+  req.on('end', () => {
+    req.rawBody = data;
+    next();
+  });
+});
+
+// Serve uploads
+const uploadsPath = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath);
+app.use('/uploads', express.static(uploadsPath));
 
 // Socket.io
 const io = new SocketIOServer(server, {
@@ -37,7 +55,6 @@ const io = new SocketIOServer(server, {
 
 io.on('connection', (socket) => {
   socket.on('ride:location', (payload) => {
-    // broadcast to ride room
     if (payload?.rideId) socket.to(`ride:${payload.rideId}`).emit('ride:location', payload);
   });
   socket.on('ride:join', (rideId) => {

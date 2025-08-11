@@ -36,3 +36,22 @@ export const refundPayment = async (req, res) => {
   }
   return res.status(400).json({ success: false, message: 'Payment provider not configured' });
 };
+
+export const stripeWebhook = async (req, res) => {
+  if (!stripe) return res.status(400).end();
+  const sig = req.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  // TODO: handle intents.succeeded, payment_method.attached, etc.
+  res.json({ received: true });
+};
+
+export const razorpayWebhook = async (req, res) => {
+  // Razorpay webhooks are signed via X-Razorpay-Signature header; verification omitted for brevity
+  // TODO: verify signature using body + secret
+  res.json({ received: true });
+};
