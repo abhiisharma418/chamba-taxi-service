@@ -70,6 +70,7 @@ driverNs.on('connection', (socket) => {
   if (!driverId) return socket.disconnect(true);
   socket.join(`driver:${driverId}`);
   socket.on('location', async (payload) => { if (payload?.lng != null && payload?.lat != null) await setDriverLocation(driverId, payload.lng, payload.lat); });
+  socket.on('disconnect', () => { /* could mark as unavailable after grace */ });
 });
 
 // Middleware
