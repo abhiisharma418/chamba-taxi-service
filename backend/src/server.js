@@ -26,6 +26,8 @@ import path from 'path';
 import fs from 'fs';
 import { setDriverLocation } from './utils/liveStore.js';
 import { setIO } from './services/notifyService.js';
+import cookieParser from 'cookie-parser';
+import { authenticate, requireActive } from './middleware/auth.js';
 
 dotenv.config();
 const app = express();
@@ -84,6 +86,7 @@ driverNs.on('connection', (socket) => {
 });
 
 // Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(helmet());
 app.use(morgan('dev'));
@@ -112,15 +115,15 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/rides', rideRoutes);
-app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/rides', authenticate, requireActive, rideRoutes);
+app.use('/api/vehicles', authenticate, requireActive, vehicleRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/tickets', ticketRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/pricing', pricingRoutes);
-app.use('/api/live', liveRoutes);
-app.use('/api/devices', deviceRoutes);
+app.use('/api/reviews', authenticate, requireActive, reviewRoutes);
+app.use('/api/tickets', authenticate, requireActive, ticketRoutes);
+app.use('/api/admin', authenticate, requireActive, adminRoutes);
+app.use('/api/pricing', authenticate, requireActive, pricingRoutes);
+app.use('/api/live', authenticate, requireActive, liveRoutes);
+app.use('/api/devices', authenticate, requireActive, deviceRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Database + Server Start
