@@ -36,7 +36,7 @@ const Login: React.FC = () => {
           navigate('/driver/dashboard');
           break;
         case 'admin':
-          navigate('/admin/dashboard');
+          window.location.href = (import.meta as any).env?.VITE_ADMIN_URL || 'http://localhost:5174';
           break;
       }
     } catch (err) {
