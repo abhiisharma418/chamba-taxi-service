@@ -24,6 +24,7 @@ import { createRateLimiter } from './middleware/rateLimit.js';
 import path from 'path';
 import fs from 'fs';
 import { setDriverLocation } from './utils/liveStore.js';
+import { setIO } from './services/notifyService.js';
 
 dotenv.config();
 const app = express();
@@ -55,8 +56,11 @@ const io = new SocketIOServer(server, {
     credentials: true,
   },
 });
+setIO(io);
 
 io.on('connection', (socket) => {
+  const userId = socket.handshake.auth?.userId;
+  if (userId) socket.join(`user:${userId}`);
   socket.on('ride:location', (payload) => {
     if (payload?.rideId) socket.to(`ride:${payload.rideId}`).emit('ride:location', payload);
   });
@@ -70,6 +74,7 @@ const driverNs = io.of('/driver');
 driverNs.on('connection', (socket) => {
   const driverId = socket.handshake.auth?.driverId;
   if (!driverId) return socket.disconnect(true);
+  socket.join(`driver:${driverId}`);
   socket.on('location', async (payload) => {
     if (payload?.lng != null && payload?.lat != null) {
       await setDriverLocation(driverId, payload.lng, payload.lat);

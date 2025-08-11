@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { Ride } from '../models/rideModel.js';
 import { Vehicle } from '../models/vehicleModel.js';
+import { notifyRide, notifyUser } from '../services/notifyService.js';
 
 const createRideSchema = Joi.object({
   pickup: Joi.object({ address: Joi.string().allow(''), coordinates: Joi.array().items(Joi.number()).length(2).required() }).required(),
@@ -30,6 +31,7 @@ export const createRide = async (req, res) => {
     pricingContext: { regionType: value.regionType, surgeMultiplier: 1 },
     fare: { estimated: 0, currency: 'INR' }
   });
+  notifyUser(req.user.id, 'ride:created', { rideId: ride._id });
   res.status(201).json({ success: true, data: ride });
 };
 
@@ -50,9 +52,7 @@ export const updateStatus = async (req, res) => {
   const ride = await Ride.findById(req.params.id);
   if (!ride) return res.status(404).json({ success: false, message: 'Ride not found' });
 
-  // Driver or admin can update certain statuses
   if (req.user.role === 'driver') {
-    // link driver to ride if accepting first time
     if (!ride.driverId && value.status === 'accepted') ride.driverId = req.user.id;
   } else if (req.user.role !== 'admin' && req.user.id !== ride.customerId.toString()) {
     return res.status(403).json({ success: false, message: 'Forbidden' });
@@ -62,6 +62,9 @@ export const updateStatus = async (req, res) => {
   if (value.status === 'on-trip') ride.startedAt = new Date();
   if (value.status === 'completed') ride.completedAt = new Date();
   await ride.save();
+  notifyRide(ride._id, 'ride:status', { status: ride.status });
+  notifyUser(ride.customerId, 'ride:status', { rideId: ride._id, status: ride.status });
+  if (ride.driverId) notifyUser(ride.driverId, 'ride:status', { rideId: ride._id, status: ride.status });
   res.json({ success: true, data: ride });
 };
 
