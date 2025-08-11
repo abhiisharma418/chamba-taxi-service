@@ -1,23 +1,15 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { RidesAPI } from '../lib/api';
 
 export interface Booking {
   id: string;
   customerId: string;
   driverId?: string;
-  pickup: {
-    address: string;
-    coordinates: [number, number];
-  };
-  destination: {
-    address: string;
-    coordinates: [number, number];
-  };
-  vehicleType: 'economy' | 'premium' | 'luxury';
-  status: 'requested' | 'accepted' | 'on-trip' | 'completed' | 'cancelled';
-  fare: {
-    estimated: number;
-    actual?: number;
-  };
+  pickup: { address: string; coordinates: [number, number] };
+  destination: { address: string; coordinates: [number, number] };
+  vehicleType: 'economy' | 'premium' | 'luxury' | 'car' | 'bike';
+  status: 'requested' | 'accepted' | 'on-trip' | 'completed' | 'cancelled' | 'arriving';
+  fare: { estimated: number; actual?: number };
   createdAt: Date;
   completedAt?: Date;
   rating?: number;
@@ -26,11 +18,9 @@ export interface Booking {
 interface BookingContextType {
   bookings: Booking[];
   currentBooking: Booking | null;
-  createBooking: (bookingData: Omit<Booking, 'id' | 'createdAt' | 'status'>) => void;
-  updateBookingStatus: (bookingId: string, status: Booking['status']) => void;
-  acceptBooking: (bookingId: string, driverId: string) => void;
-  cancelBooking: (bookingId: string) => void;
-  getBookingHistory: (userId: string, userType: 'customer' | 'driver') => Booking[];
+  createBooking: (bookingData: { pickup: Booking['pickup']; destination: Booking['destination']; vehicleType: 'car'|'bike' }) => Promise<void>;
+  updateBookingStatus: (bookingId: string, status: Booking['status']) => Promise<void>;
+  getBookingHistory: () => Promise<void>;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -43,118 +33,37 @@ export const useBooking = () => {
   return context;
 };
 
-interface BookingProviderProps {
-  children: ReactNode;
-}
+interface BookingProviderProps { children: ReactNode; }
 
 export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) => {
-  const [bookings, setBookings] = useState<Booking[]>([
-    {
-      id: '1',
-      customerId: 'customer1',
-      driverId: 'driver1',
-      pickup: {
-        address: 'Connaught Place, New Delhi',
-        coordinates: [77.2167, 28.6333]
-      },
-      destination: {
-        address: 'India Gate, New Delhi',
-        coordinates: [77.2295, 28.6129]
-      },
-      vehicleType: 'economy',
-      status: 'completed',
-      fare: {
-        estimated: 150,
-        actual: 145
-      },
-      createdAt: new Date(Date.now() - 86400000),
-      completedAt: new Date(Date.now() - 85800000),
-      rating: 5
-    }
-  ]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [currentBooking, setCurrentBooking] = useState<Booking | null>(null);
 
-  const createBooking = (bookingData: Omit<Booking, 'id' | 'createdAt' | 'status'>) => {
-    const newBooking: Booking = {
-      ...bookingData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      status: 'requested'
-    };
-    
-    setBookings(prev => [...prev, newBooking]);
-    setCurrentBooking(newBooking);
+  const getBookingHistory = async () => {
+    const res = await RidesAPI.history();
+    setBookings(res.data as any);
   };
 
-  const updateBookingStatus = (bookingId: string, status: Booking['status']) => {
-    setBookings(prev =>
-      prev.map(booking =>
-        booking.id === bookingId
-          ? {
-              ...booking,
-              status,
-              completedAt: status === 'completed' ? new Date() : booking.completedAt
-            }
-          : booking
-      )
-    );
+  useEffect(() => { getBookingHistory().catch(()=>{}); }, []);
 
+  const createBooking = async (bookingData: { pickup: Booking['pickup']; destination: Booking['destination']; vehicleType: 'car'|'bike' }) => {
+    const res = await RidesAPI.create({ pickup: bookingData.pickup, destination: bookingData.destination, vehicleType: bookingData.vehicleType, regionType: 'city' });
+    const ride = res.data;
+    setCurrentBooking(ride);
+    await getBookingHistory();
+  };
+
+  const updateBookingStatus = async (bookingId: string, status: Booking['status']) => {
+    await RidesAPI.updateStatus(bookingId, status);
+    await getBookingHistory();
     if (currentBooking?.id === bookingId) {
-      setCurrentBooking(prev =>
-        prev
-          ? {
-              ...prev,
-              status,
-              completedAt: status === 'completed' ? new Date() : prev.completedAt
-            }
-          : null
-      );
-    }
-  };
-
-  const acceptBooking = (bookingId: string, driverId: string) => {
-    setBookings(prev =>
-      prev.map(booking =>
-        booking.id === bookingId
-          ? { ...booking, driverId, status: 'accepted' }
-          : booking
-      )
-    );
-
-    if (currentBooking?.id === bookingId) {
-      setCurrentBooking(prev =>
-        prev ? { ...prev, driverId, status: 'accepted' } : null
-      );
-    }
-  };
-
-  const cancelBooking = (bookingId: string) => {
-    updateBookingStatus(bookingId, 'cancelled');
-    if (currentBooking?.id === bookingId) {
-      setCurrentBooking(null);
-    }
-  };
-
-  const getBookingHistory = (userId: string, userType: 'customer' | 'driver') => {
-    if (userType === 'customer') {
-      return bookings.filter(booking => booking.customerId === userId);
-    } else {
-      return bookings.filter(booking => booking.driverId === userId);
+      const r = await RidesAPI.get(bookingId);
+      setCurrentBooking(r.data);
     }
   };
 
   return (
-    <BookingContext.Provider
-      value={{
-        bookings,
-        currentBooking,
-        createBooking,
-        updateBookingStatus,
-        acceptBooking,
-        cancelBooking,
-        getBookingHistory
-      }}
-    >
+    <BookingContext.Provider value={{ bookings, currentBooking, createBooking, updateBookingStatus, getBookingHistory }}>
       {children}
     </BookingContext.Provider>
   );

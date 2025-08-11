@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { AuthAPI, setToken } from '../lib/api';
 
 interface User {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   type: 'customer' | 'driver' | 'admin';
   avatar?: string;
 }
@@ -27,65 +28,60 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+interface AuthProviderProps { children: ReactNode; }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in (localStorage)
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
+    const bootstrap = async () => {
+      try {
+        const saved = localStorage.getItem('user');
+        if (saved) setUser(JSON.parse(saved));
+        // attempt refresh to get new access token
+        const ref = await AuthAPI.refresh();
+        if (ref?.data?.token) setToken(ref.data.token);
+      } catch {}
+      setIsLoading(false);
+    };
+    bootstrap();
   }, []);
 
   const login = async (email: string, password: string, userType: 'customer' | 'driver' | 'admin') => {
     setIsLoading(true);
-    
-    // Mock login - replace with actual API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const mockUser: User = {
-      id: Date.now().toString(),
-      name: userType === 'admin' ? 'Admin User' : email.split('@')[0],
-      email,
-      phone: '+91 9876543210',
-      type: userType,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
-    };
-    
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    setIsLoading(false);
+    try {
+      const res = await AuthAPI.login({ email, password, userType });
+      const token = res.data.token;
+      setToken(token);
+      const u: User = { id: res.data.user.id, name: res.data.user.name, email: res.data.user.email, type: res.data.user.role as any };
+      setUser(u);
+      localStorage.setItem('user', JSON.stringify(u));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const signup = async (userData: Omit<User, 'id'> & { password: string }) => {
     setIsLoading(true);
-    
-    // Mock signup - replace with actual API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const newUser: User = {
-      ...userData,
-      id: Date.now().toString(),
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.email}`
-    };
-    
-    // Remove password from user object
-    const { password, ...userWithoutPassword } = userData;
-    const finalUser = { ...userWithoutPassword, ...newUser };
-    
-    setUser(finalUser);
-    localStorage.setItem('user', JSON.stringify(finalUser));
-    setIsLoading(false);
+    try {
+      const payload = { name: userData.name, email: userData.email, phone: userData.phone || '', role: userData.type, password: userData.password } as any;
+      const res = await AuthAPI.register(payload);
+      if (res?.data?.token) setToken(res.data.token);
+      // After signup, consider auto-login via refresh
+      const ref = await AuthAPI.refresh();
+      if (ref?.data?.token) setToken(ref.data.token);
+      const u: User = { id: Date.now().toString(), name: userData.name, email: userData.email, type: userData.type };
+      setUser(u);
+      localStorage.setItem('user', JSON.stringify(u));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try { await AuthAPI.logout(); } catch {}
+    setToken(null);
     setUser(null);
     localStorage.removeItem('user');
   };
