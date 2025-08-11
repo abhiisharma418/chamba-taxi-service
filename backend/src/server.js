@@ -18,6 +18,7 @@ import ticketRoutes from './routes/ticketRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import pricingRoutes from './routes/pricingRoutes.js';
 import liveRoutes from './routes/liveRoutes.js';
+import deviceRoutes from './routes/deviceRoutes.js';
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
@@ -119,6 +120,7 @@ app.use('/api/tickets', ticketRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/live', liveRoutes);
+app.use('/api/devices', deviceRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Database + Server Start
