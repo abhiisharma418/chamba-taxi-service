@@ -11,6 +11,14 @@ import authRoutes from './routes/authRoutes.js';
 import rideRoutes from './routes/rideRoutes.js';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './docs/swagger.js';
+import vehicleRoutes from './routes/vehicleRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import ticketRoutes from './routes/ticketRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import { auditLogger } from './middleware/audit.js';
+import { i18n } from './middleware/i18n.js';
+import { createRateLimiter } from './middleware/rateLimit.js';
 
 dotenv.config();
 const app = express();
@@ -28,7 +36,13 @@ const io = new SocketIOServer(server, {
 });
 
 io.on('connection', (socket) => {
-  // basic namespaces can be added later for rides
+  socket.on('ride:location', (payload) => {
+    // broadcast to ride room
+    if (payload?.rideId) socket.to(`ride:${payload.rideId}`).emit('ride:location', payload);
+  });
+  socket.on('ride:join', (rideId) => {
+    socket.join(`ride:${rideId}`);
+  });
   socket.on('disconnect', () => {});
 });
 
@@ -36,6 +50,9 @@ io.on('connection', (socket) => {
 app.use(express.json());
 app.use(helmet());
 app.use(morgan('dev'));
+app.use(i18n);
+app.use(auditLogger);
+app.use('/api/', createRateLimiter({ windowMs: 60_000, max: 300 }));
 
 // CORS
 const allowedOrigins = [
@@ -59,6 +76,11 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
+app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/tickets', ticketRoutes);
+app.use('/api/admin', adminRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Database + Server Start
