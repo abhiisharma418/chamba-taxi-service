@@ -1,110 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { useBooking } from '../../contexts/BookingContext';
-import Navigation from '../../components/Navigation';
-import { Users, Car, DollarSign, TrendingUp, Calendar, MapPin } from 'lucide-react';
+import { Users, Car, DollarSign, TrendingUp } from 'lucide-react';
 import { AdminAPI } from '../../lib/api';
 
 const AdminDashboard: React.FC = () => {
-  const { bookings } = useBooking();
-  const [statsApi, setStatsApi] = useState<{ users: number; rides: number; vehicles: number } | null>(null);
+  const [stats, setStats] = useState<{ users: number; rides: number; vehicles: number } | null>(null);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    AdminAPI.stats().then(res => setStatsApi(res.data)).catch(()=>{});
+    AdminAPI.stats().then(res => setStats(res.data)).catch(e => setError(e.message));
   }, []);
 
-  const totalDrivers = statsApi?.users || 0;
-  const totalCustomers = statsApi ? Math.max(0, statsApi.users - 0) : 0;
-  const totalBookings = bookings.length;
-  const completedBookings = bookings.filter(b => b.status === 'completed').length;
-  const totalRevenue = bookings.filter(b => b.status === 'completed').reduce((sum, booking) => sum + (booking.fare.actual || booking.fare.estimated), 0);
-
-  const recentBookings = bookings.slice(0, 5);
-
-  const stats = [
-    { title: 'Users', value: totalDrivers, icon: Users, color: 'bg-blue-100 text-blue-600', change: '+12%' },
-    { title: 'Vehicles', value: statsApi?.vehicles || 0, icon: Users, color: 'bg-green-100 text-green-600', change: '+18%' },
-    { title: 'Total Bookings', value: totalBookings, icon: Car, color: 'bg-purple-100 text-purple-600', change: '+25%' },
-    { title: 'Revenue', value: `₹${totalRevenue.toLocaleString()}`, icon: DollarSign, color: 'bg-emerald-100 text-emerald-600', change: '+15%' }
+  const cards = [
+    { title: 'Users', value: stats?.users ?? '—', icon: Users, color: 'bg-blue-100 text-blue-600', change: '+12%' },
+    { title: 'Vehicles', value: stats?.vehicles ?? '—', icon: Car, color: 'bg-green-100 text-green-600', change: '+18%' },
+    { title: 'Rides', value: stats?.rides ?? '—', icon: Car, color: 'bg-purple-100 text-purple-600', change: '+25%' },
+    { title: 'Revenue', value: '₹—', icon: DollarSign, color: 'bg-emerald-100 text-emerald-600', change: '+15%' },
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'text-green-600 bg-green-50';
-      case 'cancelled': return 'text-red-600 bg-red-50';
-      case 'on-trip': return 'text-blue-600 bg-blue-50';
-      case 'accepted': return 'text-emerald-600 bg-emerald-50';
-      default: return 'text-yellow-600 bg-yellow-50';
-    }
-  };
-
-  const getStatusText = (status: string) => status === 'on-trip' ? 'On Trip' : status.charAt(0).toUpperCase() + status.slice(1);
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">Monitor your ride-sharing platform</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                  <div className="flex items-center mt-1">
-                    <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                    <span className="text-sm text-green-600">{stat.change}</span>
-                    <span className="text-sm text-gray-500 ml-1">from last month</span>
-                  </div>
-                </div>
-                <div className={`p-3 rounded-full ${stat.color}`}>
-                  <stat.icon className="h-6 w-6" />
-                </div>
+    <div className="min-h-screen p-6">
+      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+      {error && <div className="mb-4 text-red-600">{error}</div>}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {cards.map((card, idx) => (
+          <div key={idx} className="bg-white rounded-lg shadow p-6 border">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">{card.title}</p>
+                <p className="text-2xl font-semibold">{card.value}</p>
               </div>
+              <card.icon className="h-8 w-8 text-blue-600" />
             </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200"><h2 className="text-lg font-semibold text-gray-900">Recent Bookings</h2></div>
-            <div className="divide-y divide-gray-200">
-              {recentBookings.map((booking) => (
-                <div key={booking.id} className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2"><div className="w-2 h-2 bg-green-500 rounded-full"></div><span className="text-sm text-gray-700 truncate">{booking.pickup.address}</span></div>
-                        <div className="flex items-center space-x-2"><div className="w-2 h-2 bg-red-500 rounded-full"></div><span className="text-sm text-gray-700 truncate">{booking.destination.address}</span></div>
-                      </div>
-                      <div className="mt-2 text-xs text-gray-500">{new Date(booking.createdAt).toLocaleString()}</div>
-                    </div>
-                    <div className="ml-4 text-right">
-                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>{getStatusText(booking.status)}</div>
-                      <div className="text-sm font-medium text-gray-900 mt-1">₹{booking.fare.actual || booking.fare.estimated}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="mt-4 flex items-center text-green-600 text-sm">
+              <TrendingUp className="h-4 w-4 mr-1" />
+              <span>{card.change}</span>
             </div>
           </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200"><h2 className="text-lg font-semibold text-gray-900">System Metrics</h2></div>
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between"><span className="text-sm text-gray-600">Active Drivers</span><span className="text-sm font-medium text-green-600">{Math.max(1, Math.floor((statsApi?.users||0)/3))} online</span></div>
-              <div className="flex items-center justify-between"><span className="text-sm text-gray-600">Average Response Time</span><span className="text-sm font-medium text-blue-600">2.3 minutes</span></div>
-              <div className="flex items-center justify-between"><span className="text-sm text-gray-600">Completion Rate</span><span className="text-sm font-medium text-green-600">98.5%</span></div>
-              <div className="flex items-center justify-between"><span className="text-sm text-gray-600">Customer Satisfaction</span><span className="text-sm font-medium text-yellow-600">4.8/5.0</span></div>
-              <div className="flex items-center justify-between"><span className="text-sm text-gray-600">Peak Hours</span><span className="text-sm font-medium text-purple-600">8-10 AM, 6-8 PM</span></div>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
