@@ -21,6 +21,8 @@ const rideSchema = new mongoose.Schema({
     regionType: { type: String, enum: ['hill', 'city'], required: true },
     surgeMultiplier: { type: Number, default: 1 }
   },
+  paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
+  paymentStatus: { type: String, enum: ['none', 'created', 'authorized', 'captured', 'refunded', 'failed'], default: 'none' },
   startedAt: Date,
   completedAt: Date,
   ratingByCustomer: Number,

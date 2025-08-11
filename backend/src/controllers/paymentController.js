@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import Joi from 'joi';
 import crypto from 'crypto';
 import { Payment } from '../models/paymentModel.js';
+import { Ride } from '../models/rideModel.js';
 
 const stripe = process.env.STRIPE_SECRET ? new Stripe(process.env.STRIPE_SECRET) : null;
 const razorpay = (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) ? new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET }) : null;
@@ -15,11 +16,13 @@ export const createPaymentIntent = async (req, res) => {
   if (value.provider === 'stripe' && stripe) {
     const intent = await stripe.paymentIntents.create({ amount: value.amount, currency: value.currency, metadata: { rideId: value.rideId || '' } });
     const payment = await Payment.create({ provider: 'stripe', amount: value.amount, currency: value.currency, rideId: value.rideId, providerRef: intent.id, status: 'created' });
+    if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'created' });
     return res.json({ success: true, data: { clientSecret: intent.client_secret, paymentId: payment._id } });
   }
   if (value.provider === 'razorpay' && razorpay) {
     const order = await razorpay.orders.create({ amount: value.amount, currency: value.currency, notes: { rideId: value.rideId || '' } });
     const payment = await Payment.create({ provider: 'razorpay', amount: value.amount, currency: value.currency, rideId: value.rideId, providerRef: order.id, status: 'created', meta: order });
+    if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'created' });
     return res.json({ success: true, data: { order, paymentId: payment._id } });
   }
   return res.status(400).json({ success: false, message: 'Payment provider not configured' });
@@ -37,12 +40,14 @@ export const refundPayment = async (req, res) => {
     const refund = await stripe.refunds.create({ payment_intent: value.providerRef, amount: value.amount });
     payment.status = 'refunded';
     await payment.save();
+    if (payment.rideId) await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'refunded' });
     return res.json({ success: true, data: refund });
   }
   if (value.provider === 'razorpay' && razorpay) {
     const refund = await razorpay.payments.refund(value.providerRef, { amount: value.amount });
     payment.status = 'refunded';
     await payment.save();
+    if (payment.rideId) await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'refunded' });
     return res.json({ success: true, data: refund });
   }
   return res.status(400).json({ success: false, message: 'Payment provider not configured' });
@@ -63,6 +68,7 @@ export const stripeWebhook = async (req, res) => {
     if (payment && payment.status !== 'captured') {
       payment.status = 'captured';
       await payment.save();
+      if (payment.rideId) await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'captured' });
     }
   }
   res.json({ received: true });
@@ -80,7 +86,22 @@ export const razorpayWebhook = async (req, res) => {
     if (payment && payment.status !== 'captured') {
       payment.status = 'captured';
       await payment.save();
+      if (payment.rideId) await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'captured' });
     }
   }
   res.json({ received: true });
+};
+
+export const getReceipt = async (req, res) => {
+  const payment = await Payment.findById(req.params.id);
+  if (!payment) return res.status(404).json({ success: false, message: 'Not found' });
+  res.json({ success: true, data: {
+    provider: payment.provider,
+    amount: payment.amount,
+    currency: payment.currency,
+    status: payment.status,
+    rideId: payment.rideId,
+    providerRef: payment.providerRef,
+    createdAt: payment.createdAt,
+  }});
 };
