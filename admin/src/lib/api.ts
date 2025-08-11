@@ -32,6 +32,13 @@ export const PricingAPI = {
   remove: (id: string) => apiFetch(`/api/pricing/${id}`, { method: 'DELETE' }) as Promise<{ success: boolean }>,
 };
 
+export const ZonesAPI = {
+  list: () => apiFetch('/api/zones') as Promise<{ success: boolean; data: any[] }>,
+  create: (payload: any) => apiFetch('/api/zones', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  update: (id: string, payload: any) => apiFetch(`/api/zones/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  remove: (id: string) => apiFetch(`/api/zones/${id}`, { method: 'DELETE' }) as Promise<{ success: boolean }>,
+};
+
 export const setToken = (token: string) => {
   localStorage.setItem('token', token);
 };

@@ -5,6 +5,7 @@ const Dashboard = React.lazy(() => import('./pages/admin/Dashboard'));
 const Drivers = React.lazy(() => import('./pages/admin/Drivers'));
 const Bookings = React.lazy(() => import('./pages/admin/Bookings'));
 const Pricing = React.lazy(() => import('./pages/admin/Pricing'));
+const Zones = React.lazy(() => import('./pages/admin/Zones'));
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/admin/drivers" element={<Drivers />} />
           <Route path="/admin/bookings" element={<Bookings />} />
           <Route path="/admin/pricing" element={<Pricing />} />
+          <Route path="/admin/zones" element={<Zones />} />
         </Routes>
       </React.Suspense>
     </Router>
