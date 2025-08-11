@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { RidesAPI } from '../lib/api';
+import { RidesAPI, LiveAPI } from '../lib/api';
 import { useAuth } from './AuthContext';
 import { io, Socket } from 'socket.io-client';
 
@@ -72,6 +72,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
         }
       } catch {}
     });
+    sock.on('dispatch:failed', async () => { await getBookingHistory(); });
     return () => { sock.disconnect(); setSocket(null); };
   }, [user]);
 
@@ -79,6 +80,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
     const res = await RidesAPI.create({ pickup: bookingData.pickup, destination: bookingData.destination, vehicleType: bookingData.vehicleType, regionType: 'city' });
     const ride = res.data;
     setCurrentBooking(ride);
+    try { await LiveAPI.startDispatch(ride.id, { coordinates: bookingData.pickup.coordinates }); } catch {}
     await getBookingHistory();
   };
 

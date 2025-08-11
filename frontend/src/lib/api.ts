@@ -42,4 +42,5 @@ export const LiveAPI = {
   heartbeat: (lng: number, lat: number) => apiFetch('/api/live/driver/heartbeat', { method: 'POST', body: JSON.stringify({ lng, lat }) }) as Promise<{ success: boolean }>,
   setAvailability: (available: boolean) => apiFetch('/api/live/driver/availability', { method: 'POST', body: JSON.stringify({ available }) }) as Promise<{ success: boolean }>,
   respondOffer: (rideId: string, accept: boolean) => apiFetch('/api/live/driver/respond', { method: 'POST', body: JSON.stringify({ rideId, accept }) }) as Promise<{ success: boolean; data: any }>,
+  startDispatch: (rideId: string, pickup: { coordinates: [number, number] }, radiusKm = 10) => apiFetch('/api/live/dispatch/start', { method: 'POST', body: JSON.stringify({ rideId, pickup, radiusKm }) }) as Promise<{ success: boolean; data: any }>,
 };
