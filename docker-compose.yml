@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+  mongo:
+    image: mongo:6
+    container_name: chamba_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chamba_backend
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/chamba_taxi
+      - FRONTEND_URL=http://localhost:5173
+      - ADMIN_URL=http://localhost:5174
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    command: npm run dev
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: chamba_frontend
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    ports:
+      - "5173:5173"
+    command: npm run dev -- --host --port 5173
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    container_name: chamba_admin
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    ports:
+      - "5174:5174"
+    command: npm run dev -- --host --port 5174
+    working_dir: /app
+    volumes:
+      - ./admin:/app
+
+volumes:
+  mongo_data:
