@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 const Dashboard = React.lazy(() => import('./pages/admin/Dashboard'));
 const Drivers = React.lazy(() => import('./pages/admin/Drivers'));
 const Bookings = React.lazy(() => import('./pages/admin/Bookings'));
+const Pricing = React.lazy(() => import('./pages/admin/Pricing'));
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/drivers" element={<Drivers />} />
           <Route path="/admin/bookings" element={<Bookings />} />
+          <Route path="/admin/pricing" element={<Pricing />} />
         </Routes>
       </React.Suspense>
     </Router>
