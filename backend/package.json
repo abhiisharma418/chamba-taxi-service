@@ -6,6 +6,8 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+    "@turf/boolean-point-in-polygon": "^7.2.0",
+    "@turf/helpers": "^7.2.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
