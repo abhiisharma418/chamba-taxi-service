@@ -17,11 +17,13 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import pricingRoutes from './routes/pricingRoutes.js';
+import liveRoutes from './routes/liveRoutes.js';
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
 import path from 'path';
 import fs from 'fs';
+import { setDriverLocation } from './utils/liveStore.js';
 
 dotenv.config();
 const app = express();
@@ -64,6 +66,17 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {});
 });
 
+const driverNs = io.of('/driver');
+driverNs.on('connection', (socket) => {
+  const driverId = socket.handshake.auth?.driverId;
+  if (!driverId) return socket.disconnect(true);
+  socket.on('location', async (payload) => {
+    if (payload?.lng != null && payload?.lat != null) {
+      await setDriverLocation(driverId, payload.lng, payload.lat);
+    }
+  });
+});
+
 // Middleware
 app.use(express.json());
 app.use(helmet());
@@ -100,6 +113,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/pricing', pricingRoutes);
+app.use('/api/live', liveRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Database + Server Start
