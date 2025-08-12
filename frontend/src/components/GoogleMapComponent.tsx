@@ -56,7 +56,8 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCYour_API_Key_Here&libraries=places&callback=initMap`;
+    const apiKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBFw0Qbyq9zTjYZqG3wK7OQU8wFHSDkbBI';
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
     script.async = true;
     script.defer = true;
     
