@@ -32,7 +32,16 @@ export const createRide = async (req, res) => {
     pricingContext: { regionType: value.regionType, surgeMultiplier: 1 },
     fare: { estimated: 0, currency: 'INR' }
   });
+
   notifyUser(req.user.id, 'ride:created', { rideId: ride._id });
+
+  // Send WhatsApp booking confirmation
+  try {
+    await sendRideNotification(ride._id, 'booking_confirmed');
+  } catch (error) {
+    console.error('WhatsApp booking confirmation failed:', error);
+  }
+
   res.status(201).json({ success: true, data: ride });
 };
 
