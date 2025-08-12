@@ -34,6 +34,10 @@ const AdminDashboard = React.lazy(() => import('./admin/src/pages/Dashboard'));
 const AdminLogin = React.lazy(() => import('./admin/src/pages/Login'));
 
 function App() {
+  // Initialize code splitting and performance monitoring
+  useCodeSplitting();
+  usePerformanceMonitoring();
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
