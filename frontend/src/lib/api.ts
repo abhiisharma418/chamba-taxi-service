@@ -139,6 +139,130 @@ function getDemoResponse(path: string, options: RequestInit) {
     };
   }
 
+  // Driver API fallbacks
+  if (path === '/api/driver/profile') {
+    return {
+      success: true,
+      data: {
+        personalInfo: {
+          name: 'Demo Driver',
+          email: 'driver@example.com',
+          phone: '+91 9876543210',
+          dateOfBirth: '1990-05-15',
+          address: '123 Main Street, City, State - 110001',
+          emergencyContact: 'Jane Doe',
+          emergencyPhone: '+91 9876543211'
+        },
+        driverInfo: {
+          licenseNumber: 'DL-1420110012345',
+          licenseExpiry: '2026-05-15',
+          experience: '5 years',
+          languages: ['Hindi', 'English', 'Punjabi'],
+          rating: 4.8,
+          totalRides: 1250,
+          joinDate: '2023-01-15',
+          status: 'active'
+        },
+        documents: {
+          profilePhoto: '',
+          licensePhoto: '',
+          aadharCard: '',
+          panCard: '',
+          medicalCertificate: '',
+          policeVerification: ''
+        },
+        preferences: {
+          notifications: {
+            rides: true,
+            earnings: true,
+            promotions: false,
+            maintenance: true
+          },
+          availability: {
+            workingHours: { start: '06:00', end: '22:00' },
+            workingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            maxDistance: 25
+          }
+        }
+      }
+    };
+  }
+
+  if (path === '/api/driver/vehicles') {
+    return {
+      success: true,
+      data: [
+        {
+          id: '1',
+          make: 'Maruti Suzuki',
+          model: 'Swift',
+          year: 2020,
+          color: 'White',
+          licensePlate: 'DL-1CA-1234',
+          vehicleType: 'hatchback',
+          fuelType: 'petrol',
+          isActive: true,
+          status: 'active'
+        }
+      ]
+    };
+  }
+
+  if (path === '/api/support/faqs') {
+    return {
+      success: true,
+      data: [
+        {
+          id: '1',
+          category: 'earnings',
+          question: 'How is my fare calculated?',
+          answer: 'Your fare is calculated based on base fare + distance rate + time rate + any surge pricing. You keep 75% of the total fare, and RideWithUs takes 25% as platform fee.',
+          helpful: 45,
+          notHelpful: 3
+        },
+        {
+          id: '2',
+          category: 'rides',
+          question: 'What should I do if a passenger cancels?',
+          answer: 'If a passenger cancels after you\'ve arrived at the pickup location and waited for more than 5 minutes, you may be eligible for a cancellation fee.',
+          helpful: 38,
+          notHelpful: 2
+        }
+      ]
+    };
+  }
+
+  if (path === '/api/support/tickets') {
+    return {
+      success: true,
+      data: []
+    };
+  }
+
+  if (path === '/api/driver/earnings') {
+    return {
+      success: true,
+      data: {
+        daily: Array.from({ length: 30 }, (_, i) => ({
+          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          amount: Math.floor(Math.random() * 2000) + 500,
+          rides: Math.floor(Math.random() * 15) + 3
+        })).reverse(),
+        summary: {
+          today: 1250,
+          yesterday: 980,
+          thisWeek: 8750,
+          lastWeek: 7200,
+          thisMonth: 35000,
+          lastMonth: 32000,
+          totalEarnings: 125000,
+          totalRides: 850,
+          avgPerRide: 147
+        }
+      }
+    };
+  }
+
   // Default demo response
   return { success: true, data: {} };
 }
