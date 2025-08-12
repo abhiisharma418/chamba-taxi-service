@@ -92,12 +92,13 @@ const Navigation: React.FC = () => {
               </div>
 
               {/* Mobile Navigation */}
-              <div className="md:hidden flex items-center">
+              <div className={`${responsive.nav.mobile} ${responsive.flex.center} gap-2`}>
+                <NotificationBell />
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all duration-300"
+                  className={`text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all duration-300 ${touch.target}`}
                 >
-                  {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                  {isMenuOpen ? <X className={touch.icon} /> : <Menu className={touch.icon} />}
                 </button>
               </div>
             </>
