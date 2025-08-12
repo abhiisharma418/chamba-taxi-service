@@ -28,6 +28,14 @@ interface Stats {
   onlineDrivers: number;
 }
 
+interface AnalyticsData {
+  revenueChart: { date: string; amount: number }[];
+  ridesChart: { date: string; rides: number }[];
+  hourlyDistribution: { hour: number; rides: number }[];
+  topRoutes: { from: string; to: string; count: number }[];
+  driverPerformance: { name: string; earnings: number; rating: number; rides: number }[];
+}
+
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
