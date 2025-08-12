@@ -145,20 +145,28 @@ const DriverProfile: React.FC = () => {
   };
 
   const handleFileUpload = async (documentType: keyof DriverProfile['documents'], file: File) => {
+    if (!profile) return;
+
     setUploading(documentType);
-    
-    // Simulate upload
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setProfile(prev => ({
-      ...prev,
-      documents: {
-        ...prev.documents,
-        [documentType]: URL.createObjectURL(file)
+
+    try {
+      const response = await DriverAPI.uploadDocument(documentType, file);
+      if (response.success) {
+        setProfile(prev => prev ? ({
+          ...prev,
+          documents: {
+            ...prev.documents,
+            [documentType]: response.data.url
+          }
+        }) : prev);
+      } else {
+        console.error('Failed to upload document');
       }
-    }));
-    
-    setUploading(null);
+    } catch (error) {
+      console.error('Error uploading document:', error);
+    } finally {
+      setUploading(null);
+    }
   };
 
   const getStatusColor = (status: string) => {
