@@ -14,8 +14,8 @@ import { useCodeSplitting, usePerformanceMonitoring } from './hooks/useCodeSplit
 
 // Lazy load pages for better performance
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
-const Login = React.lazy(() => import('./pages/Login'));
-const Signup = React.lazy(() => import('./pages/SignUp'));
+const Login = React.lazy(() => import('./pages/auth/Login'));
+const Signup = React.lazy(() => import('./pages/auth/Signup'));
 
 // Customer pages
 const CustomerDashboard = React.lazy(() => import('./pages/customer/Dashboard'));
