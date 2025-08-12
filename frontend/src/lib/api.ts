@@ -91,6 +91,10 @@ function getDemoResponse(path: string, options: RequestInit) {
     return { success: true };
   }
 
+  if (path === '/api/auth/logout') {
+    return { success: true };
+  }
+
   if (path === '/api/rides/estimate' && options.method === 'POST') {
     return {
       success: true,
