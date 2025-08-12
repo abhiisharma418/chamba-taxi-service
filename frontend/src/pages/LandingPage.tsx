@@ -95,27 +95,27 @@ const LandingPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow duration-200">
-              <div className="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="group text-center p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-100 hover:border-amber-200 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-br from-amber-100 to-amber-200 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Clock className="h-8 w-8 text-amber-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Quick Booking
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">
+                Instant Booking
               </h3>
-              <p className="text-gray-600">
-                Book a ride in seconds with our intuitive and user-friendly interface.
+              <p className="text-slate-600 leading-relaxed">
+                Book your ride in seconds with our intuitive, streamlined booking experience.
               </p>
             </div>
 
-            <div className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow duration-200">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="group text-center p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-100 hover:border-purple-200 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-br from-purple-100 to-purple-200 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Star className="h-8 w-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Top Rated
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">
+                Highly Rated
               </h3>
-              <p className="text-gray-600">
-                Join thousands of satisfied customers who trust us for their daily commute.
+              <p className="text-slate-600 leading-relaxed">
+                Join thousands of satisfied customers who choose us for reliable transportation.
               </p>
             </div>
           </div>
@@ -123,61 +123,63 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gradient-to-r from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">10K+</div>
-              <div className="text-gray-600">Happy Customers</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-3">10K+</div>
+              <div className="text-slate-600 font-medium">Happy Customers</div>
             </div>
-            <div>
-              <div className="text-4xl font-bold text-emerald-600 mb-2">500+</div>
-              <div className="text-gray-600">Verified Drivers</div>
+            <div className="text-center bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent mb-3">500+</div>
+              <div className="text-slate-600 font-medium">Verified Drivers</div>
             </div>
-            <div>
-              <div className="text-4xl font-bold text-purple-600 mb-2">50K+</div>
-              <div className="text-gray-600">Completed Rides</div>
+            <div className="text-center bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent mb-3">50K+</div>
+              <div className="text-slate-600 font-medium">Completed Rides</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-blue-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-8">
-            Ready to Get Started?
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Ready to Experience the Difference?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join our community of riders and drivers today.
+          <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto">
+            Join thousands who trust RideWithUs for honest, reliable transportation.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link
               to="/signup?type=customer"
-              className="bg-white hover:bg-gray-100 text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors duration-200"
+              className="group bg-white hover:bg-gray-100 text-slate-900 px-10 py-4 rounded-xl text-lg font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
             >
-              Start Riding
+              Start Your Journey
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
             <Link
               to="/signup?type=driver"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors duration-200"
+              className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-10 py-4 rounded-xl text-lg font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
             >
-              Start Driving
+              Drive With Us
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-slate-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <Car className="h-8 w-8 text-blue-400" />
-              <span className="text-xl font-bold">RideShare</span>
+            <div className="mb-4 md:mb-0">
+              <Logo className="text-white" size="md" />
             </div>
-            <div className="text-gray-400">
-              © 2025 RideShare. All rights reserved.
+            <div className="text-slate-400 font-medium">
+              © 2025 RideWithUs. All rights reserved. Built with trust.
             </div>
           </div>
         </div>
