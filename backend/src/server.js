@@ -109,14 +109,12 @@ driverNs.on('connection', (socket) => {
   socket.join(`driver:${driverId}`);
   socket.on('location', async (payload) => { if (payload?.lng != null && payload?.lat != null) await setDriverLocation(driverId, payload.lng, payload.lat); });
   socket.on('disconnect', () => { /* could mark as unavailable after grace */ });
-=======
   socket.on('location', async (payload) => {
     if (payload?.lng != null && payload?.lat != null) await setDriverLocation(driverId, payload.lng, payload.lat);
   });
 
 });
 
-// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/rides', authenticate, requireActive, rideRoutes);
 app.use('/api/vehicles', authenticate, requireActive, vehicleRoutes);
