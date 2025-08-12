@@ -15,16 +15,24 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md
 
   const textSizeClasses = {
     sm: 'text-lg',
-    md: 'text-xl', 
+    md: 'text-xl',
     lg: 'text-3xl'
+  };
+
+  const rwsTextSize = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base'
   };
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
-      {/* RWS Circle Logo */}
+      {/* Premium RWS Circle Logo */}
       <div className={`${sizeClasses[size]} relative`}>
-        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-          <span className="text-white font-bold text-sm">RWS</span>
+        <div className="w-full h-full bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-lg ring-2 ring-blue-300/50">
+          <span className={`text-white font-black ${rwsTextSize[size]} tracking-tighter`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            RWS
+          </span>
         </div>
       </div>
 
