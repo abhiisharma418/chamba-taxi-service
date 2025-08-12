@@ -147,7 +147,12 @@ const DriverDashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className="text-2xl font-bold text-gray-900">₹{todayEarnings}</div>
-                <div className="text-gray-600">Today's Earnings</div>
+                <div className="text-gray-600">Your Earning (75%)</div>
+                {totalTodayFares > 0 && (
+                  <div className="text-sm text-gray-500 mt-1">
+                    Total: ₹{totalTodayFares} • Commission: ₹{companyCommission}
+                  </div>
+                )}
               </div>
             </div>
           </div>
