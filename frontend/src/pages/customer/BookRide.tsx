@@ -194,7 +194,7 @@ const BookRide: React.FC = () => {
             </div>
 
             {/* Vehicle Selection */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8">
+            <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8 ${cardVariants.interactive}`} {...getStaggerDelay(1)}>
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Choose Vehicle</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
