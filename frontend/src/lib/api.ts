@@ -364,3 +364,13 @@ export const TrackingAPI = {
 
   getLocationHistory: (rideId: string) => apiFetch(`/api/tracking/history/${rideId}`) as Promise<{ success: boolean; data: any }>
 };
+
+export const DriverAPI = {
+  // Earnings endpoints
+  getEarnings: (period?: 'daily' | 'weekly' | 'monthly') => apiFetch(`/api/driver/earnings${period ? `?period=${period}` : ''}`) as Promise<{ success: boolean; data: any }>,
+  getEarningsBreakdown: () => apiFetch('/api/driver/earnings/breakdown') as Promise<{ success: boolean; data: any }>,
+  getEarningsHistory: (page?: number, limit?: number) => apiFetch(`/api/driver/earnings/history?page=${page || 1}&limit=${limit || 20}`) as Promise<{ success: boolean; data: any }>,
+
+  // Document management
+  uploadDocuments: (documents: FormData) => apiFetch('/api/driver/documents', { method: 'POST', body: documents }) as Promise<{ success: boolean; data: any }>
+};
