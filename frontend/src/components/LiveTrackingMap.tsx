@@ -1,363 +1,473 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Navigation, Clock, Phone, MessageCircle, AlertTriangle, Car } from 'lucide-react';
-import { useGoogleMaps } from '../hooks/useGoogleMaps';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { MapPin, Navigation, Clock, Phone, MessageCircle, AlertTriangle, Zap, Car } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { TrackingAPI } from '../lib/api';
 import { io, Socket } from 'socket.io-client';
+
+interface Location {
+  lat: number;
+  lng: number;
+  address?: string;
+  timestamp?: Date;
+}
+
+interface Driver {
+  id: string;
+  name: string;
+  phone: string;
+  rating: number;
+  vehicleModel: string;
+  vehicleNumber: string;
+  photo?: string;
+}
 
 interface LiveTrackingMapProps {
   rideId: string;
-  customerId?: string;
-  driverId?: string;
-  pickupLocation?: { lat: number; lng: number; address?: string };
-  destinationLocation?: { lat: number; lng: number; address?: string };
-  height?: string;
-  onDriverContact?: () => void;
-  onEmergency?: () => void;
-}
-
-interface DriverLocation {
-  lat: number;
-  lng: number;
-  heading: number;
-  speed: number;
-  timestamp: Date;
-  eta?: {
-    distanceKm: number;
-    etaMinutes: number;
-    estimatedArrival: Date;
-  };
+  pickup: Location;
+  destination: Location;
+  driver?: Driver;
+  onStatusUpdate?: (status: string) => void;
+  className?: string;
 }
 
 const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
   rideId,
-  customerId,
-  driverId,
-  pickupLocation,
-  destinationLocation,
-  height = '400px',
-  onDriverContact,
-  onEmergency
+  pickup,
+  destination,
+  driver,
+  onStatusUpdate,
+  className = ''
 }) => {
-  const { isLoaded, loadError } = useGoogleMaps();
+  const { user } = useAuth();
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const driverMarkerRef = useRef<google.maps.Marker | null>(null);
-  const pickupMarkerRef = useRef<google.maps.Marker | null>(null);
-  const destinationMarkerRef = useRef<google.maps.Marker | null>(null);
-  const routeRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const driverMarkerRef = useRef<any>(null);
+  const routeRendererRef = useRef<any>(null);
   const socketRef = useRef<Socket | null>(null);
 
-  const [driverLocation, setDriverLocation] = useState<DriverLocation | null>(null);
-  const [isTracking, setIsTracking] = useState(false);
-  const [trackingStatus, setTrackingStatus] = useState<'connecting' | 'active' | 'inactive'>('connecting');
-  const [eta, setEta] = useState<any>(null);
+  const [driverLocation, setDriverLocation] = useState<Location | null>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [eta, setEta] = useState<number | null>(null);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [rideStatus, setRideStatus] = useState('on_trip');
+  const [speed, setSpeed] = useState<number>(0);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
 
-  // Initialize socket connection
+  // Initialize WebSocket connection for real-time updates
   useEffect(() => {
-    if (!rideId) return;
-
-    const socket = io(import.meta.env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com', {
-      auth: { userId: customerId || driverId }
-    });
-
-    socketRef.current = socket;
-
-    // Join ride room
-    socket.emit('ride:join', rideId);
-
-    // Listen for tracking events
-    socket.on('tracking:started', (data) => {
-      console.log('Tracking started:', data);
-      setIsTracking(true);
-      setTrackingStatus('active');
-    });
-
-    socket.on('tracking:ended', (data) => {
-      console.log('Tracking ended:', data);
-      setIsTracking(false);
-      setTrackingStatus('inactive');
-    });
-
-    socket.on('driver:location', (data) => {
-      console.log('Driver location update:', data);
-      setDriverLocation({
-        lat: data.location.lat,
-        lng: data.location.lng,
-        heading: data.heading || 0,
-        speed: data.speed || 0,
-        timestamp: new Date(data.timestamp),
-        eta: data.eta
-      });
-      setEta(data.eta);
-      updateDriverMarker(data.location, data.heading);
-    });
-
-    socket.on('geofence:alert', (alert) => {
-      console.log('Geofence alert:', alert);
-      // Handle geofence alerts (driver arrived at pickup/destination)
-      if (alert.type === 'arrived_pickup') {
-        // Show notification that driver arrived
-      } else if (alert.type === 'arrived_destination') {
-        // Show notification that ride is ending
+    const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
+    
+    socketRef.current = io(API_URL, {
+      auth: {
+        userId: user?.id,
+        rideId: rideId,
+        userType: user?.role
       }
     });
 
-    socket.on('emergency:triggered', (data) => {
-      console.log('Emergency triggered:', data);
-      // Handle emergency alerts
+    const socket = socketRef.current;
+
+    socket.on('connect', () => {
+      console.log('Connected to tracking socket');
+      setConnectionStatus('connected');
+      
+      // Join ride tracking room
+      socket.emit('join_ride_tracking', { rideId });
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from tracking socket');
+      setConnectionStatus('disconnected');
+    });
+
+    socket.on('driver_location_update', (data: any) => {
+      console.log('Driver location update:', data);
+      setDriverLocation({
+        lat: data.lat,
+        lng: data.lng,
+        timestamp: new Date(data.timestamp)
+      });
+      setSpeed(data.speed || 0);
+      setLastUpdate(new Date());
+      
+      // Update driver marker on map
+      updateDriverMarker(data.lat, data.lng, data.heading || 0);
+      
+      // Calculate new ETA and distance
+      calculateRouteInfo(data.lat, data.lng);
+    });
+
+    socket.on('ride_status_update', (data: any) => {
+      console.log('Ride status update:', data);
+      setRideStatus(data.status);
+      if (onStatusUpdate) {
+        onStatusUpdate(data.status);
+      }
+    });
+
+    socket.on('eta_update', (data: any) => {
+      setEta(data.eta);
+      setDistance(data.distance);
     });
 
     return () => {
-      socket.disconnect();
-    };
-  }, [rideId, customerId, driverId]);
-
-  // Initialize map
-  useEffect(() => {
-    if (!isLoaded || !mapRef.current) return;
-
-    const map = new google.maps.Map(mapRef.current, {
-      zoom: 15,
-      center: pickupLocation || { lat: 31.1048, lng: 77.1734 },
-      mapTypeId: google.maps.MapTypeId.ROADMAP,
-      styles: [
-        {
-          featureType: 'poi',
-          elementType: 'labels',
-          stylers: [{ visibility: 'off' }]
-        }
-      ]
-    });
-
-    mapInstanceRef.current = map;
-
-    // Initialize route renderer
-    const directionsRenderer = new google.maps.DirectionsRenderer({
-      suppressMarkers: true,
-      polylineOptions: {
-        strokeColor: '#2563eb',
-        strokeWeight: 4,
-        strokeOpacity: 0.8
+      if (socket) {
+        socket.emit('leave_ride_tracking', { rideId });
+        socket.disconnect();
       }
-    });
-    directionsRenderer.setMap(map);
-    routeRendererRef.current = directionsRenderer;
+    };
+  }, [rideId, user]);
 
-    // Add pickup marker
-    if (pickupLocation) {
-      const pickupMarker = new google.maps.Marker({
-        position: pickupLocation,
-        map,
+  // Initialize Google Maps
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const initMap = () => {
+      if (!window.google) {
+        console.error('Google Maps not loaded');
+        return;
+      }
+
+      const map = new window.google.maps.Map(mapRef.current, {
+        zoom: 15,
+        center: pickup,
+        styles: [
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ],
+        disableDefaultUI: false,
+        zoomControl: true,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: true
+      });
+
+      mapInstanceRef.current = map;
+
+      // Add pickup marker
+      new window.google.maps.Marker({
+        position: pickup,
+        map: map,
         title: 'Pickup Location',
         icon: {
-          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="16" cy="16" r="12" fill="#10b981" stroke="white" stroke-width="3"/>
-              <circle cx="16" cy="16" r="4" fill="white"/>
-            </svg>
-          `),
-          scaledSize: new google.maps.Size(32, 32),
-          anchor: new google.maps.Point(16, 16)
+          path: window.google.maps.SymbolPath.CIRCLE,
+          fillColor: '#10B981',
+          fillOpacity: 1,
+          strokeWeight: 2,
+          strokeColor: '#FFFFFF',
+          scale: 8
         }
       });
-      pickupMarkerRef.current = pickupMarker;
-    }
 
-    // Add destination marker
-    if (destinationLocation) {
-      const destinationMarker = new google.maps.Marker({
-        position: destinationLocation,
-        map,
+      // Add destination marker
+      new window.google.maps.Marker({
+        position: destination,
+        map: map,
         title: 'Destination',
         icon: {
-          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="16" cy="16" r="12" fill="#dc2626" stroke="white" stroke-width="3"/>
-              <circle cx="16" cy="16" r="4" fill="white"/>
-            </svg>
-          `),
-          scaledSize: new google.maps.Size(32, 32),
-          anchor: new google.maps.Point(16, 16)
+          path: window.google.maps.SymbolPath.CIRCLE,
+          fillColor: '#EF4444',
+          fillOpacity: 1,
+          strokeWeight: 2,
+          strokeColor: '#FFFFFF',
+          scale: 8
         }
       });
-      destinationMarkerRef.current = destinationMarker;
+
+      // Initialize route renderer
+      routeRendererRef.current = new window.google.maps.DirectionsRenderer({
+        suppressMarkers: false,
+        polylineOptions: {
+          strokeColor: '#3B82F6',
+          strokeWeight: 4,
+          strokeOpacity: 0.8
+        }
+      });
+      routeRendererRef.current.setMap(map);
+
+      setIsMapLoaded(true);
+
+      // Initial route calculation if driver location is available
+      if (driverLocation) {
+        calculateRouteInfo(driverLocation.lat, driverLocation.lng);
+      }
+    };
+
+    if (window.google) {
+      initMap();
+    } else {
+      window.initMap = initMap;
     }
+  }, [pickup, destination, driverLocation]);
 
-    // Show route if both locations are available
-    if (pickupLocation && destinationLocation) {
-      showRoute(pickupLocation, destinationLocation);
-    }
+  const updateDriverMarker = useCallback((lat: number, lng: number, heading: number = 0) => {
+    if (!mapInstanceRef.current || !window.google) return;
 
-  }, [isLoaded, pickupLocation, destinationLocation]);
+    const position = { lat, lng };
 
-  const updateDriverMarker = (location: { lat: number; lng: number }, heading: number = 0) => {
-    if (!mapInstanceRef.current) return;
-
-    // Remove existing driver marker
     if (driverMarkerRef.current) {
-      driverMarkerRef.current.setMap(null);
-    }
-
-    // Create new driver marker with car icon
-    const driverMarker = new google.maps.Marker({
-      position: location,
-      map: mapInstanceRef.current,
-      title: 'Driver Location',
-      icon: {
-        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-          <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-            <g transform="rotate(${heading} 20 20)">
-              <circle cx="20" cy="20" r="18" fill="#2563eb" stroke="white" stroke-width="3"/>
-              <path d="M12 20 L20 14 L28 20 L20 26 Z" fill="white"/>
-            </g>
-          </svg>
-        `),
-        scaledSize: new google.maps.Size(40, 40),
-        anchor: new google.maps.Point(20, 20)
+      driverMarkerRef.current.setPosition(position);
+      
+      // Update heading if available
+      if (heading > 0) {
+        driverMarkerRef.current.setIcon({
+          path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          fillColor: '#3B82F6',
+          fillOpacity: 1,
+          strokeWeight: 2,
+          strokeColor: '#FFFFFF',
+          scale: 6,
+          rotation: heading
+        });
       }
-    });
+    } else {
+      driverMarkerRef.current = new window.google.maps.Marker({
+        position: position,
+        map: mapInstanceRef.current,
+        title: `Driver: ${driver?.name || 'Unknown'}`,
+        icon: {
+          path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          fillColor: '#3B82F6',
+          fillOpacity: 1,
+          strokeWeight: 2,
+          strokeColor: '#FFFFFF',
+          scale: 6,
+          rotation: heading
+        }
+      });
 
-    driverMarkerRef.current = driverMarker;
+      // Add info window
+      const infoWindow = new window.google.maps.InfoWindow({
+        content: `
+          <div style="padding: 8px;">
+            <strong>${driver?.name || 'Driver'}</strong><br/>
+            ${driver?.vehicleModel || ''} (${driver?.vehicleNumber || ''})<br/>
+            Speed: ${speed.toFixed(1)} km/h
+          </div>
+        `
+      });
 
-    // Center map on driver location
-    mapInstanceRef.current.panTo(location);
-  };
-
-  const showRoute = (start: { lat: number; lng: number }, end: { lat: number; lng: number }) => {
-    if (!mapInstanceRef.current || !routeRendererRef.current) return;
-
-    const directionsService = new google.maps.DirectionsService();
-
-    directionsService.route({
-      origin: start,
-      destination: end,
-      travelMode: google.maps.TravelMode.DRIVING,
-      avoidTolls: false,
-      avoidHighways: false
-    }, (result, status) => {
-      if (status === google.maps.DirectionsStatus.OK && result) {
-        routeRendererRef.current?.setDirections(result);
-      }
-    });
-  };
-
-  const handleEmergency = () => {
-    if (socketRef.current && driverLocation) {
-      socketRef.current.emit('trigger:emergency', {
-        rideId,
-        location: { lat: driverLocation.lat, lng: driverLocation.lng },
-        message: 'Emergency triggered by user'
+      driverMarkerRef.current.addListener('click', () => {
+        infoWindow.open(mapInstanceRef.current, driverMarkerRef.current);
       });
     }
-    onEmergency?.();
+
+    // Center map on driver with some padding
+    const bounds = new window.google.maps.LatLngBounds();
+    bounds.extend(position);
+    bounds.extend(destination);
+    mapInstanceRef.current.fitBounds(bounds, { padding: 50 });
+  }, [driver, speed, destination]);
+
+  const calculateRouteInfo = useCallback(async (driverLat: number, driverLng: number) => {
+    if (!window.google || !routeRendererRef.current) return;
+
+    const directionsService = new window.google.maps.DirectionsService();
+    
+    try {
+      const result = await new Promise((resolve, reject) => {
+        directionsService.route({
+          origin: { lat: driverLat, lng: driverLng },
+          destination: destination,
+          travelMode: window.google.maps.TravelMode.DRIVING,
+          avoidHighways: false,
+          avoidTolls: false
+        }, (result: any, status: string) => {
+          if (status === 'OK') {
+            resolve(result);
+          } else {
+            reject(new Error(`Directions request failed: ${status}`));
+          }
+        });
+      });
+
+      routeRendererRef.current.setDirections(result);
+
+      // Extract ETA and distance
+      const route = (result as any).routes[0];
+      const leg = route.legs[0];
+      
+      setEta(Math.round(leg.duration.value / 60)); // Convert to minutes
+      setDistance(parseFloat((leg.distance.value / 1000).toFixed(1))); // Convert to km
+
+    } catch (error) {
+      console.error('Route calculation error:', error);
+    }
+  }, [destination]);
+
+  const handleEmergency = async () => {
+    try {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          await TrackingAPI.triggerEmergency({
+            rideId,
+            location: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            },
+            message: 'Emergency triggered by user'
+          });
+          
+          alert('Emergency alert sent to authorities and ride support team');
+        });
+      }
+    } catch (error) {
+      console.error('Emergency trigger failed:', error);
+      alert('Failed to trigger emergency alert');
+    }
   };
 
-  if (loadError) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-700">Error loading map. Please refresh the page.</p>
-      </div>
-    );
-  }
+  const shareLocation = async () => {
+    try {
+      await TrackingAPI.shareLiveLocation({
+        rideId,
+        customerId: user?.id || ''
+      });
+      
+      alert('Live location shared successfully');
+    } catch (error) {
+      console.error('Location sharing failed:', error);
+      alert('Failed to share location');
+    }
+  };
 
-  if (!isLoaded) {
-    return (
-      <div className="bg-gray-100 rounded-lg p-8 flex items-center justify-center" style={{ height }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-gray-600">Loading live tracking...</p>
-        </div>
-      </div>
-    );
-  }
+  const formatLastUpdate = (date: Date | null) => {
+    if (!date) return 'Never';
+    
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const seconds = Math.floor(diff / 1000);
+    
+    if (seconds < 10) return 'Just now';
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    
+    return date.toLocaleTimeString();
+  };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-      {/* Status Bar */}
-      <div className={`px-4 py-3 text-white text-sm font-medium ${
-        trackingStatus === 'active' ? 'bg-green-600' : 
-        trackingStatus === 'connecting' ? 'bg-yellow-600' : 'bg-gray-600'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+    <div className={`relative ${className}`}>
+      {/* Connection Status */}
+      <div className="absolute top-4 left-4 z-10">
+        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+          connectionStatus === 'connected' 
+            ? 'bg-green-100 text-green-800' 
+            : connectionStatus === 'connecting'
+            ? 'bg-yellow-100 text-yellow-800'
+            : 'bg-red-100 text-red-800'
+        }`}>
+          <div className="flex items-center space-x-1">
             <div className={`w-2 h-2 rounded-full ${
-              trackingStatus === 'active' ? 'bg-white animate-pulse' : 'bg-white/50'
+              connectionStatus === 'connected' ? 'bg-green-500' : 
+              connectionStatus === 'connecting' ? 'bg-yellow-500' : 'bg-red-500'
             }`}></div>
             <span>
-              {trackingStatus === 'active' ? 'Live Tracking Active' : 
-               trackingStatus === 'connecting' ? 'Connecting...' : 'Tracking Inactive'}
+              {connectionStatus === 'connected' ? 'Live' : 
+               connectionStatus === 'connecting' ? 'Connecting' : 'Disconnected'}
             </span>
           </div>
-          
-          {eta && (
-            <div className="text-right">
-              <div className="text-xs opacity-80">ETA</div>
-              <div className="font-bold">{eta.etaMinutes} min</div>
-            </div>
-          )}
         </div>
       </div>
 
       {/* Map Container */}
-      <div 
-        ref={mapRef}
-        style={{ height }}
-        className="w-full"
-      />
+      <div ref={mapRef} className="w-full h-full min-h-[400px] rounded-lg"></div>
 
-      {/* Driver Info Panel */}
-      {driverLocation && (
-        <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center justify-between">
+      {/* Tracking Info Overlay */}
+      <div className="absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          {eta && (
+            <div className="text-center">
+              <Clock className="h-5 w-5 mx-auto mb-1 text-blue-600" />
+              <div className="text-sm font-medium text-slate-900">{eta} min</div>
+              <div className="text-xs text-slate-500">ETA</div>
+            </div>
+          )}
+          
+          {distance && (
+            <div className="text-center">
+              <Navigation className="h-5 w-5 mx-auto mb-1 text-green-600" />
+              <div className="text-sm font-medium text-slate-900">{distance} km</div>
+              <div className="text-xs text-slate-500">Distance</div>
+            </div>
+          )}
+          
+          <div className="text-center">
+            <Zap className="h-5 w-5 mx-auto mb-1 text-orange-600" />
+            <div className="text-sm font-medium text-slate-900">{speed.toFixed(1)} km/h</div>
+            <div className="text-xs text-slate-500">Speed</div>
+          </div>
+          
+          <div className="text-center">
+            <Car className="h-5 w-5 mx-auto mb-1 text-purple-600" />
+            <div className="text-sm font-medium text-slate-900 capitalize">{rideStatus.replace('_', ' ')}</div>
+            <div className="text-xs text-slate-500">Status</div>
+          </div>
+        </div>
+
+        {/* Driver Info */}
+        {driver && (
+          <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg mb-3">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-100 p-2 rounded-full">
-                <Car className="h-5 w-5 text-blue-600" />
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-medium text-sm">
+                  {driver.name.charAt(0).toUpperCase()}
+                </span>
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Driver Location</p>
-                <p className="text-sm text-gray-600">
-                  Speed: {Math.round(driverLocation.speed || 0)} km/h • 
-                  Updated: {driverLocation.timestamp.toLocaleTimeString()}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex space-x-2">
-              {onDriverContact && (
-                <button
-                  onClick={onDriverContact}
-                  className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <Phone className="h-4 w-4" />
-                </button>
-              )}
-              
-              <button
-                onClick={handleEmergency}
-                className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                <AlertTriangle className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {eta && (
-            <div className="mt-3 grid grid-cols-3 gap-4 text-center">
-              <div className="bg-gray-50 rounded-lg p-2">
-                <div className="text-xs text-gray-500">Distance</div>
-                <div className="font-semibold">{eta.distanceKm} km</div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-2">
-                <div className="text-xs text-gray-500">ETA</div>
-                <div className="font-semibold">{eta.etaMinutes} min</div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-2">
-                <div className="text-xs text-gray-500">Arrival</div>
-                <div className="font-semibold text-xs">
-                  {new Date(eta.estimatedArrival).toLocaleTimeString()}
+                <div className="font-medium text-slate-900">{driver.name}</div>
+                <div className="text-sm text-slate-600">{driver.vehicleModel} • {driver.vehicleNumber}</div>
+                <div className="text-xs text-slate-500">
+                  Last update: {formatLastUpdate(lastUpdate)}
                 </div>
               </div>
             </div>
-          )}
+            
+            <div className="flex space-x-2">
+              <button
+                onClick={() => window.open(`tel:${driver.phone}`)}
+                className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Phone className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => window.open(`https://wa.me/${driver.phone.replace(/\D/g, '')}`)}
+                className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex space-x-2">
+          <button
+            onClick={shareLocation}
+            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          >
+            Share Location
+          </button>
+          <button
+            onClick={handleEmergency}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors flex items-center space-x-1"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            <span>SOS</span>
+          </button>
+        </div>
+      </div>
+
+      {/* No GPS Signal Warning */}
+      {lastUpdate && new Date().getTime() - lastUpdate.getTime() > 60000 && (
+        <div className="absolute top-4 right-4 bg-amber-100 border border-amber-300 rounded-lg p-3 z-10">
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            <span className="text-amber-800 text-sm font-medium">GPS signal weak</span>
+          </div>
         </div>
       )}
     </div>
