@@ -24,6 +24,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   onCurrentLocation,
   type
 }) => {
+  const { isLoaded, loadError } = useGoogleMaps({ libraries: ['places'] });
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -31,20 +32,21 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
   const placesService = useRef<google.maps.places.PlacesService | null>(null);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setQuery(value);
   }, [value]);
 
   useEffect(() => {
-    // Initialize Google Places services
-    if (window.google && window.google.maps && window.google.maps.places) {
+    // Initialize Google Places services when maps are loaded
+    if (isLoaded && window.google && window.google.maps && window.google.maps.places) {
       autocompleteService.current = new google.maps.places.AutocompleteService();
       // Create a dummy map for PlacesService (required by Google Maps API)
       const dummyMap = new google.maps.Map(document.createElement('div'));
       placesService.current = new google.maps.places.PlacesService(dummyMap);
     }
-  }, []);
+  }, [isLoaded]);
 
   const searchPlaces = async (searchQuery: string) => {
     if (!searchQuery.trim() || !autocompleteService.current || !window.google) return;
