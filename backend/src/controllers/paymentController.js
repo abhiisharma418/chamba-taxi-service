@@ -22,34 +22,62 @@ const setRideCompletedOnCapture = async (payment) => {
 };
 
 export const createPaymentIntent = async (req, res) => {
-  const schema = Joi.object({ provider: Joi.string().valid('razorpay', 'stripe').required(), amount: Joi.number().integer().min(100).required(), currency: Joi.string().default('INR'), rideId: Joi.string().optional(), captureMethod: Joi.string().valid('automatic','manual').default('automatic') });
+  const schema = Joi.object({
+    provider: Joi.string().valid('razorpay', 'stripe').required(),
+    amount: Joi.number().integer().min(100).required(),
+    currency: Joi.string().default('INR'),
+    rideId: Joi.string().optional(),
+    captureMethod: Joi.string().valid('automatic','manual').default('automatic')
+  });
   const { error, value } = schema.validate(req.body);
   if (error) return res.status(400).json({ success: false, message: error.message });
 
   if (value.provider === 'stripe' && stripe) {
     const params = { amount: value.amount, currency: value.currency, metadata: { rideId: value.rideId || '' } };
-    if (value.captureMethod === 'manual') Object.assign(params, { capture_method: 'manual' } as any);
-    const intent = await stripe.paymentIntents.create(params as any);
-    const payment = await Payment.create({ provider: 'stripe', amount: value.amount, currency: value.currency, rideId: value.rideId, providerRef: intent.id, status: 'created' });
+    if (value.captureMethod === 'manual') Object.assign(params, { capture_method: 'manual' });
+    const intent = await stripe.paymentIntents.create(params);
+    const payment = await Payment.create({
+      provider: 'stripe',
+      amount: value.amount,
+      currency: value.currency,
+      rideId: value.rideId,
+      providerRef: intent.id,
+      status: 'created'
+    });
     if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'created' });
     return res.json({ success: true, data: { clientSecret: intent.client_secret, paymentId: payment._id } });
   }
+
   if (value.provider === 'razorpay' && razorpay) {
     const order = await razorpay.orders.create({ amount: value.amount, currency: value.currency, notes: { rideId: value.rideId || '' } });
-    const payment = await Payment.create({ provider: 'razorpay', amount: value.amount, currency: value.currency, rideId: value.rideId, providerRef: order.id, status: 'created', meta: order });
+    const payment = await Payment.create({
+      provider: 'razorpay',
+      amount: value.amount,
+      currency: value.currency,
+      rideId: value.rideId,
+      providerRef: order.id,
+      status: 'created',
+      meta: order
+    });
     if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'created' });
     return res.json({ success: true, data: { order, paymentId: payment._id } });
   }
+
   return res.status(400).json({ success: false, message: 'Payment provider not configured' });
 };
 
 export const authorizePayment = async (req, res) => {
-  const schema = Joi.object({ provider: Joi.string().valid('razorpay','stripe').required(), providerRef: Joi.string().required() });
+  const schema = Joi.object({
+    provider: Joi.string().valid('razorpay','stripe').required(),
+    providerRef: Joi.string().required()
+  });
   const { error, value } = schema.validate(req.body);
   if (error) return res.status(400).json({ success: false, message: error.message });
+
   const payment = await Payment.findOne({ provider: value.provider, providerRef: value.providerRef });
   if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
   if (payment.status === 'authorized' || payment.status === 'captured') return res.json({ success: true, data: payment });
+
   payment.status = 'authorized';
   await payment.save();
   if (payment.rideId) await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'authorized' });
@@ -57,20 +85,27 @@ export const authorizePayment = async (req, res) => {
 };
 
 export const capturePayment = async (req, res) => {
-  const schema = Joi.object({ provider: Joi.string().valid('razorpay','stripe').required(), providerRef: Joi.string().required(), amount: Joi.number().integer().optional(), currency: Joi.string().default('INR') });
+  const schema = Joi.object({
+    provider: Joi.string().valid('razorpay','stripe').required(),
+    providerRef: Joi.string().required(),
+    amount: Joi.number().integer().optional(),
+    currency: Joi.string().default('INR')
+  });
   const { error, value } = schema.validate(req.body);
   if (error) return res.status(400).json({ success: false, message: error.message });
+
   const payment = await Payment.findOne({ provider: value.provider, providerRef: value.providerRef });
   if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
   if (payment.status === 'captured') return res.json({ success: true, data: payment });
 
   if (value.provider === 'stripe' && stripe) {
-    const intent = await stripe.paymentIntents.capture(value.providerRef as any);
+    const intent = await stripe.paymentIntents.capture(value.providerRef);
     payment.status = 'captured';
     await payment.save();
     await setRideCompletedOnCapture(payment);
     return res.json({ success: true, data: intent });
   }
+
   if (value.provider === 'razorpay' && razorpay) {
     const amt = value.amount || payment.amount;
     const resp = await razorpay.payments.capture(value.providerRef, amt, value.currency);
@@ -79,11 +114,16 @@ export const capturePayment = async (req, res) => {
     await setRideCompletedOnCapture(payment);
     return res.json({ success: true, data: resp });
   }
+
   return res.status(400).json({ success: false, message: 'Payment provider not configured' });
 };
 
 export const refundPayment = async (req, res) => {
-  const schema = Joi.object({ provider: Joi.string().valid('razorpay', 'stripe').required(), providerRef: Joi.string().required(), amount: Joi.number().integer().optional() });
+  const schema = Joi.object({
+    provider: Joi.string().valid('razorpay', 'stripe').required(),
+    providerRef: Joi.string().required(),
+    amount: Joi.number().integer().optional()
+  });
   const { error, value } = schema.validate(req.body);
   if (error) return res.status(400).json({ success: false, message: error.message });
 
@@ -97,6 +137,7 @@ export const refundPayment = async (req, res) => {
     if (payment.rideId) await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'refunded' });
     return res.json({ success: true, data: refund });
   }
+
   if (value.provider === 'razorpay' && razorpay) {
     const refund = await razorpay.payments.refund(value.providerRef, { amount: value.amount });
     payment.status = 'refunded';
@@ -104,6 +145,7 @@ export const refundPayment = async (req, res) => {
     if (payment.rideId) await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'refunded' });
     return res.json({ success: true, data: refund });
   }
+
   return res.status(400).json({ success: false, message: 'Payment provider not configured' });
 };
 
@@ -149,18 +191,23 @@ export const razorpayWebhook = async (req, res) => {
 export const getReceipt = async (req, res) => {
   const payment = await Payment.findById(req.params.id);
   if (!payment) return res.status(404).json({ success: false, message: 'Not found' });
+
   const acceptsPdf = (req.headers['accept'] || '').includes('application/pdf') || req.path.endsWith('.pdf');
   if (!acceptsPdf) {
-    return res.json({ success: true, data: {
-      provider: payment.provider,
-      amount: payment.amount,
-      currency: payment.currency,
-      status: payment.status,
-      rideId: payment.rideId,
-      providerRef: payment.providerRef,
-      createdAt: payment.createdAt,
-    }});
+    return res.json({
+      success: true,
+      data: {
+        provider: payment.provider,
+        amount: payment.amount,
+        currency: payment.currency,
+        status: payment.status,
+        rideId: payment.rideId,
+        providerRef: payment.providerRef,
+        createdAt: payment.createdAt,
+      }
+    });
   }
+
   // Stream PDF
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `inline; filename=receipt-${payment._id}.pdf`);
@@ -170,7 +217,7 @@ export const getReceipt = async (req, res) => {
   doc.fontSize(12).text(`Payment ID: ${payment._id}`);
   doc.text(`Provider: ${payment.provider}`);
   doc.text(`Provider Ref: ${payment.providerRef}`);
-  doc.text(`Amount: ₹${(payment.amount/100).toFixed(2)} ${payment.currency}`);
+  doc.text(`Amount: ₹${(payment.amount / 100).toFixed(2)} ${payment.currency}`);
   doc.text(`Status: ${payment.status}`);
   if (payment.rideId) doc.text(`Ride ID: ${payment.rideId}`);
   doc.text(`Date: ${new Date(payment.createdAt).toLocaleString()}`);

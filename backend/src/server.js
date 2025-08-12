@@ -1,6 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import cors from "cors";
 import helmet from "helmet";
@@ -31,7 +32,6 @@ import { setIO } from './services/notifyService.js';
 import cookieParser from 'cookie-parser';
 import { authenticate, requireActive } from './middleware/auth.js';
 
-dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
@@ -51,27 +51,22 @@ const uploadsPath = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath);
 app.use('/uploads', express.static(uploadsPath));
 
-// Socket.io
-const io = new SocketIOServer(server, {
-  cors: { origin: [ process.env.FRONTEND_URL || "http://localhost:5173", process.env.ADMIN_URL || "http://localhost:5174" ], credentials: true },
-});
-setIO(io);
+// CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:3000",  // frontend URL now port 3000
+  process.env.ADMIN_URL || "http://localhost:5174"
+].filter(Boolean);
 
-io.on('connection', (socket) => {
-  const userId = socket.handshake.auth?.userId;
-  if (userId) socket.join(`user:${userId}`);
-  socket.on('ride:location', (payload) => { if (payload?.rideId) socket.to(`ride:${payload.rideId}`).emit('ride:location', payload); });
-  socket.on('ride:join', (rideId) => { socket.join(`ride:${rideId}`); });
-});
-
-const driverNs = io.of('/driver');
-driverNs.on('connection', (socket) => {
-  const driverId = socket.handshake.auth?.driverId;
-  if (!driverId) return socket.disconnect(true);
-  socket.join(`driver:${driverId}`);
-  socket.on('location', async (payload) => { if (payload?.lng != null && payload?.lat != null) await setDriverLocation(driverId, payload.lng, payload.lat); });
-  socket.on('disconnect', () => { /* could mark as unavailable after grace */ });
-});
+app.use(cors({
+  origin: (origin, callback) => {
+    // allow requests with no origin (like Postman, curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  optionsSuccessStatus: 200,
+}));
 
 // Middleware
 app.use(cookieParser());
@@ -82,14 +77,46 @@ app.use(i18n);
 app.use(auditLogger);
 app.use('/api/', createRateLimiter({ windowMs: 60_000, max: 300 }));
 
-// CORS
-const allowedOrigins = [ process.env.FRONTEND_URL || "http://localhost:5173", process.env.ADMIN_URL || "http://localhost:5174" ].filter(Boolean);
-app.use(cors({ origin: (origin, cb) => { if (!origin) return cb(null, true); if (allowedOrigins.includes(origin)) return cb(null, true); return cb(new Error('Not allowed by CORS')); }, credentials: true }));
-
-// Docs
+// Swagger docs
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Routes
+// Socket.io setup with matching CORS origins
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
+});
+setIO(io);
+
+io.on('connection', (socket) => {
+  const userId = socket.handshake.auth?.userId;
+  if (userId) socket.join(`user:${userId}`);
+
+  socket.on('ride:location', (payload) => {
+    if (payload?.rideId) socket.to(`ride:${payload.rideId}`).emit('ride:location', payload);
+  });
+
+  socket.on('ride:join', (rideId) => {
+    socket.join(`ride:${rideId}`);
+  });
+});
+
+const driverNs = io.of('/driver');
+driverNs.on('connection', (socket) => {
+  const driverId = socket.handshake.auth?.driverId;
+  if (!driverId) return socket.disconnect(true);
+  socket.join(`driver:${driverId}`);
+  socket.on('location', async (payload) => { if (payload?.lng != null && payload?.lat != null) await setDriverLocation(driverId, payload.lng, payload.lat); });
+  socket.on('disconnect', () => { /* could mark as unavailable after grace */ });
+=======
+  socket.on('location', async (payload) => {
+    if (payload?.lng != null && payload?.lat != null) await setDriverLocation(driverId, payload.lng, payload.lat);
+  });
+
+});
+
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/rides', authenticate, requireActive, rideRoutes);
 app.use('/api/vehicles', authenticate, requireActive, vehicleRoutes);
@@ -104,7 +131,10 @@ app.use('/api/live', authenticate, requireActive, liveRoutes);
 app.use('/api/devices', authenticate, requireActive, deviceRoutes);
 app.use("/api/bookings", bookingRoutes);
 
-// Start
+// Start server and connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => { console.log("MongoDB Connected"); server.listen(process.env.PORT || 5000, () => console.log(`Server running on port ${process.env.PORT || 5000}`)); })
+  .then(() => {
+    console.log("MongoDB Connected");
+    server.listen(process.env.PORT || 5000, () => console.log(`Server running on port ${process.env.PORT || 5000}`));
+  })
   .catch((err) => console.error(err));
