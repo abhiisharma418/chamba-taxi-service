@@ -29,11 +29,97 @@ const DriverRides = React.lazy(() => import('./pages/driver/Rides'));
 const DriverEarnings = React.lazy(() => import('./pages/driver/Earnings'));
 const DriverProfile = React.lazy(() => import('./pages/driver/Profile'));
 
-function App() {
+// Inner app component that has access to all providers
+const AppRoutes: React.FC = () => {
   // Initialize code splitting and performance monitoring
   useCodeSplitting();
   usePerformanceMonitoring();
 
+  return (
+    <Router>
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-surface transition-colors duration-200">
+        <Suspense fallback={<PageSkeleton />}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+
+            {/* Customer Routes */}
+            <Route
+              path="/customer/dashboard"
+              element={
+                <ProtectedRoute userType="customer">
+                  <CustomerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customer/book-ride"
+              element={
+                <ProtectedRoute userType="customer">
+                  <CustomerBookRide />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customer/history"
+              element={
+                <ProtectedRoute userType="customer">
+                  <CustomerHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customer/live-tracking/:rideId"
+              element={
+                <ProtectedRoute userType="customer">
+                  <CustomerLiveTracking />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Driver Routes */}
+            <Route
+              path="/driver/dashboard"
+              element={
+                <ProtectedRoute userType="driver">
+                  <DriverDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/driver/rides"
+              element={
+                <ProtectedRoute userType="driver">
+                  <DriverRides />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/driver/earnings"
+              element={
+                <ProtectedRoute userType="driver">
+                  <DriverEarnings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/driver/profile"
+              element={
+                <ProtectedRoute userType="driver">
+                  <DriverProfile />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Suspense>
+      </div>
+    </Router>
+  );
+};
+
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
