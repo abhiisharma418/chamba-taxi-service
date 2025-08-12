@@ -22,25 +22,30 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      // Call login API
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
+      // Import and use AuthAPI
+      const { AuthAPI } = await import('../../lib/api');
+
+      const data = await AuthAPI.login({
+        email: formData.email,
+        password: formData.password,
+        userType: 'customer' // Default, backend doesn't need this
       });
 
-      const data = await response.json();
-
       if (data.success) {
+        // Prepare user object for context
+        const user = {
+          id: data.data.user.id,
+          firstName: data.data.user.name.split(' ')[0] || data.data.user.name,
+          lastName: data.data.user.name.split(' ').slice(1).join(' ') || '',
+          name: data.data.user.name,
+          email: data.data.user.email,
+          role: data.data.user.role as 'customer' | 'driver' | 'admin'
+        };
+
         // Login user and redirect based on role
-        await login(data.user, data.token);
-        
-        switch (data.user.role) {
+        await login(user, data.data.token);
+
+        switch (user.role) {
           case 'admin':
             navigate('/admin/dashboard');
             break;
@@ -51,10 +56,11 @@ const Login: React.FC = () => {
             navigate('/customer/dashboard');
         }
       } else {
-        setError(data.message || 'Login failed');
+        setError('Login failed. Please check your credentials.');
       }
-    } catch (err) {
-      setError('Network error. Please try again.');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
