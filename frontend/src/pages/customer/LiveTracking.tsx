@@ -100,21 +100,34 @@ const LiveTracking: React.FC = () => {
     }
   };
 
-  const handleEmergency = async () => {
+  const handleEmergencyClick = () => {
+    setShowEmergencyModal(true);
+  };
+
+  const handleEmergencyConfirm = async (emergencyType: string) => {
+    setEmergencyLoading(true);
     try {
       const response = await TrackingAPI.triggerEmergency({
         rideId: rideId!,
-        location: { lat: 0, lng: 0 }, // You'd get user's current location here
-        message: 'Emergency triggered from tracking page'
+        location: userLocation || { lat: 0, lng: 0 },
+        message: `Emergency: ${emergencyType} - Triggered from live tracking`,
+        emergencyType
       });
 
       if (response.success) {
-        alert('Emergency alert sent! Support will contact you shortly.');
+        alert('🚨 Emergency alert sent! Support and emergency contacts have been notified. Stay safe!');
+        setShowEmergencyModal(false);
       }
     } catch (error) {
       console.error('Error triggering emergency:', error);
-      alert('Failed to send emergency alert. Please call support directly.');
+      alert('Failed to send emergency alert. Please call 112 or local emergency services directly.');
+    } finally {
+      setEmergencyLoading(false);
     }
+  };
+
+  const handleDirectCall = (number: string) => {
+    window.location.href = `tel:${number}`;
   };
 
   const getStatusColor = (status: string) => {
