@@ -77,7 +77,7 @@ const CustomerDashboard: React.FC = () => {
 
         {/* Current Booking */}
         {currentBooking && (
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 mb-10 text-white shadow-2xl">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 mb-10 text-white shadow-2xl animate-scaleIn hover-lift">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
