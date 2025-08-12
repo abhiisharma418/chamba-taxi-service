@@ -163,7 +163,10 @@ const Login: React.FC = () => {
 
         {/* Demo Credentials */}
         <div className="mt-8 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200">
-          <p className="text-sm font-semibold text-slate-700 mb-3">Demo Credentials:</p>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <p className="text-sm font-semibold text-slate-700">Demo Mode Active</p>
+          </div>
           <div className="text-sm text-slate-600 space-y-2">
             <div className="flex justify-between items-center">
               <span className="font-medium">Customer:</span>
@@ -173,6 +176,9 @@ const Login: React.FC = () => {
               <span className="font-medium">Driver:</span>
               <span className="text-blue-600 font-mono">driver@test.com / password</span>
             </div>
+            <p className="text-xs text-slate-500 mt-3 text-center">
+              💡 Using fallback authentication when backend is unavailable
+            </p>
           </div>
         </div>
       </div>
