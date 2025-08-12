@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
+import { animations, cardVariants, buttonVariants, getStaggerDelay } from '../../utils/animations';
 import MapComponent from '../../components/MapComponent';
 import LocationSearch from '../../components/LocationSearch';
 import PaymentMethod from '../../components/PaymentMethod';
