@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
 import { StatsCardSkeleton, ListItemSkeleton, CardSkeleton } from '../../components/LoadingSkeletons';
+import { responsive, touch, patterns } from '../../utils/responsive';
 import { Car, MapPin, Clock, Star, Plus, ArrowRight, Receipt } from 'lucide-react';
 
 const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
