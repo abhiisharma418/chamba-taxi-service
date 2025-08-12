@@ -38,17 +38,33 @@ const DriverEarnings: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [showBreakdown, setShowBreakdown] = useState(false);
 
-  // Use React Query hooks for data fetching
-  const {
-    data: earningsResponse,
-    isLoading: earningsLoading,
-    error: earningsError
-  } = useDriverEarnings(selectedPeriod);
+  // Use API for data fetching with fallback
+  const [earningsData, setEarningsData] = useState<EarningsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const {
-    data: breakdownResponse,
-    isLoading: breakdownLoading
-  } = useDriverEarningsBreakdown();
+  useEffect(() => {
+    const loadEarnings = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await DriverAPI.getEarnings(selectedPeriod);
+        if (response.success) {
+          setEarningsData(response.data);
+        } else {
+          setEarningsData(getFallbackData());
+        }
+      } catch (err) {
+        console.error('Failed to load earnings:', err);
+        setError('Failed to load earnings data');
+        setEarningsData(getFallbackData());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEarnings();
+  }, [selectedPeriod]);
 
   const loading = earningsLoading || breakdownLoading;
   const earningsData = earningsResponse?.success ? {
