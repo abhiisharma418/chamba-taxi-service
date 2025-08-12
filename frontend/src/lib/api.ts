@@ -253,3 +253,65 @@ export const PaymentAPI = {
     amount?: number
   }) => apiFetch('/api/payment/refund', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>
 };
+
+export const WhatsAppAPI = {
+  sendBookingConfirmation: (payload: {
+    customerPhone: string;
+    bookingData: {
+      customerName: string;
+      bookingId: string;
+      vehicleType: string;
+      pickupLocation: string;
+      destination: string;
+      fare: number;
+    }
+  }) => apiFetch('/api/whatsapp/booking-confirmation', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  sendDriverAssigned: (payload: {
+    customerPhone: string;
+    driverData: {
+      name: string;
+      phone: string;
+      vehicleNumber: string;
+      vehicleModel: string;
+      estimatedArrival: number;
+    };
+    bookingData: {
+      customerName: string;
+      bookingId: string;
+    }
+  }) => apiFetch('/api/whatsapp/driver-assigned', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  sendStatusUpdate: (payload: {
+    customerPhone: string;
+    status: 'driver_arrived' | 'trip_started' | 'trip_completed';
+    bookingData: {
+      customerName: string;
+      bookingId: string;
+      fare?: number;
+    };
+    additionalInfo?: any;
+  }) => apiFetch('/api/whatsapp/status-update', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  sendDriverNotification: (payload: {
+    driverPhone: string;
+    type: 'new_booking' | 'booking_cancelled';
+    bookingData: any;
+  }) => apiFetch('/api/whatsapp/driver-notification', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  sendCustomMessage: (payload: {
+    to: string;
+    message: string;
+    type?: 'text' | 'location' | 'contact';
+    location?: {
+      latitude: number;
+      longitude: number;
+      name?: string;
+      address?: string;
+    };
+    contact?: {
+      name: string;
+      phone: string;
+    };
+  }) => apiFetch('/api/whatsapp/custom-message', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>
+};
