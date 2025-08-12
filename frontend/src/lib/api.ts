@@ -210,3 +210,46 @@ export const LiveAPI = {
   respondOffer: (rideId: string, accept: boolean) => apiFetch('/api/live/driver/respond', { method: 'POST', body: JSON.stringify({ rideId, accept }) }) as Promise<{ success: boolean; data: any }>,
   startDispatch: (rideId: string, pickup: { coordinates: [number, number] }, radiusKm = 10) => apiFetch('/api/live/dispatch/start', { method: 'POST', body: JSON.stringify({ rideId, pickup, radiusKm }) }) as Promise<{ success: boolean; data: any }>,
 };
+
+export const PaymentAPI = {
+  createIntent: (payload: {
+    provider: 'razorpay' | 'stripe' | 'upi' | 'cod';
+    amount: number;
+    currency?: string;
+    rideId?: string;
+    paymentMethod?: string;
+    upiId?: string
+  }) => apiFetch('/api/payment/intent', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  verifyUpi: (payload: {
+    paymentId: string;
+    transactionId?: string;
+    status: 'success' | 'failed'
+  }) => apiFetch('/api/payment/verify-upi', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  confirmCod: (payload: {
+    paymentId: string;
+    driverId: string;
+    amount: number
+  }) => apiFetch('/api/payment/confirm-cod', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  getReceipt: (paymentId: string) => apiFetch(`/api/payment/receipt/${paymentId}`) as Promise<{ success: boolean; data: any }>,
+
+  authorize: (payload: {
+    provider: 'razorpay' | 'stripe';
+    providerRef: string
+  }) => apiFetch('/api/payment/authorize', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  capture: (payload: {
+    provider: 'razorpay' | 'stripe';
+    providerRef: string;
+    amount?: number;
+    currency?: string
+  }) => apiFetch('/api/payment/capture', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  refund: (payload: {
+    provider: 'razorpay' | 'stripe';
+    providerRef: string;
+    amount?: number
+  }) => apiFetch('/api/payment/refund', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>
+};
