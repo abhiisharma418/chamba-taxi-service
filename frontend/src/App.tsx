@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { BookingProvider } from './contexts/BookingContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 // Pages
 import LandingPage from './pages/LandingPage';
