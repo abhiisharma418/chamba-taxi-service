@@ -133,22 +133,52 @@ const BookRide: React.FC = () => {
         paymentMethod: paymentData.method,
         paymentStatus: paymentData.status,
         amount: fareEstimate,
-        transactionId: paymentData.transactionId
+        transactionId: paymentData.transactionId,
+        customerId: user?.id
       };
 
-      const booking = await createBooking(bookingPayload as any);
-      setBookingData({ ...booking, payment: paymentData });
-      setCurrentStep('confirmation');
+      // Use RidesAPI directly instead of context for real API call
+      const response = await RidesAPI.create(bookingPayload);
 
-      // If COD, immediately proceed to dashboard
-      if (paymentData.method === 'cod') {
-        setTimeout(() => {
-          navigate('/customer/dashboard');
-        }, 2000);
+      if (response.success) {
+        const booking = response.data;
+        setBookingData({ ...booking, payment: paymentData });
+        setCurrentStep('confirmation');
+
+        // Send WhatsApp notification if enabled
+        if (whatsappEnabled && whatsappPhone) {
+          try {
+            const { WhatsAppAPI } = await import('../../lib/api');
+            await WhatsAppAPI.sendBookingConfirmation({
+              customerPhone: whatsappPhone,
+              bookingData: {
+                customerName: user?.name || 'Customer',
+                bookingId: booking.id || booking._id || 'N/A',
+                vehicleType: vehicleType,
+                pickupLocation: pickupLocation.address,
+                destination: destinationLocation.address,
+                fare: fareEstimate || 0
+              }
+            });
+          } catch (whatsappError) {
+            console.log('WhatsApp notification failed:', whatsappError);
+            // Don't fail the booking for WhatsApp errors
+          }
+        }
+
+        // If COD, show success message longer
+        if (paymentData.method === 'cod') {
+          setTimeout(() => {
+            navigate('/customer/dashboard');
+          }, 3000);
+        }
+      } else {
+        throw new Error('Booking creation failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Booking error:', error);
-      alert('Booking failed. Please try again.');
+      setEstimateError(error.message || 'Booking failed. Please try again.');
+      setCurrentStep('details'); // Go back to details step
     } finally {
       setPaymentProcessing(false);
     }
