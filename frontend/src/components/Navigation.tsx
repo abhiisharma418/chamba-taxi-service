@@ -11,7 +11,11 @@ import {
   X,
   LogOut,
   MapPin,
-  Clock
+  Clock,
+  DollarSign,
+  FileText,
+  Settings,
+  HelpCircle
 } from 'lucide-react';
 import Logo from './Logo';
 
