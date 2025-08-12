@@ -66,8 +66,6 @@ const DriverEarnings: React.FC = () => {
     loadEarnings();
   }, [selectedPeriod]);
 
-  // Import DriverAPI
-  const { DriverAPI } = require('../../lib/api');
 
   // Fallback data for error state
   const getFallbackData = (): EarningsData => ({
