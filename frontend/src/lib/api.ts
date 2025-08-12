@@ -366,11 +366,79 @@ export const TrackingAPI = {
 };
 
 export const DriverAPI = {
+  // Profile endpoints
+  getProfile: () => apiFetch('/api/driver/profile') as Promise<{ success: boolean; data: any }>,
+  updateProfile: (payload: any) => apiFetch('/api/driver/profile', { method: 'PUT', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  getProfileCompletion: () => apiFetch('/api/driver/profile/completion') as Promise<{ success: boolean; data: any }>,
+
+  // Document management
+  uploadDocument: (documentType: string, file: File, expiry?: string) => {
+    const formData = new FormData();
+    formData.append('document', file);
+    formData.append('documentType', documentType);
+    if (expiry) formData.append('expiry', expiry);
+    return apiFetch('/api/driver/documents/upload', { method: 'POST', body: formData }) as Promise<{ success: boolean; data: any }>;
+  },
+  getDocumentAlerts: () => apiFetch('/api/driver/documents/alerts') as Promise<{ success: boolean; data: any }>,
+
+  // Trip history endpoints
+  getTripHistory: (params?: { status?: string; month?: string; page?: number; limit?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.append('status', params.status);
+    if (params?.month) query.append('month', params.month);
+    if (params?.page) query.append('page', params.page.toString());
+    if (params?.limit) query.append('limit', params.limit.toString());
+    return apiFetch(`/api/rides/history?${query.toString()}`) as Promise<{ success: boolean; data: any[] }>;
+  },
+  getTripDetails: (tripId: string) => apiFetch(`/api/rides/${tripId}`) as Promise<{ success: boolean; data: any }>,
+  getTripStats: () => apiFetch('/api/driver/trips/stats') as Promise<{ success: boolean; data: any }>,
+
   // Earnings endpoints
   getEarnings: (period?: 'daily' | 'weekly' | 'monthly') => apiFetch(`/api/driver/earnings${period ? `?period=${period}` : ''}`) as Promise<{ success: boolean; data: any }>,
   getEarningsBreakdown: () => apiFetch('/api/driver/earnings/breakdown') as Promise<{ success: boolean; data: any }>,
   getEarningsHistory: (page?: number, limit?: number) => apiFetch(`/api/driver/earnings/history?page=${page || 1}&limit=${limit || 20}`) as Promise<{ success: boolean; data: any }>,
 
-  // Document management
-  uploadDocuments: (documents: FormData) => apiFetch('/api/driver/documents', { method: 'POST', body: documents }) as Promise<{ success: boolean; data: any }>
+  // Vehicle management endpoints
+  getVehicles: () => apiFetch('/api/driver/vehicles') as Promise<{ success: boolean; data: any[] }>,
+  getVehicle: (vehicleId: string) => apiFetch(`/api/driver/vehicles/${vehicleId}`) as Promise<{ success: boolean; data: any }>,
+  createVehicle: (payload: any) => apiFetch('/api/driver/vehicles', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  updateVehicle: (vehicleId: string, payload: any) => apiFetch(`/api/driver/vehicles/${vehicleId}`, { method: 'PUT', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  deleteVehicle: (vehicleId: string) => apiFetch(`/api/driver/vehicles/${vehicleId}`, { method: 'DELETE' }) as Promise<{ success: boolean; data: any }>,
+  uploadVehicleDocument: (vehicleId: string, documentType: string, file: File, expiry: string) => {
+    const formData = new FormData();
+    formData.append('document', file);
+    formData.append('documentType', documentType);
+    formData.append('expiry', expiry);
+    return apiFetch(`/api/driver/vehicles/${vehicleId}/documents`, { method: 'POST', body: formData }) as Promise<{ success: boolean; data: any }>;
+  },
+  addServiceRecord: (vehicleId: string, payload: any) => apiFetch(`/api/driver/vehicles/${vehicleId}/service`, { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  addInspectionRecord: (vehicleId: string, payload: any) => apiFetch(`/api/driver/vehicles/${vehicleId}/inspection`, { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  getVehicleAlerts: (vehicleId: string) => apiFetch(`/api/driver/vehicles/${vehicleId}/alerts`) as Promise<{ success: boolean; data: any }>,
+  toggleVehicleStatus: (vehicleId: string, isActive: boolean) => apiFetch(`/api/driver/vehicles/${vehicleId}/status`, { method: 'PATCH', body: JSON.stringify({ isActive }) }) as Promise<{ success: boolean; data: any }>,
+  getVehicleStats: () => apiFetch('/api/driver/vehicles/stats') as Promise<{ success: boolean; data: any }>,
+
+  // Support endpoints
+  getFAQs: (params?: { search?: string; category?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.category) query.append('category', params.category);
+    return apiFetch(`/api/support/faqs?${query.toString()}`) as Promise<{ success: boolean; data: any[] }>;
+  },
+  getFAQCategories: () => apiFetch('/api/support/faqs/categories') as Promise<{ success: boolean; data: any }>,
+  recordFAQFeedback: (faqId: string, helpful: boolean, feedback?: string) => apiFetch(`/api/support/faqs/${faqId}/feedback`, { method: 'POST', body: JSON.stringify({ helpful, feedback }) }) as Promise<{ success: boolean; data: any }>,
+
+  getTickets: (status?: string) => apiFetch(`/api/support/tickets${status ? `?status=${status}` : ''}`) as Promise<{ success: boolean; data: any[] }>,
+  getTicket: (ticketId: string) => apiFetch(`/api/support/tickets/${ticketId}`) as Promise<{ success: boolean; data: any }>,
+  createTicket: (payload: { subject: string; category: string; priority: string; message: string; metadata?: any }) => apiFetch('/api/support/tickets', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  addMessage: (ticketId: string, message: string, attachments?: File[]) => {
+    const formData = new FormData();
+    formData.append('message', message);
+    if (attachments) {
+      attachments.forEach(file => formData.append('attachments', file));
+    }
+    return apiFetch(`/api/support/tickets/${ticketId}/messages`, { method: 'POST', body: formData }) as Promise<{ success: boolean; data: any }>;
+  },
+  closeTicket: (ticketId: string, rating?: number, feedback?: string) => apiFetch(`/api/support/tickets/${ticketId}/close`, { method: 'PATCH', body: JSON.stringify({ rating, feedback }) }) as Promise<{ success: boolean; data: any }>,
+  getTicketStats: () => apiFetch('/api/support/tickets/stats') as Promise<{ success: boolean; data: any }>,
+  searchSupport: (query: string, type?: 'faq' | 'tickets') => apiFetch(`/api/support/search?query=${encodeURIComponent(query)}${type ? `&type=${type}` : ''}`) as Promise<{ success: boolean; data: any }>
 };
