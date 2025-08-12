@@ -22,7 +22,7 @@ const Signup: React.FC = () => {
   React.useEffect(() => {
     const type = searchParams.get('type') as 'customer' | 'driver' | 'admin' | null;
     if (type === 'admin') {
-      window.location.href = (import.meta as any).env?.VITE_ADMIN_URL || 'http://localhost:5174';
+      window.location.href = (import.meta as any).env?.VITE_ADMIN_URL || 'https://chamba-taxi-service-2.onrender.com';
       return;
     }
     if (type === 'customer' || type === 'driver') {
