@@ -1,29 +1,39 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { PageSkeleton } from './LoadingSkeletons';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  userType: 'customer' | 'driver';
+  userType?: 'customer' | 'driver' | 'admin';
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, userType }) => {
   const { user, isLoading } = useAuth();
 
+  // Show loading while checking authentication
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
+  // Redirect to login if not authenticated
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  if (user.type !== userType) {
-    return <Navigate to="/" />;
+  // Check user role if specified
+  if (userType && user.role !== userType) {
+    // Redirect to appropriate dashboard based on user role
+    switch (user.role) {
+      case 'admin':
+        return <Navigate to="/admin/dashboard" replace />;
+      case 'driver':
+        return <Navigate to="/driver/dashboard" replace />;
+      case 'customer':
+        return <Navigate to="/customer/dashboard" replace />;
+      default:
+        return <Navigate to="/login" replace />;
+    }
   }
 
   return <>{children}</>;
