@@ -5,8 +5,9 @@ import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
 import MapComponent from '../../components/MapComponent';
 import LocationSearch from '../../components/LocationSearch';
-import { Car, Clock, CreditCard, Bike, Users, Zap } from 'lucide-react';
-import { RidesAPI } from '../../lib/api';
+import PaymentMethod from '../../components/PaymentMethod';
+import { Car, Clock, CreditCard, Bike, Users, Zap, ArrowLeft, CheckCircle } from 'lucide-react';
+import { RidesAPI, PaymentAPI } from '../../lib/api';
 import { io } from 'socket.io-client';
 
 interface Location {
@@ -18,13 +19,17 @@ const BookRide: React.FC = () => {
   const { user } = useAuth();
   const { createBooking } = useBooking();
   const navigate = useNavigate();
-  
+
   const [pickupLocation, setPickupLocation] = useState<Location>({ address: '', coordinates: [0, 0] });
   const [destinationLocation, setDestinationLocation] = useState<Location>({ address: '', coordinates: [0, 0] });
   const [vehicleType, setVehicleType] = useState<'car' | 'bike'>('car');
   const [isBooking, setIsBooking] = useState(false);
   const [fareEstimate, setFareEstimate] = useState<number | null>(null);
   const [estimateInfo, setEstimateInfo] = useState<any>(null);
+  const [currentStep, setCurrentStep] = useState<'details' | 'payment' | 'confirmation'>('details');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(null);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [bookingData, setBookingData] = useState<any>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -66,17 +71,54 @@ const BookRide: React.FC = () => {
     setEstimateInfo(res.data);
   };
 
-  const handleBookRide = async () => {
-    if (!pickupLocation.address || !destinationLocation.address || !user) return;
-    setIsBooking(true);
-    const payload = {
-      pickup: pickupLocation,
-      destination: destinationLocation,
-      vehicleType,
-      regionType: 'city',
-    };
-    await createBooking(payload as any);
-    setIsBooking(false);
+  const handleContinueToPayment = () => {
+    if (!pickupLocation.address || !destinationLocation.address || !fareEstimate) return;
+    setCurrentStep('payment');
+  };
+
+  const handleBackToDetails = () => {
+    setCurrentStep('details');
+  };
+
+  const handlePaymentMethodSelect = (method: any) => {
+    setSelectedPaymentMethod(method);
+  };
+
+  const handlePaymentComplete = async (paymentData: any) => {
+    setPaymentProcessing(true);
+
+    try {
+      // Create booking with payment info
+      const bookingPayload = {
+        pickup: pickupLocation,
+        destination: destinationLocation,
+        vehicleType,
+        regionType: 'city',
+        paymentMethod: paymentData.method,
+        paymentStatus: paymentData.status,
+        amount: fareEstimate,
+        transactionId: paymentData.transactionId
+      };
+
+      const booking = await createBooking(bookingPayload as any);
+      setBookingData({ ...booking, payment: paymentData });
+      setCurrentStep('confirmation');
+
+      // If COD, immediately proceed to dashboard
+      if (paymentData.method === 'cod') {
+        setTimeout(() => {
+          navigate('/customer/dashboard');
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Booking error:', error);
+      alert('Booking failed. Please try again.');
+    } finally {
+      setPaymentProcessing(false);
+    }
+  };
+
+  const handleProceedToDashboard = () => {
     navigate('/customer/dashboard');
   };
 
@@ -169,33 +211,87 @@ const BookRide: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <button
-                onClick={handleEstimate}
-                disabled={!pickupLocation.address || !destinationLocation.address}
-                className="flex-1 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 text-slate-900 font-semibold py-4 px-6 rounded-xl transition-all duration-300 disabled:cursor-not-allowed"
-              >
-                <Zap className="h-5 w-5 inline mr-2" />
-                Get Estimate
-              </button>
-              <button
-                onClick={handleBookRide}
-                disabled={!pickupLocation.address || !destinationLocation.address || isBooking}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-slate-400 disabled:to-slate-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {isBooking ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white inline mr-2"></div>
-                    Finding Driver...
-                  </>
-                ) : (
-                  <>
-                    <Car className="h-5 w-5 inline mr-2" />
-                    Book Ride
-                  </>
+            {currentStep === 'details' && (
+              <div className="flex gap-4">
+                <button
+                  onClick={handleEstimate}
+                  disabled={!pickupLocation.address || !destinationLocation.address}
+                  className="flex-1 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 text-slate-900 font-semibold py-4 px-6 rounded-xl transition-all duration-300 disabled:cursor-not-allowed"
+                >
+                  <Zap className="h-5 w-5 inline mr-2" />
+                  Get Estimate
+                </button>
+                <button
+                  onClick={handleContinueToPayment}
+                  disabled={!fareEstimate}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-slate-400 disabled:to-slate-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  <CreditCard className="h-5 w-5 inline mr-2" />
+                  Continue to Payment
+                </button>
+              </div>
+            )}
+
+            {currentStep === 'payment' && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900">Payment Method</h2>
+                  <button
+                    onClick={handleBackToDetails}
+                    className="flex items-center space-x-2 text-slate-600 hover:text-slate-800 transition-colors"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                    <span>Back</span>
+                  </button>
+                </div>
+
+                <PaymentMethod
+                  amount={fareEstimate || 0}
+                  onPaymentSelect={handlePaymentMethodSelect}
+                  onPaymentComplete={handlePaymentComplete}
+                />
+              </div>
+            )}
+
+            {currentStep === 'confirmation' && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8 text-center">
+                <div className="mb-6">
+                  <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                  <h2 className="text-3xl font-bold text-slate-900 mb-2">Booking Confirmed!</h2>
+                  <p className="text-slate-600 text-lg">Your ride has been booked successfully</p>
+                </div>
+
+                {bookingData && (
+                  <div className="bg-slate-50 rounded-xl p-6 mb-6">
+                    <div className="grid grid-cols-2 gap-4 text-left">
+                      <div>
+                        <span className="text-slate-500 text-sm">Booking ID</span>
+                        <p className="font-semibold">{bookingData._id?.slice(-8) || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 text-sm">Payment Method</span>
+                        <p className="font-semibold capitalize">{bookingData.payment?.method || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 text-sm">Amount</span>
+                        <p className="font-semibold">₹{fareEstimate}</p>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 text-sm">Status</span>
+                        <p className="font-semibold text-green-600">Confirmed</p>
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </button>
-            </div>
+
+                <button
+                  onClick={handleProceedToDashboard}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Go to Dashboard
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Map and Summary */}
@@ -237,7 +333,7 @@ const BookRide: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-center space-x-2 text-green-100 bg-green-800/30 rounded-xl p-3">
                     <CreditCard className="h-5 w-5" />
-                    <span>Cash & Online Payment Available</span>
+                    <span>Multiple Payment Options Available</span>
                   </div>
                 </div>
               </div>
