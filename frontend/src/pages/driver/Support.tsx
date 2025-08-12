@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
-import { 
+import {
   MessageSquare, Phone, Mail, FileText, HelpCircle, Search,
   ChevronRight, Clock, CheckCircle, AlertCircle, User,
-  Star, Mic, Camera, Paperclip, Send, ThumbsUp, ThumbsDown
+  Star, Mic, Camera, Paperclip, Send, ThumbsUp, ThumbsDown, Plus
 } from 'lucide-react';
 
 interface FAQ {
