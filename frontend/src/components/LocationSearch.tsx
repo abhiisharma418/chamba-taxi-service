@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Navigation2, Search, X, Loader } from 'lucide-react';
-import useGoogleMaps from '../hooks/useGoogleMaps';
+import React, { useState, useRef, useEffect } from 'react';
+import { MapPin, Navigation, Search, X } from 'lucide-react';
 
 interface Location {
   address: string;
@@ -13,7 +12,7 @@ interface LocationSearchProps {
   value: string;
   onChange: (location: Location) => void;
   onCurrentLocation?: () => void;
-  type: 'pickup' | 'destination';
+  type?: 'pickup' | 'destination';
 }
 
 const LocationSearch: React.FC<LocationSearchProps> = ({
@@ -22,79 +21,61 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   value,
   onChange,
   onCurrentLocation,
-  type
+  type = 'destination'
 }) => {
-  const { isLoaded, loadError } = useGoogleMaps({ libraries: ['places'] });
   const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState(value);
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState(value);
+  const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesService = useRef<google.maps.places.PlacesService | null>(null);
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Sample locations for demo - in real app, this would come from Google Places API
+  const sampleLocations: Location[] = [
+    { address: 'Shimla Railway Station, Shimla, HP', coordinates: [77.1734, 31.1048] },
+    { address: 'Mall Road, Shimla, HP', coordinates: [77.1727, 31.1033] },
+    { address: 'Kalka Railway Station, Kalka, HR', coordinates: [76.9366, 30.8406] },
+    { address: 'Chandigarh Airport, Chandigarh', coordinates: [76.7884, 30.6735] },
+    { address: 'Sector 17, Chandigarh', coordinates: [76.7794, 30.7411] },
+    { address: 'PGI Hospital, Chandigarh', coordinates: [76.7689, 30.7614] },
+    { address: 'Rock Garden, Chandigarh', coordinates: [76.8131, 30.7526] },
+    { address: 'Sukhna Lake, Chandigarh', coordinates: [76.8131, 30.7420] },
+    { address: 'Christ Church, Shimla, HP', coordinates: [77.1719, 31.1033] },
+    { address: 'Jakhu Temple, Shimla, HP', coordinates: [77.1828, 31.1125] },
+    { address: 'The Ridge, Shimla, HP', coordinates: [77.1719, 31.1040] },
+    { address: 'Kufri, Shimla, HP', coordinates: [77.2648, 31.0976] },
+    { address: 'Narkanda, Shimla, HP', coordinates: [77.3167, 31.2167] }
+  ];
 
   useEffect(() => {
-    setQuery(value);
+    setSearchQuery(value);
   }, [value]);
 
   useEffect(() => {
-    // Initialize Google Places services when maps are loaded
-    if (isLoaded && window.google && window.google.maps && window.google.maps.places) {
-      autocompleteService.current = new google.maps.places.AutocompleteService();
-      // Create a dummy map for PlacesService (required by Google Maps API)
-      const dummyMap = new google.maps.Map(document.createElement('div'));
-      placesService.current = new google.maps.places.PlacesService(dummyMap);
-    }
-  }, [isLoaded]);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
 
-  const searchPlaces = async (searchQuery: string) => {
-    if (!searchQuery.trim() || !autocompleteService.current || !isLoaded) return;
-
-    setIsLoading(true);
-
-    try {
-      autocompleteService.current.getPlacePredictions(
-        {
-          input: searchQuery,
-          componentRestrictions: { country: 'IN' }, // Restrict to India
-          types: ['establishment', 'geocode'],
-          fields: ['place_id', 'formatted_address', 'geometry', 'name'],
-          bounds: new google.maps.LatLngBounds(
-            new google.maps.LatLng(31.0, 77.0), // Southwest bounds (Shimla area)
-            new google.maps.LatLng(31.2, 77.3)  // Northeast bounds
-          )
-        },
-        (predictions, status) => {
-          setIsLoading(false);
-          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-            setSuggestions(predictions.slice(0, 6)); // Limit to 6 suggestions
-          } else {
-            setSuggestions([]);
-          }
-        }
-      );
-    } catch (error) {
-      setIsLoading(false);
-      setSuggestions([]);
-      console.warn('Places search error:', error);
-    }
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuery = e.target.value;
-    setQuery(newQuery);
+    const query = e.target.value;
+    setSearchQuery(query);
     setIsOpen(true);
 
-    // Clear existing timer
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-
-    // Debounce search
-    if (newQuery.length > 2) {
-      debounceTimer.current = setTimeout(() => {
-        searchPlaces(newQuery);
+    if (query.length > 2) {
+      setIsLoading(true);
+      // Simulate API call delay
+      setTimeout(() => {
+        const filtered = sampleLocations.filter(location =>
+          location.address.toLowerCase().includes(query.toLowerCase())
+        );
+        setSuggestions(filtered);
+        setIsLoading(false);
       }, 300);
     } else {
       setSuggestions([]);
@@ -102,214 +83,143 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     }
   };
 
-  const selectPlace = (prediction: google.maps.places.AutocompletePrediction) => {
-    if (!placesService.current || !window.google) return;
-
-    placesService.current.getDetails(
-      { placeId: prediction.place_id },
-      (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place && place.geometry) {
-          const location: Location = {
-            address: place.formatted_address || prediction.description,
-            coordinates: [
-              place.geometry.location?.lng() || 0,
-              place.geometry.location?.lat() || 0
-            ]
-          };
-          
-          setQuery(location.address);
-          setIsOpen(false);
-          setSuggestions([]);
-          onChange(location);
-        }
-      }
-    );
-  };
-
-  const handleCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation is not supported by this browser.');
-      return;
-    }
-
-    setIsLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coords = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-
-        // Reverse geocode to get actual address
-        if (isLoaded && window.google && window.google.maps) {
-          const geocoder = new google.maps.Geocoder();
-          geocoder.geocode({ location: coords }, (results, status) => {
-            setIsLoading(false);
-            if (status === 'OK' && results && results[0]) {
-              const location: Location = {
-                address: results[0].formatted_address,
-                coordinates: [coords.lng, coords.lat]
-              };
-              setQuery(location.address);
-              onChange(location);
-              setIsOpen(false);
-            } else {
-              // Fallback if geocoding fails
-              const location: Location = {
-                address: `Current Location (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`,
-                coordinates: [coords.lng, coords.lat]
-              };
-              setQuery(location.address);
-              onChange(location);
-            }
-          });
-        } else {
-          setIsLoading(false);
-          // Fallback without geocoding
-          const location: Location = {
-            address: 'Current Location',
-            coordinates: [coords.lng, coords.lat]
-          };
-          setQuery(location.address);
-          onChange(location);
-        }
-      },
-      (error) => {
-        setIsLoading(false);
-        console.error('Error getting current location:', error);
-        let errorMessage = 'Unable to get current location.';
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Location access denied by user.';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information unavailable.';
-            break;
-          case error.TIMEOUT:
-            errorMessage = 'Location request timeout.';
-            break;
-        }
-        alert(errorMessage);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
-      }
-    );
-  };
-
-  const clearInput = () => {
-    setQuery('');
+  const handleSuggestionClick = (location: Location) => {
+    setSearchQuery(location.address);
+    onChange(location);
     setIsOpen(false);
     setSuggestions([]);
-    onChange({ address: '', coordinates: [0, 0] });
   };
 
-  // Mock suggestions when Google Places is not available
-  const mockSuggestions = query.length > 2 ? [
-    { place_id: '1', description: `${query} - Popular Location`, structured_formatting: { main_text: query, secondary_text: 'Popular Location' } },
-    { place_id: '2', description: `${query} - City Center`, structured_formatting: { main_text: query, secondary_text: 'City Center' } },
-    { place_id: '3', description: `${query} - Mall Area`, structured_formatting: { main_text: query, secondary_text: 'Mall Area' } }
-  ] : [];
+  const handleCurrentLocationClick = () => {
+    if (onCurrentLocation) {
+      onCurrentLocation();
+      setIsOpen(false);
+    }
+  };
 
-  const displaySuggestions = window.google ? suggestions : mockSuggestions;
+  const handleClear = () => {
+    setSearchQuery('');
+    onChange({ address: '', coordinates: [0, 0] });
+    setSuggestions([]);
+    inputRef.current?.focus();
+  };
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+    if (searchQuery.length > 2) {
+      const filtered = sampleLocations.filter(location =>
+        location.address.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setSuggestions(filtered);
+    }
+  };
 
   return (
-    <div className="relative">
-      <label className="block text-sm font-semibold text-slate-700 mb-2">{label}</label>
+    <div className="relative" ref={dropdownRef}>
+      <label className="block text-sm font-medium text-slate-700 mb-2">
+        {label}
+      </label>
       
       <div className="relative">
-        <div className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={handleInputChange}
-            onFocus={() => setIsOpen(true)}
-            placeholder={placeholder}
-            className="w-full pl-12 pr-10 py-3 border border-slate-300 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/80"
-          />
-          
-          {/* Location icon */}
-          <div className="absolute left-4 top-3.5">
-            <div className={`w-3 h-3 rounded-full ${type === 'pickup' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-          </div>
-          
-          {/* Clear button */}
-          {query && (
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+          {type === 'pickup' ? (
+            <div className="w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
+          ) : (
+            <div className="w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-md"></div>
+          )}
+        </div>
+        
+        <input
+          ref={inputRef}
+          type="text"
+          value={searchQuery}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          placeholder={placeholder}
+          className="w-full pl-10 pr-20 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        />
+        
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+          {searchQuery && (
             <button
-              onClick={clearInput}
-              className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 transition-colors"
+              onClick={handleClear}
+              className="text-slate-400 hover:text-slate-600 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
           )}
+          
+          {type === 'pickup' && onCurrentLocation && (
+            <button
+              onClick={handleCurrentLocationClick}
+              className="text-blue-500 hover:text-blue-600 transition-colors"
+              title="Use current location"
+            >
+              <Navigation className="h-4 w-4" />
+            </button>
+          )}
         </div>
-
-        {/* Current location button */}
-        {type === 'pickup' && onCurrentLocation && (
-          <button
-            onClick={handleCurrentLocation}
-            className="mt-3 flex items-center space-x-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
-          >
-            <Navigation2 className="h-4 w-4" />
-            <span>Use current location</span>
-          </button>
-        )}
-
-        {/* Suggestions dropdown */}
-        {isOpen && (query.length > 2 || displaySuggestions.length > 0) && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-            {isLoading ? (
-              <div className="p-4 text-center">
-                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                <p className="text-sm text-slate-600 mt-2">Searching...</p>
-              </div>
-            ) : displaySuggestions.length > 0 ? (
-              displaySuggestions.map((prediction, index) => (
-                <button
-                  key={prediction.place_id || index}
-                  onClick={() => {
-                    if (window.google) {
-                      selectPlace(prediction);
-                    } else {
-                      // Mock selection for demo
-                      const location: Location = {
-                        address: prediction.description,
-                        coordinates: [77.1734 + Math.random() * 0.1, 31.1048 + Math.random() * 0.1]
-                      };
-                      setQuery(location.address);
-                      setIsOpen(false);
-                      setSuggestions([]);
-                      onChange(location);
-                    }
-                  }}
-                  className="w-full text-left px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-b-0 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-slate-400 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-slate-900 truncate">
-                        {prediction.structured_formatting?.main_text || prediction.description.split(',')[0]}
-                      </div>
-                      <div className="text-sm text-slate-500 truncate">
-                        {prediction.structured_formatting?.secondary_text || 
-                         prediction.description.split(',').slice(1).join(',').trim()}
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              ))
-            ) : query.length > 2 && (
-              <div className="p-4 text-center text-slate-500">
-                <Search className="h-6 w-6 mx-auto mb-2 text-slate-400" />
-                <p className="text-sm">No locations found</p>
-              </div>
-            )}
-          </div>
-        )}
       </div>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+          {type === 'pickup' && onCurrentLocation && (
+            <button
+              onClick={handleCurrentLocationClick}
+              className="w-full text-left px-4 py-3 hover:bg-blue-50 flex items-center space-x-3 border-b border-slate-100"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Navigation className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <div className="font-medium text-slate-900">Use Current Location</div>
+                <div className="text-sm text-slate-500">Detect your location automatically</div>
+              </div>
+            </button>
+          )}
+
+          {isLoading && (
+            <div className="px-4 py-3 text-center text-slate-500">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mx-auto"></div>
+              <span className="text-sm mt-2 block">Searching...</span>
+            </div>
+          )}
+
+          {!isLoading && suggestions.length === 0 && searchQuery.length > 2 && (
+            <div className="px-4 py-3 text-center text-slate-500">
+              <Search className="h-5 w-5 mx-auto mb-2 opacity-50" />
+              <span className="text-sm">No locations found</span>
+            </div>
+          )}
+
+          {!isLoading && suggestions.map((location, index) => (
+            <button
+              key={index}
+              onClick={() => handleSuggestionClick(location)}
+              className="w-full text-left px-4 py-3 hover:bg-slate-50 flex items-center space-x-3 border-b border-slate-100 last:border-b-0"
+            >
+              <div className="p-2 bg-slate-100 rounded-lg">
+                <MapPin className="h-4 w-4 text-slate-600" />
+              </div>
+              <div className="flex-1">
+                <div className="font-medium text-slate-900">{location.address}</div>
+                <div className="text-sm text-slate-500">
+                  {location.coordinates[1].toFixed(4)}, {location.coordinates[0].toFixed(4)}
+                </div>
+              </div>
+            </button>
+          ))}
+          
+          {!isLoading && searchQuery.length <= 2 && (
+            <div className="px-4 py-8 text-center">
+              <Search className="h-8 w-8 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500 text-sm">
+                Type at least 3 characters to search for locations
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
