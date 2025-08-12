@@ -1,10 +1,11 @@
 import React, { ReactNode } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from './Logo';
-import { 
-  LogOut, 
-  User, 
-  Bell, 
+import {
+  LogOut,
+  User,
+  Bell,
   Settings,
   Shield,
   LayoutDashboard,
@@ -20,14 +21,14 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', active: true },
-    { icon: Car, label: 'Rides', path: '/rides' },
-    { icon: Users, label: 'Drivers', path: '/drivers' },
-    { icon: Users, label: 'Customers', path: '/customers' },
-    { icon: DollarSign, label: 'Pricing', path: '/pricing' },
-    { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Car, label: 'Live Rides', path: '/rides' },
+    { icon: Users, label: 'User Management', path: '/users' },
+    { icon: DollarSign, label: 'Financial', path: '/financial' },
   ];
 
   return (
@@ -44,11 +45,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <nav className="flex-1 p-4 space-y-2">
             {menuItems.map((item) => {
               const IconComponent = item.icon;
+              const isActive = location.pathname === item.path;
               return (
                 <button
                   key={item.path}
+                  onClick={() => navigate(item.path)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
-                    item.active
+                    isActive
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                       : 'text-slate-700 hover:bg-blue-50 hover:text-blue-600'
                   }`}
