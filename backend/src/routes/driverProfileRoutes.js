@@ -1,14 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const {
+import express from 'express';
+import {
   getProfile,
   updateProfile,
   uploadDocument,
   getDocumentAlerts,
   verifyDocument,
   getProfileCompletion
-} = require('../controllers/driverProfileController');
-const { authenticateToken } = require('../middleware/auth');
+} from '../controllers/driverProfileController.js';
+import { authenticate } from '../middleware/auth.js';
+
+const router = express.Router();
 
 // All routes require authentication
 router.use(authenticateToken);
