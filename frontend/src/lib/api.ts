@@ -315,3 +315,52 @@ export const WhatsAppAPI = {
     };
   }) => apiFetch('/api/whatsapp/custom-message', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>
 };
+
+export const TrackingAPI = {
+  startTracking: (payload: {
+    rideId: string;
+    driverId?: string;
+    customerId?: string;
+  }) => apiFetch('/api/tracking/start', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  stopTracking: (payload: {
+    rideId: string;
+    reason?: 'completed' | 'cancelled' | 'manual';
+  }) => apiFetch('/api/tracking/stop', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  updateLocation: (payload: {
+    lat: number;
+    lng: number;
+    heading?: number;
+    speed?: number;
+    accuracy?: number;
+  }) => apiFetch('/api/tracking/location', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  batchUpdateLocation: (payload: {
+    locations: Array<{
+      lat: number;
+      lng: number;
+      timestamp: Date;
+      heading?: number;
+      speed?: number;
+      accuracy?: number;
+    }>;
+  }) => apiFetch('/api/tracking/location/batch', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  getTrackingStatus: (rideId: string) => apiFetch(`/api/tracking/status/${rideId}`) as Promise<{ success: boolean; data: any }>,
+
+  getActiveRides: () => apiFetch('/api/tracking/active') as Promise<{ success: boolean; data: any }>,
+
+  shareLiveLocation: (payload: {
+    rideId: string;
+    customerId: string;
+  }) => apiFetch('/api/tracking/share-location', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  triggerEmergency: (payload: {
+    rideId: string;
+    location: { lat: number; lng: number };
+    message?: string;
+  }) => apiFetch('/api/tracking/emergency', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  getLocationHistory: (rideId: string) => apiFetch(`/api/tracking/history/${rideId}`) as Promise<{ success: boolean; data: any }>
+};
