@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark mode configuration */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
 /* Custom animations for better UX */
 @keyframes shimmer {
   0% {
