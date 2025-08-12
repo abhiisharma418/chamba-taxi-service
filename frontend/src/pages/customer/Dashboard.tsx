@@ -11,9 +11,18 @@ const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-s
 const CustomerDashboard: React.FC = () => {
   const { user } = useAuth();
   const { currentBooking, bookings } = useBooking();
+  const [isLoading, setIsLoading] = useState(true);
 
   const userBookings = bookings.filter(booking => booking.customerId === user?.id);
   const recentBookings = userBookings.slice(0, 3);
+
+  // Simulate initial loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
