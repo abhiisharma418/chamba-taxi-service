@@ -59,6 +59,7 @@ export const PaymentsAPI = {
 
 export const DispatchAPI = {
   search: (pickup: { lng: number; lat: number }, radiusKm: number) => apiFetch('/api/live/dispatch/search', { method: 'POST', body: JSON.stringify({ pickup: { coordinates: [pickup.lng, pickup.lat] }, radiusKm }) }) as Promise<{ success: boolean; data: any[] }>,
+  start: (rideId: string, pickup: { lng: number; lat: number }, radiusKm = 10) => apiFetch('/api/live/dispatch/start', { method: 'POST', body: JSON.stringify({ rideId, pickup: { coordinates: [pickup.lng, pickup.lat] }, radiusKm }) }) as Promise<{ success: boolean; data: any }>,
 };
 
 export const setToken = (token: string) => {

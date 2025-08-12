@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { DispatchAPI, getToken, setToken } from '../../lib/api';
+import io from 'socket.io-client';
 
 const ClickHandler: React.FC<{ onClick: (latlng: L.LatLng) => void }> = ({ onClick }) => {
   useMapEvents({ click: (e) => onClick(e.latlng) });
@@ -15,6 +16,8 @@ const DispatchPage: React.FC = () => {
   const [radiusKm, setRadiusKm] = useState(10);
   const [tokenInput, setTokenInput] = useState(getToken() || '');
   const [error, setError] = useState('');
+  const [rideId, setRideId] = useState('');
+  const [logs, setLogs] = useState<string[]>([]);
 
   const saveToken = () => setToken(tokenInput);
 
@@ -23,7 +26,21 @@ const DispatchPage: React.FC = () => {
     try { const res = await DispatchAPI.search(pickup, radiusKm); setDrivers(res.data || []); } catch (e: any) { setError(e.message); }
   };
 
+  const start = async () => {
+    if (!rideId) { setError('Enter rideId'); return; }
+    setError('');
+    try { await DispatchAPI.start(rideId, pickup, radiusKm); setLogs(l=>[`Started dispatch for ${rideId}`, ...l]); } catch (e: any) { setError(e.message); }
+  };
+
   useEffect(() => { search(); }, []);
+
+  useEffect(() => {
+    const url = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000';
+    const sock = io(url, { auth: { userId: 'admin' } });
+    sock.on('ride:status', (p: any) => setLogs(l=>[`Ride ${p?.rideId || ''} status: ${p?.status}`, ...l]));
+    sock.on('dispatch:failed', (p: any) => setLogs(l=>[`Dispatch failed for ride ${p?.rideId}`, ...l]));
+    return () => { sock.disconnect(); };
+  }, []);
 
   return (
     <div className="min-h-screen p-6">
@@ -38,10 +55,12 @@ const DispatchPage: React.FC = () => {
       {error && <div className="mb-4 text-red-600">{error}</div>}
 
       <div className="flex items-center gap-3 mb-3">
+        <input type="text" value={rideId} onChange={e=>setRideId(e.target.value)} placeholder="Ride ID" className="border rounded px-3 py-2 w-80" />
         <input type="number" value={pickup.lng} onChange={e=>setPickup(p=>({...p, lng: Number(e.target.value)}))} className="border rounded px-3 py-2" placeholder="Lng" />
         <input type="number" value={pickup.lat} onChange={e=>setPickup(p=>({...p, lat: Number(e.target.value)}))} className="border rounded px-3 py-2" placeholder="Lat" />
         <input type="number" value={radiusKm} onChange={e=>setRadiusKm(Number(e.target.value))} className="border rounded px-3 py-2" placeholder="Radius km" />
         <button onClick={search} className="px-4 py-2 bg-emerald-600 text-white rounded">Search</button>
+        <button onClick={start} className="px-4 py-2 bg-indigo-600 text-white rounded">Start Dispatch</button>
       </div>
 
       <div className="bg-white border rounded mb-6" style={{ height: 450 }}>
@@ -52,11 +71,19 @@ const DispatchPage: React.FC = () => {
         </MapContainer>
       </div>
 
-      <div className="bg-white border rounded p-4">
-        <h2 className="text-lg font-semibold mb-2">Nearby Drivers</h2>
-        <ul className="list-disc pl-5">
-          {drivers.map((d,i)=>(<li key={i}>Driver {d.driverId} at [{d.lat.toFixed(4)}, {d.lng.toFixed(4)}]</li>))}
-        </ul>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white border rounded p-4">
+          <h2 className="text-lg font-semibold mb-2">Nearby Drivers</h2>
+          <ul className="list-disc pl-5">
+            {drivers.map((d,i)=>(<li key={i}>Driver {d.driverId} at [{d.lat.toFixed(4)}, {d.lng.toFixed(4)}]</li>))}
+          </ul>
+        </div>
+        <div className="bg-white border rounded p-4">
+          <h2 className="text-lg font-semibold mb-2">Events</h2>
+          <div className="h-64 overflow-auto text-sm text-gray-700 space-y-1">
+            {logs.map((line, i)=>(<div key={i}>{line}</div>))}
+          </div>
+        </div>
       </div>
     </div>
   );
