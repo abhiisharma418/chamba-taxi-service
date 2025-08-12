@@ -104,18 +104,32 @@ export const useLazyComponent = (importFn: () => Promise<any>) => {
 export const usePerformanceMonitoring = () => {
   useEffect(() => {
     // Monitor long tasks
-    if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          if (entry.entryType === 'longtask') {
-            console.warn('Long task detected:', entry.duration);
+    if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
+      try {
+        const observer = new PerformanceObserver((list) => {
+          try {
+            for (const entry of list.getEntries()) {
+              if (entry.entryType === 'longtask') {
+                console.warn('Long task detected:', entry.duration);
+              }
+            }
+          } catch (error) {
+            console.debug('Error processing performance entries:', error);
           }
-        }
-      });
+        });
 
-      observer.observe({ entryTypes: ['longtask'] });
+        observer.observe({ entryTypes: ['longtask'] });
 
-      return () => observer.disconnect();
+        return () => {
+          try {
+            observer.disconnect();
+          } catch (error) {
+            console.debug('Error disconnecting performance observer:', error);
+          }
+        };
+      } catch (error) {
+        console.debug('Error setting up performance monitoring:', error);
+      }
     }
   }, []);
 };
