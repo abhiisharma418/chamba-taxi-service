@@ -3,17 +3,21 @@ import { AuthAPI, setToken } from '../lib/api';
 
 interface User {
   id: string;
+  firstName: string;
+  lastName: string;
   name: string;
   email: string;
   phone?: string;
-  type: 'customer' | 'driver';
+  role: 'customer' | 'driver' | 'admin';
   avatar?: string;
+  licenseNumber?: string;
+  vehicleModel?: string;
+  vehicleNumber?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, userType: 'customer' | 'driver') => Promise<void>;
-  signup: (userData: Omit<User, 'id'> & { password: string }) => Promise<void>;
+  login: (user: User, token: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
