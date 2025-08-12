@@ -24,4 +24,4 @@ router.post('/documents/upload', uploadDocument);
 router.get('/documents/alerts', getDocumentAlerts);
 router.post('/documents/verify', verifyDocument); // Admin only
 
-module.exports = router;
+export default router;
