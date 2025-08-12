@@ -1,28 +1,26 @@
-import express from 'express';
-import { authenticate } from '../middleware/auth.js';
-import {
-  getDriverProfile,
-  updateDriverProfile,
-  uploadDocument,
-  getDriverEarnings,
-  getDriverStats,
-  upload
-} from '../controllers/driverProfileController.js';
-
+const express = require('express');
 const router = express.Router();
+const {
+  getProfile,
+  updateProfile,
+  uploadDocument,
+  getDocumentAlerts,
+  verifyDocument,
+  getProfileCompletion
+} = require('../controllers/driverProfileController');
+const { authenticateToken } = require('../middleware/auth');
 
 // All routes require authentication
-router.use(authenticate);
+router.use(authenticateToken);
 
 // Profile routes
-router.get('/profile', getDriverProfile);
-router.put('/profile', updateDriverProfile);
+router.get('/', getProfile);
+router.put('/', updateProfile);
+router.get('/completion', getProfileCompletion);
 
-// Document upload
-router.post('/upload-document', upload.single('document'), uploadDocument);
+// Document routes
+router.post('/documents/upload', uploadDocument);
+router.get('/documents/alerts', getDocumentAlerts);
+router.post('/documents/verify', verifyDocument); // Admin only
 
-// Earnings and statistics
-router.get('/earnings', getDriverEarnings);
-router.get('/stats', getDriverStats);
-
-export default router;
+module.exports = router;
