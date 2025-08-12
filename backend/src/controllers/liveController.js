@@ -46,15 +46,28 @@ export const driverSetAvailability = async (req, res) => {
   }
 };
 
-async function offerToDriver(ride, driverId) {
-  const driverPos = await getDriverPosition(driverId);
-  let eta = null;
-  if (driverPos) {
-    try { const r = await getDistanceAndDuration({ coordinates: [driverPos.lng, driverPos.lat] }, ride.pickup); eta = r.durationMin; } catch {}
+// Handle driver response to ride offer
+export const driverRespond = async (req, res) => {
+  try {
+    const schema = Joi.object({
+      rideId: Joi.string().required(),
+      accept: Joi.boolean().required()
+    });
+    const { error, value } = schema.validate(req.body);
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const result = await handleDriverResponse(value.rideId, req.user.id, value.accept);
+
+    if (result.success) {
+      res.json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  } catch (error) {
+    console.error('Driver response error:', error);
+    res.status(500).json({ success: false, message: 'Failed to process response' });
   }
-  await setPendingOffer(ride.id, driverId, 20);
-  notifyDriver(driverId, 'dispatch:offer', { rideId: ride.id, pickup: ride.pickup, destination: ride.destination, eta });
-}
+};
 
 export const dispatchNearestDriver = async (req, res) => {
   const schema = Joi.object({ pickup: Joi.object({ coordinates: Joi.array().items(Joi.number()).length(2).required() }).required(), radiusKm: Joi.number().default(10), rideId: Joi.string().optional() });
