@@ -239,6 +239,20 @@ const BookRide: React.FC = () => {
               />
             )}
 
+            {/* Error display */}
+            {estimateError && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                <p className="text-red-700">{estimateError}</p>
+                <button
+                  onClick={() => setEstimateError(null)}
+                  className="ml-auto text-red-400 hover:text-red-600"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+
             {currentStep === 'details' && (
               <div className="flex gap-4">
                 <button
