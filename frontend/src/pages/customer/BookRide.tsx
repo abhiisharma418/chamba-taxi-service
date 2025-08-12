@@ -31,6 +31,8 @@ const BookRide: React.FC = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(null);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [bookingData, setBookingData] = useState<any>(null);
+  const [whatsappEnabled, setWhatsappEnabled] = useState(true);
+  const [whatsappPhone, setWhatsappPhone] = useState(user?.phone || '');
 
   useEffect(() => {
     if (!user) return;
