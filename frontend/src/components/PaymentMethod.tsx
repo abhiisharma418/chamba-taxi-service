@@ -117,38 +117,77 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const handlePayment = async () => {
     if (!selectedMethod) return;
-    
+
     setIsProcessing(true);
-    
+
     try {
       if (selectedMethod.type === 'cod') {
-        // Handle COD payment
-        onPaymentComplete({
-          method: 'cod',
-          status: 'pending',
-          amount,
-          transactionId: `COD_${Date.now()}`
+        // Handle COD payment - create intent
+        const response = await PaymentAPI.createIntent({
+          provider: 'cod',
+          amount: amount * 100, // Convert to paise
+          currency: 'INR'
         });
-      } else if (selectedMethod.type === 'upi') {
-        // Handle UPI payment
-        const upiUrl = generateUpiUrl(selectedMethod, upiId);
-        
-        // Try to open UPI app
-        const isAppOpened = await tryOpenUpiApp(upiUrl);
-        
-        if (isAppOpened) {
-          // Simulate payment processing (in real app, this would be handled by backend)
-          setTimeout(() => {
-            onPaymentComplete({
-              method: selectedMethod.id,
-              status: 'success',
-              amount,
-              transactionId: `UPI_${Date.now()}`
-            });
-          }, 3000);
+
+        if (response.success) {
+          onPaymentComplete({
+            method: 'cod',
+            status: 'pending',
+            amount,
+            transactionId: response.data.paymentId,
+            paymentId: response.data.paymentId
+          });
         } else {
-          // Fallback: show QR code or manual UPI option
-          showQRCodeFallback(upiUrl);
+          throw new Error('COD payment creation failed');
+        }
+      } else if (selectedMethod.type === 'upi') {
+        // Handle UPI payment - create intent first
+        const response = await PaymentAPI.createIntent({
+          provider: 'upi',
+          amount: amount * 100, // Convert to paise
+          currency: 'INR',
+          paymentMethod: selectedMethod.id,
+          upiId: selectedMethod.id === 'upi' ? upiId : undefined
+        });
+
+        if (response.success) {
+          const { upiUrl, paymentId } = response.data;
+
+          // Try to open UPI app
+          const isAppOpened = await tryOpenUpiApp(upiUrl);
+
+          if (isAppOpened) {
+            // Simulate verification (in real app, this would be done via webhook or polling)
+            setTimeout(async () => {
+              try {
+                await PaymentAPI.verifyUpi({
+                  paymentId,
+                  status: 'success',
+                  transactionId: `UPI_${Date.now()}`
+                });
+
+                onPaymentComplete({
+                  method: selectedMethod.id,
+                  status: 'success',
+                  amount,
+                  transactionId: `UPI_${Date.now()}`,
+                  paymentId
+                });
+              } catch (error) {
+                onPaymentComplete({
+                  method: selectedMethod.id,
+                  status: 'failed',
+                  amount,
+                  paymentId
+                });
+              }
+            }, 3000);
+          } else {
+            // Fallback: show QR code or manual UPI option
+            showQRCodeFallback(upiUrl);
+          }
+        } else {
+          throw new Error('UPI payment creation failed');
         }
       } else if (selectedMethod.type === 'card') {
         // Handle card payment via Razorpay
