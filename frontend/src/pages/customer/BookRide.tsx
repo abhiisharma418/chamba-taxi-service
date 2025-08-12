@@ -270,7 +270,7 @@ const BookRide: React.FC = () => {
                 <button
                   onClick={handleEstimate}
                   disabled={!pickupLocation.address || !destinationLocation.address || estimateLoading}
-                  className="flex-1 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 text-slate-900 font-semibold py-4 px-6 rounded-xl transition-all duration-300 disabled:cursor-not-allowed"
+                  className={`flex-1 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 text-slate-900 font-semibold py-4 px-6 rounded-xl disabled:cursor-not-allowed ${buttonVariants.secondary}`}
                 >
                   {estimateLoading ? (
                     <Loader2 className="h-5 w-5 inline mr-2 animate-spin" />
