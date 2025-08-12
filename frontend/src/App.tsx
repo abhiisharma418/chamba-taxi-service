@@ -20,66 +20,68 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <BookingProvider>
-          <Router>
-            <div className="min-h-screen bg-gray-50">
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <BookingProvider>
+            <Router>
+              <div className="min-h-screen bg-gray-50 dark:bg-dark-surface transition-colors duration-200">
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
 
-                {/* Customer Routes */}
-                <Route
-                  path="/customer/dashboard"
-                  element={
-                    <ProtectedRoute userType="customer">
-                      <CustomerDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/customer/book-ride"
-                  element={
-                    <ProtectedRoute userType="customer">
-                      <CustomerBookRide />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/customer/history"
-                  element={
-                    <ProtectedRoute userType="customer">
-                      <CustomerHistory />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Customer Routes */}
+                  <Route
+                    path="/customer/dashboard"
+                    element={
+                      <ProtectedRoute userType="customer">
+                        <CustomerDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/customer/book-ride"
+                    element={
+                      <ProtectedRoute userType="customer">
+                        <CustomerBookRide />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/customer/history"
+                    element={
+                      <ProtectedRoute userType="customer">
+                        <CustomerHistory />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* Driver Routes */}
-                <Route
-                  path="/driver/dashboard"
-                  element={
-                    <ProtectedRoute userType="driver">
-                      <DriverDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/driver/rides"
-                  element={
-                    <ProtectedRoute userType="driver">
-                      <DriverRides />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </div>
-          </Router>
-        </BookingProvider>
-      </NotificationProvider>
-    </AuthProvider>
+                  {/* Driver Routes */}
+                  <Route
+                    path="/driver/dashboard"
+                    element={
+                      <ProtectedRoute userType="driver">
+                        <DriverDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/driver/rides"
+                    element={
+                      <ProtectedRoute userType="driver">
+                        <DriverRides />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </div>
+            </Router>
+          </BookingProvider>
+        </NotificationProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
