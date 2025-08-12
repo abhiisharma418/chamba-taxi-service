@@ -196,7 +196,9 @@ export const triggerEmergency = async (req, res) => {
             triggeredBy,
             location: value.location,
             message: value.message,
-            timestamp: new Date()
+            emergencyType: value.emergencyType || 'GENERAL_EMERGENCY',
+            timestamp: new Date(),
+            status: 'ACTIVE'
           }
         }
       });
