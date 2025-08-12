@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CreditCard, Wallet, Smartphone, Building2, QrCode, IndianRupee } from 'lucide-react';
+import { PaymentAPI } from '../lib/api';
 
 interface PaymentMethodProps {
   amount: number;
