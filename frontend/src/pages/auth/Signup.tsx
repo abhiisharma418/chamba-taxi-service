@@ -77,41 +77,47 @@ const Signup: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Import and use AuthAPI
+      const { AuthAPI } = await import('../../lib/api');
+
+      const data = await AuthAPI.register({
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        role: formData.role
+      });
+
+      if (data.success) {
+        // Create user object after successful registration
+        const user = {
+          id: Date.now().toString(), // Temporary ID until login
           firstName: formData.firstName,
           lastName: formData.lastName,
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
           email: formData.email,
           phone: formData.phone,
-          password: formData.password,
-          role: formData.role,
+          role: formData.role as 'customer' | 'driver' | 'admin',
           ...(formData.role === 'driver' && {
             licenseNumber: formData.licenseNumber,
             vehicleModel: formData.vehicleModel,
             vehicleNumber: formData.vehicleNumber
           })
-        })
-      });
+        };
 
-      const data = await response.json();
+        await login(user, data.data.token);
 
-      if (data.success) {
-        await login(data.user, data.token);
-        
         if (formData.role === 'driver') {
           navigate('/driver/dashboard');
         } else {
           navigate('/customer/dashboard');
         }
       } else {
-        setError(data.message || 'Registration failed');
+        setError('Registration failed. Please try again.');
       }
-    } catch (err) {
-      setError('Network error. Please try again.');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
