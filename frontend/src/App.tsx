@@ -25,9 +25,11 @@ const CustomerLiveTracking = React.lazy(() => import('./pages/customer/LiveTrack
 
 // Driver pages
 const DriverDashboard = React.lazy(() => import('./pages/driver/Dashboard'));
-const DriverRides = React.lazy(() => import('./pages/driver/Rides'));
+const DriverTripHistory = React.lazy(() => import('./pages/driver/TripHistory'));
 const DriverEarnings = React.lazy(() => import('./pages/driver/Earnings'));
 const DriverProfile = React.lazy(() => import('./pages/driver/Profile'));
+const DriverVehicleManagement = React.lazy(() => import('./pages/driver/VehicleManagement'));
+const DriverSupport = React.lazy(() => import('./pages/driver/Support'));
 
 // Inner app component that has access to all providers
 const AppRoutes: React.FC = () => {
