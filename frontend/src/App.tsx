@@ -10,6 +10,7 @@ import { queryClient } from './lib/queryClient';
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
 import { PageSkeleton } from './components/LoadingSkeletons';
+import { useCodeSplitting, usePerformanceMonitoring } from './hooks/useCodeSplitting';
 
 // Lazy load pages for better performance
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
