@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import useGoogleMaps from '../hooks/useGoogleMaps';
+import { MapPin, Navigation, Route } from 'lucide-react';
 
 interface Location {
   address: string;
@@ -11,6 +13,7 @@ interface MapComponentProps {
   onLocationSelect?: (type: 'pickup' | 'destination', location: Location) => void;
   height?: string;
   showRoute?: boolean;
+  className?: string;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -18,18 +21,22 @@ const MapComponent: React.FC<MapComponentProps> = ({
   destination,
   onLocationSelect,
   height = '400px',
-  showRoute = true
+  showRoute = true,
+  className = ''
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const { isLoaded, loadError } = useGoogleMaps({ libraries: ['places'] });
+
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService | null>(null);
   const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
   const [pickupMarker, setPickupMarker] = useState<google.maps.Marker | null>(null);
   const [destinationMarker, setDestinationMarker] = useState<google.maps.Marker | null>(null);
+  const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
 
-  useEffect(() => {
-    // Initialize Google Maps only if available
-    if (!mapRef.current || !window.google || !window.google.maps) return;
+  // Initialize map when Google Maps is loaded
+  const initializeMap = useCallback(() => {
+    if (!mapRef.current || !window.google || !isLoaded) return;
 
     const mapInstance = new google.maps.Map(mapRef.current, {
       center: { lat: 31.1048, lng: 77.1734 }, // Default to Shimla, India
