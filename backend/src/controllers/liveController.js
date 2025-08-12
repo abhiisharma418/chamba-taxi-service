@@ -24,11 +24,26 @@ export const driverHeartbeat = async (req, res) => {
 };
 
 export const driverSetAvailability = async (req, res) => {
-  const schema = Joi.object({ available: Joi.boolean().required() });
-  const { error, value } = schema.validate(req.body);
-  if (error) return res.status(400).json({ success: false, message: error.message });
-  await setDriverAvailability(req.user.id, value.available);
-  res.json({ success: true });
+  try {
+    const schema = Joi.object({ available: Joi.boolean().required() });
+    const { error, value } = schema.validate(req.body);
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const success = await setDriverAvailability(req.user.id, value.available);
+
+    if (success) {
+      res.json({
+        success: true,
+        message: `Driver ${value.available ? 'online' : 'offline'}`,
+        isAvailable: value.available
+      });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to update availability' });
+    }
+  } catch (error) {
+    console.error('Driver availability error:', error);
+    res.status(500).json({ success: false, message: 'Availability update failed' });
+  }
 };
 
 async function offerToDriver(ride, driverId) {
