@@ -39,6 +39,9 @@ const LiveTracking: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [trackingStatus, setTrackingStatus] = useState<any>(null);
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [emergencyLoading, setEmergencyLoading] = useState(false);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
   useEffect(() => {
     if (!rideId || !user) return;
