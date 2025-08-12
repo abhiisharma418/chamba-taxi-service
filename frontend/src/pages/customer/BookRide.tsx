@@ -84,8 +84,10 @@ const BookRide: React.FC = () => {
     setEstimateError(null);
     setFareEstimate(null);
     setEstimateInfo(null);
+    setFareBreakdown(null);
 
     try {
+      // First try to get accurate estimate from backend
       const payload = {
         pickup: pickupLocation,
         destination: destinationLocation,
@@ -93,13 +95,43 @@ const BookRide: React.FC = () => {
         regionType: 'city',
       };
 
-      const res = await RidesAPI.estimate(payload);
+      try {
+        const res = await RidesAPI.estimate(payload);
 
-      if (res.success) {
-        setFareEstimate(res.data.estimated || res.data.price);
-        setEstimateInfo(res.data);
-      } else {
-        throw new Error('Estimation failed');
+        if (res.success) {
+          setFareEstimate(res.data.estimated || res.data.price);
+          setEstimateInfo(res.data);
+
+          // Also calculate fare breakdown
+          const breakdown = getEstimateForTrip(
+            pickupLocation.address,
+            destinationLocation.address,
+            vehicleType,
+            res.data.distanceKm,
+            res.data.durationMin
+          );
+          setFareBreakdown(breakdown);
+        } else {
+          throw new Error('Backend estimation failed');
+        }
+      } catch (backendError) {
+        console.log('Backend estimation failed, using local calculation:', backendError);
+
+        // Fallback to local calculation
+        const breakdown = getEstimateForTrip(
+          pickupLocation.address,
+          destinationLocation.address,
+          vehicleType
+        );
+
+        setFareEstimate(breakdown.totalFare);
+        setFareBreakdown(breakdown);
+        setEstimateInfo({
+          estimated: breakdown.totalFare,
+          distanceKm: 5.2, // Default estimate
+          durationMin: 12, // Default estimate
+          surge: breakdown.surgeMultiplier
+        });
       }
     } catch (error: any) {
       console.error('Fare estimation failed:', error);
