@@ -65,15 +65,28 @@ const BookRide: React.FC = () => {
 
   const handleEstimate = async () => {
     if (!pickupLocation.address || !destinationLocation.address) return;
-    const payload = {
-      pickup: pickupLocation,
-      destination: destinationLocation,
-      vehicleType,
-      regionType: 'city',
-    };
-    const res = await RidesAPI.estimate(payload);
-    setFareEstimate(res.data.price || res.data.estimated);
-    setEstimateInfo(res.data);
+
+    setEstimateLoading(true);
+    setEstimateError(null);
+    setFareEstimate(null);
+    setEstimateInfo(null);
+
+    try {
+      const payload = {
+        pickup: pickupLocation,
+        destination: destinationLocation,
+        vehicleType,
+        regionType: 'city',
+      };
+      const res = await RidesAPI.estimate(payload);
+      setFareEstimate(res.data.estimated || res.data.price);
+      setEstimateInfo(res.data);
+    } catch (error) {
+      console.error('Fare estimation failed:', error);
+      setEstimateError('Unable to calculate fare. Please try again.');
+    } finally {
+      setEstimateLoading(false);
+    }
   };
 
   const handleContinueToPayment = () => {
