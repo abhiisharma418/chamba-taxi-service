@@ -361,21 +361,34 @@ const BookRide: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-green-100">Distance</span>
-                    <span className="font-semibold">{estimateInfo?.distance || estimateInfo?.distanceKm || '5.2'} km</span>
+                    <span className="font-semibold">{estimateInfo?.distanceKm?.toFixed(1) || '5.2'} km</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-green-100">Duration</span>
-                    <span className="font-semibold">{estimateInfo?.duration || estimateInfo?.durationMin || '12'} min</span>
+                    <span className="font-semibold">{estimateInfo?.durationMin || '12'} min</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-green-100">Region</span>
+                    <span className="font-semibold capitalize">{estimateInfo?.regionType || 'City'}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-green-100">Vehicle</span>
                     <span className="font-semibold capitalize">{vehicleType}</span>
                   </div>
+                  {estimateInfo?.surge && estimateInfo.surge > 1 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-green-100">Surge Pricing</span>
+                      <span className="font-semibold text-yellow-200">{estimateInfo.surge}x</span>
+                    </div>
+                  )}
                   <div className="border-t border-green-500 pt-4">
                     <div className="flex items-center justify-between text-2xl font-bold">
                       <span>Total Fare</span>
                       <span>₹{fareEstimate}</span>
                     </div>
+                    {estimateInfo?.surge && estimateInfo.surge > 1 && (
+                      <p className="text-green-200 text-sm mt-2">*Higher demand in your area</p>
+                    )}
                   </div>
                   <div className="flex items-center justify-center space-x-2 text-green-100 bg-green-800/30 rounded-xl p-3">
                     <CreditCard className="h-5 w-5" />
