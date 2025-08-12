@@ -129,24 +129,64 @@ const CustomerDashboard: React.FC = () => {
             </div>
           </div>
           {recentBookings.length > 0 ? (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-gray-100">
               {recentBookings.map((booking) => (
-                <div key={booking.id} className="p-6">
+                <div key={booking.id} className="p-8 hover:bg-slate-50/50 transition-colors duration-300">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2"><div className="w-2 h-2 bg-green-500 rounded-full"></div><span className="text-sm text-gray-700">{booking.pickup.address}</span></div>
-                        <div className="flex items-center space-x-2"><div className="w-2 h-2 bg-red-500 rounded-full"></div><span className="text-sm text-gray-700">{booking.destination.address}</span></div>
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          <span className="text-slate-700 font-medium">{booking.pickup.address}</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                          <span className="text-slate-700 font-medium">{booking.destination.address}</span>
+                        </div>
                       </div>
-                      <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500"><span>{new Date(booking.createdAt).toLocaleDateString()}</span><span className="capitalize">{booking.vehicleType}</span><span className={`capitalize ${booking.status === 'completed' ? 'text-green-600' : booking.status === 'cancelled' ? 'text-red-600' : 'text-yellow-600'}`}>{booking.status}</span>{booking.paymentStatus && (<span>Payment: <b className="capitalize">{booking.paymentStatus}</b></span>)}</div>
+                      <div className="mt-4 flex items-center space-x-6 text-sm text-slate-500">
+                        <span className="font-medium">{new Date(booking.createdAt).toLocaleDateString()}</span>
+                        <span className="capitalize bg-slate-100 px-3 py-1 rounded-full">{booking.vehicleType}</span>
+                        <span className={`capitalize font-semibold px-3 py-1 rounded-full ${
+                          booking.status === 'completed' ? 'bg-green-100 text-green-700' :
+                          booking.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                          'bg-yellow-100 text-yellow-700'
+                        }`}>{booking.status}</span>
+                      </div>
                     </div>
-                    <div className="text-right ml-4"><div className="font-semibold text-gray-900">₹{booking.fare.actual || booking.fare.estimated}</div>{booking.rating && (<div className="flex items-center space-x-1 mt-1"><Star className="h-3 w-3 text-yellow-400 fill-current" /><span className="text-xs text-gray-600">{booking.rating}</span></div>)}{booking.paymentId && (<div className="mt-2"><a href={`${API_URL}/api/payments/receipt/${booking.paymentId}.pdf`} target="_blank" className="text-blue-600 text-xs">Receipt</a></div>)}</div>
+                    <div className="text-right ml-6">
+                      <div className="text-2xl font-bold text-slate-900 mb-2">₹{booking.fare.actual || booking.fare.estimated}</div>
+                      {booking.rating && (
+                        <div className="flex items-center justify-end space-x-1 mb-2">
+                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                          <span className="text-sm font-medium text-slate-600">{booking.rating}</span>
+                        </div>
+                      )}
+                      {booking.paymentId && (
+                        <a href={`${API_URL}/api/payments/receipt/${booking.paymentId}.pdf`} target="_blank"
+                           className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                          <Receipt className="h-4 w-4" />
+                          Receipt
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="p-12 text-center"><Car className="h-12 w-12 text-gray-400 mx-auto mb-4" /><h3 className="text-lg font-medium text-gray-900 mb-2">No rides yet</h3><p className="text-gray-600 mb-4">Book your first ride to get started!</p><Link to="/customer/book-ride" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"><Plus className="h-4 w-4 mr-2" />Book a Ride</Link></div>
+            <div className="p-16 text-center">
+              <div className="bg-gradient-to-br from-blue-100 to-blue-200 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Car className="h-10 w-10 text-blue-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">No rides yet</h3>
+              <p className="text-slate-600 mb-8 max-w-md mx-auto">Book your first ride with RideWithUs and experience premium transportation!</p>
+              <Link to="/customer/book-ride"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <Plus className="h-5 w-5" />
+                Book Your First Ride
+              </Link>
+            </div>
           )}
         </div>
       </div>
