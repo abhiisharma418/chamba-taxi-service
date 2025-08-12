@@ -47,7 +47,29 @@ const DriverEarnings: React.FC = () => {
   const loadEarningsData = async () => {
     setLoading(true);
     try {
-      // Simulate API call - in real app, this would fetch from backend
+      // Fetch real earnings data from backend
+      const [earningsResponse, breakdownResponse] = await Promise.all([
+        DriverAPI.getEarnings(selectedPeriod),
+        DriverAPI.getEarningsBreakdown()
+      ]);
+
+      if (earningsResponse.success && breakdownResponse.success) {
+        const earningsData: EarningsData = {
+          daily: earningsResponse.data.daily || [],
+          weekly: earningsResponse.data.weekly || [],
+          monthly: earningsResponse.data.monthly || [],
+          summary: earningsResponse.data.summary,
+          breakdown: breakdownResponse.data
+        };
+
+        setEarningsData(earningsData);
+      } else {
+        throw new Error('Failed to fetch earnings data');
+      }
+    } catch (error) {
+      console.error('Error loading earnings data:', error);
+
+      // Fallback to mock data if API fails
       const mockData: EarningsData = {
         daily: Array.from({ length: 30 }, (_, i) => ({
           date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -85,10 +107,8 @@ const DriverEarnings: React.FC = () => {
           cancellationFee: 300
         }
       };
-      
+
       setEarningsData(mockData);
-    } catch (error) {
-      console.error('Error loading earnings data:', error);
     } finally {
       setLoading(false);
     }
