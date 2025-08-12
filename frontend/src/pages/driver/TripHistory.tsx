@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
-import { 
+import {
   Calendar, MapPin, Clock, DollarSign, Star, Filter,
   Search, Download, Eye, MoreHorizontal, Navigation as NavigationIcon,
-  TrendingUp, BarChart3, Users, Target, Phone, MessageSquare
+  TrendingUp, BarChart3, Users, Target, Phone, MessageSquare, X
 } from 'lucide-react';
 
 interface TripData {
