@@ -1,184 +1,192 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
 import { 
-  User, Car, Camera, Phone, Mail, MapPin, Star, Shield, 
-  Edit, Save, X, Upload, FileText, Clock, Award, CheckCircle
+  User, Camera, Phone, Mail, MapPin, Calendar, 
+  Edit3, Save, X, Upload, Star, Shield, Award,
+  Car, FileText, Clock, Check, AlertCircle
 } from 'lucide-react';
 
 interface DriverProfile {
   personalInfo: {
     name: string;
-    phone: string;
     email: string;
-    address: string;
+    phone: string;
     dateOfBirth: string;
+    address: string;
     emergencyContact: string;
-    profilePhoto: string;
+    emergencyPhone: string;
   };
-  vehicleInfo: {
-    make: string;
-    model: string;
-    year: string;
-    color: string;
-    licensePlate: string;
-    registrationNumber: string;
-    insuranceExpiry: string;
-    pollutionExpiry: string;
-    vehiclePhoto: string;
-  };
-  documents: {
-    drivingLicense: { uploaded: boolean; verified: boolean; expiryDate: string };
-    aadharCard: { uploaded: boolean; verified: boolean };
-    panCard: { uploaded: boolean; verified: boolean };
-    vehicleRC: { uploaded: boolean; verified: boolean };
-    insurance: { uploaded: boolean; verified: boolean; expiryDate: string };
-    pollutionCert: { uploaded: boolean; verified: boolean; expiryDate: string };
-  };
-  stats: {
+  driverInfo: {
+    licenseNumber: string;
+    licenseExpiry: string;
+    experience: string;
+    languages: string[];
     rating: number;
     totalRides: number;
     joinDate: string;
-    badgesEarned: string[];
-    verificationLevel: 'basic' | 'verified' | 'premium';
+    status: 'active' | 'inactive' | 'suspended';
+  };
+  documents: {
+    profilePhoto: string;
+    licensePhoto: string;
+    aadharCard: string;
+    panCard: string;
+    medicalCertificate: string;
+    policeVerification: string;
+  };
+  preferences: {
+    notifications: {
+      rides: boolean;
+      earnings: boolean;
+      promotions: boolean;
+      maintenance: boolean;
+    };
+    availability: {
+      workingHours: { start: string; end: string };
+      workingDays: string[];
+      maxDistance: number;
+    };
   };
 }
 
 const DriverProfile: React.FC = () => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<DriverProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
-  const [activeTab, setActiveTab] = useState<'personal' | 'vehicle' | 'documents' | 'stats'>('personal');
-  const [uploadingDocument, setUploadingDocument] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'personal' | 'driver' | 'documents' | 'preferences'>('personal');
+  const [uploading, setUploading] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
-    try {
-      // Simulate API call - in real app, this would fetch from backend
-      const mockProfile: DriverProfile = {
-        personalInfo: {
-          name: user?.name || 'John Doe',
-          phone: '+91 98765 43210',
-          email: user?.email || 'john.doe@example.com',
-          address: '123 Main Street, Sector 15, Chandigarh, 160015',
-          dateOfBirth: '1990-05-15',
-          emergencyContact: '+91 98765 43211',
-          profilePhoto: ''
-        },
-        vehicleInfo: {
-          make: 'Maruti Suzuki',
-          model: 'Swift Dzire',
-          year: '2020',
-          color: 'White',
-          licensePlate: 'CH01AB1234',
-          registrationNumber: 'CH01201923456789',
-          insuranceExpiry: '2025-03-15',
-          pollutionExpiry: '2024-12-01',
-          vehiclePhoto: ''
-        },
-        documents: {
-          drivingLicense: { uploaded: true, verified: true, expiryDate: '2026-08-20' },
-          aadharCard: { uploaded: true, verified: true },
-          panCard: { uploaded: true, verified: false },
-          vehicleRC: { uploaded: true, verified: true },
-          insurance: { uploaded: true, verified: true, expiryDate: '2025-03-15' },
-          pollutionCert: { uploaded: false, verified: false, expiryDate: '2024-12-01' }
-        },
-        stats: {
-          rating: 4.8,
-          totalRides: 1247,
-          joinDate: '2023-01-15',
-          badgesEarned: ['Safe Driver', 'Top Rated', 'Punctual'],
-          verificationLevel: 'verified'
-        }
-      };
-      
-      setProfile(mockProfile);
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    } finally {
-      setLoading(false);
+  // Mock profile data - in real app, this would come from API
+  const [profile, setProfile] = useState<DriverProfile>({
+    personalInfo: {
+      name: user?.name || 'John Doe',
+      email: user?.email || 'john.doe@example.com',
+      phone: '+91 9876543210',
+      dateOfBirth: '1990-05-15',
+      address: '123 Main Street, City, State - 110001',
+      emergencyContact: 'Jane Doe',
+      emergencyPhone: '+91 9876543211'
+    },
+    driverInfo: {
+      licenseNumber: 'DL-1420110012345',
+      licenseExpiry: '2026-05-15',
+      experience: '5 years',
+      languages: ['Hindi', 'English', 'Punjabi'],
+      rating: 4.8,
+      totalRides: 1250,
+      joinDate: '2023-01-15',
+      status: 'active'
+    },
+    documents: {
+      profilePhoto: '',
+      licensePhoto: '',
+      aadharCard: '',
+      panCard: '',
+      medicalCertificate: '',
+      policeVerification: ''
+    },
+    preferences: {
+      notifications: {
+        rides: true,
+        earnings: true,
+        promotions: false,
+        maintenance: true
+      },
+      availability: {
+        workingHours: { start: '06:00', end: '22:00' },
+        workingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        maxDistance: 25
+      }
     }
-  };
+  });
 
   const handleSave = async () => {
-    try {
-      // Save profile changes to backend
-      setEditMode(false);
-      // Show success message
-    } catch (error) {
-      console.error('Error saving profile:', error);
-    }
+    // API call to save profile
+    setIsEditing(false);
   };
 
-  const handleDocumentUpload = async (documentType: string, file: File) => {
-    setUploadingDocument(documentType);
-    try {
-      // Upload document to backend
-      // Update document status
-      if (profile) {
-        setProfile({
-          ...profile,
-          documents: {
-            ...profile.documents,
-            [documentType]: {
-              ...profile.documents[documentType as keyof typeof profile.documents],
-              uploaded: true
-            }
-          }
-        });
+  const handleFileUpload = async (documentType: keyof DriverProfile['documents'], file: File) => {
+    setUploading(documentType);
+    
+    // Simulate upload
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setProfile(prev => ({
+      ...prev,
+      documents: {
+        ...prev.documents,
+        [documentType]: URL.createObjectURL(file)
       }
-    } catch (error) {
-      console.error('Error uploading document:', error);
-    } finally {
-      setUploadingDocument(null);
+    }));
+    
+    setUploading(null);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'text-green-600 bg-green-100';
+      case 'inactive': return 'text-gray-600 bg-gray-100';
+      case 'suspended': return 'text-red-600 bg-red-100';
+      default: return 'text-gray-600 bg-gray-100';
     }
   };
 
-  const getVerificationStatusColor = (level: string) => {
-    switch (level) {
-      case 'premium': return 'text-purple-600 bg-purple-100';
-      case 'verified': return 'text-green-600 bg-green-100';
-      default: return 'text-yellow-600 bg-yellow-100';
-    }
-  };
-
-  const getDocumentStatusIcon = (doc: any) => {
-    if (doc.verified) return <CheckCircle className="h-5 w-5 text-green-600" />;
-    if (doc.uploaded) return <Clock className="h-5 w-5 text-yellow-600" />;
-    return <X className="h-5 w-5 text-red-600" />;
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
-        <Navigation />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading profile...</p>
-          </div>
-        </div>
+  const DocumentUpload: React.FC<{ 
+    type: keyof DriverProfile['documents']; 
+    label: string; 
+    current: string;
+    required?: boolean;
+  }> = ({ type, label, current, required = false }) => (
+    <div className="border border-gray-200 rounded-lg p-4">
+      <div className="flex items-center justify-between mb-3">
+        <label className="font-medium text-gray-900">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        {current && <Check className="h-5 w-5 text-green-600" />}
       </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
-        <Navigation />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
-            <p className="text-red-600">Failed to load profile</p>
-          </div>
-        </div>
+      
+      <div className="relative">
+        <input
+          type="file"
+          accept="image/*,.pdf"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(type, file);
+          }}
+          className="hidden"
+          id={`upload-${type}`}
+        />
+        
+        <label
+          htmlFor={`upload-${type}`}
+          className={`
+            flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer
+            ${current ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-gray-50'}
+            ${uploading === type ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}
+          `}
+        >
+          {uploading === type ? (
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              <p className="text-sm text-gray-600">Uploading...</p>
+            </div>
+          ) : current ? (
+            <div className="text-center">
+              <Check className="h-8 w-8 text-green-600 mx-auto mb-2" />
+              <p className="text-sm text-green-700">Document uploaded</p>
+              <p className="text-xs text-gray-500">Click to replace</p>
+            </div>
+          ) : (
+            <div className="text-center">
+              <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Upload {label}</p>
+              <p className="text-xs text-gray-500">PNG, JPG or PDF up to 5MB</p>
+            </div>
+          )}
+        </label>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
@@ -190,235 +198,309 @@ const DriverProfile: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
-                  {profile.personalInfo.profilePhoto ? (
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center">
+                  {profile.documents.profilePhoto ? (
                     <img 
-                      src={profile.personalInfo.profilePhoto} 
+                      src={profile.documents.profilePhoto} 
                       alt="Profile" 
-                      className="w-full h-full rounded-2xl object-cover"
+                      className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
-                    profile.personalInfo.name.split(' ').map(n => n[0]).join('')
+                    <User className="h-12 w-12 text-white" />
                   )}
                 </div>
-                <button className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
+                <button className="absolute -bottom-2 -right-2 bg-blue-600 text-white rounded-full p-2 hover:bg-blue-700 transition-colors">
                   <Camera className="h-4 w-4" />
                 </button>
               </div>
               
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">{profile.personalInfo.name}</h1>
+                <p className="text-gray-600">Driver ID: #{user?.id}</p>
                 <div className="flex items-center space-x-4 mt-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(profile.driverInfo.status)}`}>
+                    {profile.driverInfo.status.charAt(0).toUpperCase() + profile.driverInfo.status.slice(1)}
+                  </span>
                   <div className="flex items-center space-x-1">
-                    <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                    <span className="font-semibold">{profile.stats.rating}</span>
-                    <span className="text-gray-600">({profile.stats.totalRides} rides)</span>
-                  </div>
-                  
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${getVerificationStatusColor(profile.stats.verificationLevel)}`}>
-                    <Shield className="h-4 w-4 inline mr-1" />
-                    {profile.stats.verificationLevel.charAt(0).toUpperCase() + profile.stats.verificationLevel.slice(1)}
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="font-medium">{profile.driverInfo.rating}</span>
+                    <span className="text-gray-500">({profile.driverInfo.totalRides} rides)</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <button
-              onClick={() => editMode ? handleSave() : setEditMode(true)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-colors ${
-                editMode
-                  ? 'bg-green-600 hover:bg-green-700 text-white'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }`}
-            >
-              {editMode ? <Save className="h-5 w-5" /> : <Edit className="h-5 w-5" />}
-              <span>{editMode ? 'Save Changes' : 'Edit Profile'}</span>
-            </button>
+            <div className="flex space-x-3">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                    <span>Cancel</span>
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Save className="h-4 w-4" />
+                    <span>Save Changes</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Edit3 className="h-4 w-4" />
+                  <span>Edit Profile</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 mb-8">
-          <div className="flex space-x-1 p-2">
-            {[
-              { id: 'personal', label: 'Personal Info', icon: User },
-              { id: 'vehicle', label: 'Vehicle Info', icon: Car },
-              { id: 'documents', label: 'Documents', icon: FileText },
-              { id: 'stats', label: 'Statistics', icon: Award }
-            ].map((tab) => {
-              const IconComponent = tab.icon;
-              return (
+        {/* Tabs */}
+        <div className="mb-8">
+          <div className="border-b border-gray-200 bg-white rounded-t-2xl">
+            <nav className="flex space-x-8 px-8 pt-6">
+              {[
+                { id: 'personal', label: 'Personal Info', icon: User },
+                { id: 'driver', label: 'Driver Details', icon: Shield },
+                { id: 'documents', label: 'Documents', icon: FileText },
+                { id: 'preferences', label: 'Preferences', icon: Award }
+              ].map(({ id, label, icon: Icon }) => (
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
+                  key={id}
+                  onClick={() => setActiveTab(id as any)}
+                  className={`
+                    flex items-center space-x-2 pb-4 border-b-2 transition-colors
+                    ${activeTab === id 
+                      ? 'border-blue-600 text-blue-600' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }
+                  `}
                 >
-                  <IconComponent className="h-5 w-5" />
-                  <span>{tab.label}</span>
+                  <Icon className="h-5 w-5" />
+                  <span className="font-medium">{label}</span>
                 </button>
-              );
-            })}
+              ))}
+            </nav>
           </div>
         </div>
 
         {/* Tab Content */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8">
           {activeTab === 'personal' && (
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Personal Information</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    value={profile.personalInfo.name}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    value={profile.personalInfo.phone}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    value={profile.personalInfo.email}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                  <input
-                    type="date"
-                    value={profile.personalInfo.dateOfBirth}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
-                </div>
-                
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                  <textarea
-                    value={profile.personalInfo.address}
-                    disabled={!editMode}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact</label>
-                  <input
-                    type="tel"
-                    value={profile.personalInfo.emergencyContact}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <input
+                  type="text"
+                  value={profile.personalInfo.name}
+                  disabled={!isEditing}
+                  onChange={(e) => setProfile(prev => ({
+                    ...prev,
+                    personalInfo: { ...prev.personalInfo, name: e.target.value }
+                  }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  value={profile.personalInfo.email}
+                  disabled={!isEditing}
+                  onChange={(e) => setProfile(prev => ({
+                    ...prev,
+                    personalInfo: { ...prev.personalInfo, email: e.target.value }
+                  }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <input
+                  type="tel"
+                  value={profile.personalInfo.phone}
+                  disabled={!isEditing}
+                  onChange={(e) => setProfile(prev => ({
+                    ...prev,
+                    personalInfo: { ...prev.personalInfo, phone: e.target.value }
+                  }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                <input
+                  type="date"
+                  value={profile.personalInfo.dateOfBirth}
+                  disabled={!isEditing}
+                  onChange={(e) => setProfile(prev => ({
+                    ...prev,
+                    personalInfo: { ...prev.personalInfo, dateOfBirth: e.target.value }
+                  }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                <textarea
+                  value={profile.personalInfo.address}
+                  disabled={!isEditing}
+                  onChange={(e) => setProfile(prev => ({
+                    ...prev,
+                    personalInfo: { ...prev.personalInfo, address: e.target.value }
+                  }))}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact</label>
+                <input
+                  type="text"
+                  value={profile.personalInfo.emergencyContact}
+                  disabled={!isEditing}
+                  onChange={(e) => setProfile(prev => ({
+                    ...prev,
+                    personalInfo: { ...prev.personalInfo, emergencyContact: e.target.value }
+                  }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Phone</label>
+                <input
+                  type="tel"
+                  value={profile.personalInfo.emergencyPhone}
+                  disabled={!isEditing}
+                  onChange={(e) => setProfile(prev => ({
+                    ...prev,
+                    personalInfo: { ...prev.personalInfo, emergencyPhone: e.target.value }
+                  }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                />
               </div>
             </div>
           )}
 
-          {activeTab === 'vehicle' && (
+          {activeTab === 'driver' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Vehicle Information</h3>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Make</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">License Number</label>
                   <input
                     type="text"
-                    value={profile.vehicleInfo.make}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                    value={profile.driverInfo.licenseNumber}
+                    disabled={!isEditing}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">License Expiry</label>
                   <input
-                    type="text"
-                    value={profile.vehicleInfo.model}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                    type="date"
+                    value={profile.driverInfo.licenseExpiry}
+                    disabled={!isEditing}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
-                  <input
-                    type="text"
-                    value={profile.vehicleInfo.year}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Driving Experience</label>
+                  <select
+                    value={profile.driverInfo.experience}
+                    disabled={!isEditing}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                  >
+                    <option value="1-2 years">1-2 years</option>
+                    <option value="3-5 years">3-5 years</option>
+                    <option value="5-10 years">5-10 years</option>
+                    <option value="10+ years">10+ years</option>
+                  </select>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Join Date</label>
                   <input
-                    type="text"
-                    value={profile.vehicleInfo.color}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">License Plate</label>
-                  <input
-                    type="text"
-                    value={profile.vehicleInfo.licensePlate}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Registration Number</label>
-                  <input
-                    type="text"
-                    value={profile.vehicleInfo.registrationNumber}
-                    disabled={!editMode}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                    type="date"
+                    value={profile.driverInfo.joinDate}
+                    disabled
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
                   />
                 </div>
               </div>
 
-              {/* Vehicle Photo */}
-              <div className="mt-8">
-                <label className="block text-sm font-medium text-gray-700 mb-4">Vehicle Photo</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
-                  {profile.vehicleInfo.vehiclePhoto ? (
-                    <img src={profile.vehicleInfo.vehiclePhoto} alt="Vehicle" className="max-h-48 mx-auto rounded-lg" />
-                  ) : (
-                    <div>
-                      <Car className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600">Upload vehicle photo</p>
-                      {editMode && (
-                        <button className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                          <Upload className="h-4 w-4 inline mr-2" />
-                          Choose File
-                        </button>
-                      )}
-                    </div>
-                  )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Languages Spoken</label>
+                <div className="flex flex-wrap gap-2">
+                  {['Hindi', 'English', 'Punjabi', 'Marathi', 'Tamil', 'Telugu', 'Bengali'].map(lang => (
+                    <label key={lang} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={profile.driverInfo.languages.includes(lang)}
+                        disabled={!isEditing}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setProfile(prev => ({
+                              ...prev,
+                              driverInfo: {
+                                ...prev.driverInfo,
+                                languages: [...prev.driverInfo.languages, lang]
+                              }
+                            }));
+                          } else {
+                            setProfile(prev => ({
+                              ...prev,
+                              driverInfo: {
+                                ...prev.driverInfo,
+                                languages: prev.driverInfo.languages.filter(l => l !== lang)
+                              }
+                            }));
+                          }
+                        }}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">{lang}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <Star className="h-6 w-6 text-yellow-500 fill-current" />
+                    <span className="font-semibold text-gray-900">Rating</span>
+                  </div>
+                  <div className="text-2xl font-bold text-blue-600">{profile.driverInfo.rating}/5.0</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <Car className="h-6 w-6 text-green-600" />
+                    <span className="font-semibold text-gray-900">Total Rides</span>
+                  </div>
+                  <div className="text-2xl font-bold text-green-600">{profile.driverInfo.totalRides}</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <Clock className="h-6 w-6 text-purple-600" />
+                    <span className="font-semibold text-gray-900">Experience</span>
+                  </div>
+                  <div className="text-2xl font-bold text-purple-600">{profile.driverInfo.experience}</div>
                 </div>
               </div>
             </div>
@@ -426,97 +508,224 @@ const DriverProfile: React.FC = () => {
 
           {activeTab === 'documents' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Documents & Verification</h3>
-              
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="h-5 w-5 text-amber-600" />
+                  <p className="text-amber-800 font-medium">Document Requirements</p>
+                </div>
+                <p className="text-amber-700 text-sm mt-1">
+                  Please upload clear, readable copies of all required documents. All documents must be valid and not expired.
+                </p>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(profile.documents).map(([key, doc]) => (
-                  <div key={key} className="border border-gray-200 rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-semibold text-gray-900 capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </h4>
-                      {getDocumentStatusIcon(doc)}
-                    </div>
-                    
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Status:</span>
-                        <span className={`font-medium ${
-                          doc.verified ? 'text-green-600' : 
-                          doc.uploaded ? 'text-yellow-600' : 'text-red-600'
-                        }`}>
-                          {doc.verified ? 'Verified' : doc.uploaded ? 'Under Review' : 'Not Uploaded'}
-                        </span>
-                      </div>
-                      
-                      {'expiryDate' in doc && doc.expiryDate && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Expires:</span>
-                          <span className="font-medium">{new Date(doc.expiryDate).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {!doc.uploaded && (
-                      <button
-                        onClick={() => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*,application/pdf';
-                          input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (file) handleDocumentUpload(key, file);
-                          };
-                          input.click();
-                        }}
-                        disabled={uploadingDocument === key}
-                        className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
-                      >
-                        {uploadingDocument === key ? 'Uploading...' : 'Upload'}
-                      </button>
-                    )}
-                  </div>
-                ))}
+                <DocumentUpload
+                  type="profilePhoto"
+                  label="Profile Photo"
+                  current={profile.documents.profilePhoto}
+                  required
+                />
+                
+                <DocumentUpload
+                  type="licensePhoto"
+                  label="Driving License"
+                  current={profile.documents.licensePhoto}
+                  required
+                />
+                
+                <DocumentUpload
+                  type="aadharCard"
+                  label="Aadhar Card"
+                  current={profile.documents.aadharCard}
+                  required
+                />
+                
+                <DocumentUpload
+                  type="panCard"
+                  label="PAN Card"
+                  current={profile.documents.panCard}
+                  required
+                />
+                
+                <DocumentUpload
+                  type="medicalCertificate"
+                  label="Medical Certificate"
+                  current={profile.documents.medicalCertificate}
+                />
+                
+                <DocumentUpload
+                  type="policeVerification"
+                  label="Police Verification"
+                  current={profile.documents.policeVerification}
+                />
               </div>
             </div>
           )}
 
-          {activeTab === 'stats' && (
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Driver Statistics</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
-                  <Star className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-blue-800 mb-2">{profile.stats.rating}</div>
-                  <div className="text-blue-600">Average Rating</div>
-                </div>
-                
-                <div className="text-center bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
-                  <Car className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-green-800 mb-2">{profile.stats.totalRides}</div>
-                  <div className="text-green-600">Total Rides</div>
-                </div>
-                
-                <div className="text-center bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
-                  <Clock className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-purple-800 mb-2">
-                    {Math.floor((Date.now() - new Date(profile.stats.joinDate).getTime()) / (1000 * 60 * 60 * 24))}
-                  </div>
-                  <div className="text-purple-600">Days Active</div>
+          {activeTab === 'preferences' && (
+            <div className="space-y-8">
+              {/* Notification Preferences */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
+                <div className="space-y-4">
+                  {Object.entries(profile.preferences.notifications).map(([key, value]) => (
+                    <label key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div>
+                        <span className="font-medium text-gray-900 capitalize">
+                          {key.replace(/([A-Z])/g, ' $1')}
+                        </span>
+                        <p className="text-sm text-gray-600">
+                          {key === 'rides' && 'Get notified about new ride requests'}
+                          {key === 'earnings' && 'Receive daily earnings summaries'}
+                          {key === 'promotions' && 'Get updates about bonuses and incentives'}
+                          {key === 'maintenance' && 'System maintenance and update notifications'}
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={value}
+                        disabled={!isEditing}
+                        onChange={(e) => setProfile(prev => ({
+                          ...prev,
+                          preferences: {
+                            ...prev.preferences,
+                            notifications: {
+                              ...prev.preferences.notifications,
+                              [key]: e.target.checked
+                            }
+                          }
+                        }))}
+                        className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                    </label>
+                  ))}
                 </div>
               </div>
 
-              {/* Badges */}
-              <div className="mt-8">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Badges Earned</h4>
-                <div className="flex flex-wrap gap-3">
-                  {profile.stats.badgesEarned.map((badge, index) => (
-                    <div key={index} className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 px-4 py-2 rounded-full font-medium flex items-center space-x-2">
-                      <Award className="h-4 w-4" />
-                      <span>{badge}</span>
+              {/* Availability Preferences */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Availability Settings</h3>
+                
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Working Hours</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Start Time</label>
+                        <input
+                          type="time"
+                          value={profile.preferences.availability.workingHours.start}
+                          disabled={!isEditing}
+                          onChange={(e) => setProfile(prev => ({
+                            ...prev,
+                            preferences: {
+                              ...prev.preferences,
+                              availability: {
+                                ...prev.preferences.availability,
+                                workingHours: {
+                                  ...prev.preferences.availability.workingHours,
+                                  start: e.target.value
+                                }
+                              }
+                            }
+                          }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">End Time</label>
+                        <input
+                          type="time"
+                          value={profile.preferences.availability.workingHours.end}
+                          disabled={!isEditing}
+                          onChange={(e) => setProfile(prev => ({
+                            ...prev,
+                            preferences: {
+                              ...prev.preferences,
+                              availability: {
+                                ...prev.preferences.availability,
+                                workingHours: {
+                                  ...prev.preferences.availability.workingHours,
+                                  end: e.target.value
+                                }
+                              }
+                            }
+                          }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                        />
+                      </div>
                     </div>
-                  ))}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Working Days</label>
+                    <div className="grid grid-cols-4 gap-3">
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                        <label key={day} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={profile.preferences.availability.workingDays.includes(day)}
+                            disabled={!isEditing}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setProfile(prev => ({
+                                  ...prev,
+                                  preferences: {
+                                    ...prev.preferences,
+                                    availability: {
+                                      ...prev.preferences.availability,
+                                      workingDays: [...prev.preferences.availability.workingDays, day]
+                                    }
+                                  }
+                                }));
+                              } else {
+                                setProfile(prev => ({
+                                  ...prev,
+                                  preferences: {
+                                    ...prev.preferences,
+                                    availability: {
+                                      ...prev.preferences.availability,
+                                      workingDays: prev.preferences.availability.workingDays.filter(d => d !== day)
+                                    }
+                                  }
+                                }));
+                              }
+                            }}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">{day.slice(0, 3)}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Maximum Distance (km): {profile.preferences.availability.maxDistance}
+                    </label>
+                    <input
+                      type="range"
+                      min="5"
+                      max="50"
+                      value={profile.preferences.availability.maxDistance}
+                      disabled={!isEditing}
+                      onChange={(e) => setProfile(prev => ({
+                        ...prev,
+                        preferences: {
+                          ...prev.preferences,
+                          availability: {
+                            ...prev.preferences.availability,
+                            maxDistance: parseInt(e.target.value)
+                          }
+                        }
+                      }))}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>5 km</span>
+                      <span>50 km</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
