@@ -5,11 +5,22 @@ import { Ride } from '../models/rideModel.js';
 import { notifyDriver, notifyCustomer } from '../services/notificationService.js';
 
 export const driverHeartbeat = async (req, res) => {
-  const schema = Joi.object({ lng: Joi.number().required(), lat: Joi.number().required() });
-  const { error, value } = schema.validate(req.body);
-  if (error) return res.status(400).json({ success: false, message: error.message });
-  await setDriverLocation(req.user.id, value.lng, value.lat);
-  res.json({ success: true });
+  try {
+    const schema = Joi.object({ lng: Joi.number().required(), lat: Joi.number().required() });
+    const { error, value } = schema.validate(req.body);
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const success = await updateDriverLocation(req.user.id, value.lat, value.lng);
+
+    if (success) {
+      res.json({ success: true, message: 'Location updated' });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to update location' });
+    }
+  } catch (error) {
+    console.error('Driver heartbeat error:', error);
+    res.status(500).json({ success: false, message: 'Heartbeat failed' });
+  }
 };
 
 export const driverSetAvailability = async (req, res) => {
