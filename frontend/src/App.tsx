@@ -91,10 +91,10 @@ const AppRoutes: React.FC = () => {
               }
             />
             <Route
-              path="/driver/rides"
+              path="/driver/trip-history"
               element={
                 <ProtectedRoute userType="driver">
-                  <DriverRides />
+                  <DriverTripHistory />
                 </ProtectedRoute>
               }
             />
@@ -111,6 +111,22 @@ const AppRoutes: React.FC = () => {
               element={
                 <ProtectedRoute userType="driver">
                   <DriverProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/driver/vehicle-management"
+              element={
+                <ProtectedRoute userType="driver">
+                  <DriverVehicleManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/driver/support"
+              element={
+                <ProtectedRoute userType="driver">
+                  <DriverSupport />
                 </ProtectedRoute>
               }
             />
