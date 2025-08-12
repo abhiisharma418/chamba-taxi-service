@@ -117,7 +117,7 @@ const CustomerDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          <Link to="/customer/book-ride" className="group bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+          <Link to="/customer/book-ride" className="group bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 animate-fadeInUp hover-lift" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center justify-between">
               <div>
                 <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300 mb-4">
