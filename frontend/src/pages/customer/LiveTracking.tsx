@@ -365,6 +365,108 @@ const LiveTracking: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Emergency Modal */}
+      {showEmergencyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="h-8 w-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Emergency Alert</h3>
+              <p className="text-gray-600">
+                This will immediately notify our support team, emergency contacts, and local authorities if needed.
+              </p>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              <h4 className="font-semibold text-gray-900">Select Emergency Type:</h4>
+
+              <button
+                onClick={() => handleEmergencyConfirm('SAFETY_CONCERN')}
+                disabled={emergencyLoading}
+                className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <Shield className="h-5 w-5" />
+                  <div>
+                    <div className="font-medium">Safety Concern</div>
+                    <div className="text-sm opacity-90">Driver behavior or route issues</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleEmergencyConfirm('MEDICAL_EMERGENCY')}
+                disabled={emergencyLoading}
+                className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5" />
+                  <div>
+                    <div className="font-medium">Medical Emergency</div>
+                    <div className="text-sm opacity-90">Need immediate medical assistance</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleEmergencyConfirm('VEHICLE_ACCIDENT')}
+                disabled={emergencyLoading}
+                className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5" />
+                  <div>
+                    <div className="font-medium">Vehicle Accident</div>
+                    <div className="text-sm opacity-90">Road accident or vehicle breakdown</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleEmergencyConfirm('GENERAL_EMERGENCY')}
+                disabled={emergencyLoading}
+                className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <HeadphonesIcon className="h-5 w-5" />
+                  <div>
+                    <div className="font-medium">Other Emergency</div>
+                    <div className="text-sm opacity-90">General emergency or assistance needed</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowEmergencyModal(false)}
+                disabled={emergencyLoading}
+                className="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDirectCall('112')}
+                className="flex-1 bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                Call 112 Now
+              </button>
+            </div>
+
+            {emergencyLoading && (
+              <div className="absolute inset-0 bg-white bg-opacity-90 rounded-2xl flex items-center justify-center">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-600">Sending emergency alert...</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
