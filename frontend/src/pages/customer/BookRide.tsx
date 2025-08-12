@@ -282,7 +282,7 @@ const BookRide: React.FC = () => {
                 <button
                   onClick={handleContinueToPayment}
                   disabled={!fareEstimate}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-slate-400 disabled:to-slate-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:transform-none"
+                  className={`flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-slate-400 disabled:to-slate-500 text-white font-semibold py-4 px-6 rounded-xl disabled:cursor-not-allowed disabled:transform-none ${buttonVariants.primary}`}
                 >
                   <CreditCard className="h-5 w-5 inline mr-2" />
                   Continue to Payment
