@@ -23,6 +23,7 @@ import deviceRoutes from './routes/deviceRoutes.js';
 import zoneRoutes from './routes/zoneRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
 import whatsappRoutes from './routes/whatsappRoutes.js';
+import trackingRoutes from './routes/trackingRoutes.js';
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
