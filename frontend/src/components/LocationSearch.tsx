@@ -49,21 +49,26 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   }, [isLoaded]);
 
   const searchPlaces = async (searchQuery: string) => {
-    if (!searchQuery.trim() || !autocompleteService.current || !window.google) return;
+    if (!searchQuery.trim() || !autocompleteService.current || !isLoaded) return;
 
     setIsLoading(true);
-    
+
     try {
       autocompleteService.current.getPlacePredictions(
         {
           input: searchQuery,
           componentRestrictions: { country: 'IN' }, // Restrict to India
-          types: ['establishment', 'geocode']
+          types: ['establishment', 'geocode'],
+          fields: ['place_id', 'formatted_address', 'geometry', 'name'],
+          bounds: new google.maps.LatLngBounds(
+            new google.maps.LatLng(31.0, 77.0), // Southwest bounds (Shimla area)
+            new google.maps.LatLng(31.2, 77.3)  // Northeast bounds
+          )
         },
         (predictions, status) => {
           setIsLoading(false);
           if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-            setSuggestions(predictions.slice(0, 5)); // Limit to 5 suggestions
+            setSuggestions(predictions.slice(0, 6)); // Limit to 6 suggestions
           } else {
             setSuggestions([]);
           }
@@ -72,6 +77,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     } catch (error) {
       setIsLoading(false);
       setSuggestions([]);
+      console.warn('Places search error:', error);
     }
   };
 
