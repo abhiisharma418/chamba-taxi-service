@@ -46,7 +46,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   }, []);
 
   const searchPlaces = async (searchQuery: string) => {
-    if (!searchQuery.trim() || !autocompleteService.current) return;
+    if (!searchQuery.trim() || !autocompleteService.current || !window.google) return;
 
     setIsLoading(true);
     
