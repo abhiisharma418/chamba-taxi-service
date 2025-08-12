@@ -86,7 +86,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   };
 
   const selectPlace = (prediction: google.maps.places.AutocompletePrediction) => {
-    if (!placesService.current) return;
+    if (!placesService.current || !window.google) return;
 
     placesService.current.getDetails(
       { placeId: prediction.place_id },
