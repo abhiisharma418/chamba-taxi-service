@@ -7,7 +7,7 @@ import MapComponent from '../../components/MapComponent';
 import LocationSearch from '../../components/LocationSearch';
 import PaymentMethod from '../../components/PaymentMethod';
 import WhatsAppNotification from '../../components/WhatsAppNotification';
-import { Car, Clock, CreditCard, Bike, Users, Zap, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Car, Clock, CreditCard, Bike, Users, Zap, ArrowLeft, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { RidesAPI, PaymentAPI } from '../../lib/api';
 import { io } from 'socket.io-client';
 
