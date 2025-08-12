@@ -74,26 +74,25 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-gray-100">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2">
-            <Car className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">RideShare</span>
+          <Link to="/" className="inline-flex items-center justify-center">
+            <Logo size="lg" />
           </Link>
-          <p className="text-gray-600 mt-2">Create your account to get started.</p>
+          <p className="text-slate-600 mt-4 text-lg">Join thousands who trust RideWithUs</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* User Type Selection */}
-          <div className="flex space-x-2 bg-gray-100 rounded-lg p-1">
+          <div className="flex space-x-2 bg-slate-100 rounded-xl p-1.5">
             <button
               type="button"
               onClick={() => setUserType('customer')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+              className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
                 userType === 'customer'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-lg transform scale-105'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Customer
@@ -101,10 +100,10 @@ const Signup: React.FC = () => {
             <button
               type="button"
               onClick={() => setUserType('driver')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+              className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
                 userType === 'driver'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-lg transform scale-105'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Driver
