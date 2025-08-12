@@ -90,12 +90,18 @@ const BookRide: React.FC = () => {
         vehicleType,
         regionType: 'city',
       };
+
       const res = await RidesAPI.estimate(payload);
-      setFareEstimate(res.data.estimated || res.data.price);
-      setEstimateInfo(res.data);
-    } catch (error) {
+
+      if (res.success) {
+        setFareEstimate(res.data.estimated || res.data.price);
+        setEstimateInfo(res.data);
+      } else {
+        throw new Error('Estimation failed');
+      }
+    } catch (error: any) {
       console.error('Fare estimation failed:', error);
-      setEstimateError('Unable to calculate fare. Please try again.');
+      setEstimateError(error.message || 'Unable to calculate fare. Please try again.');
     } finally {
       setEstimateLoading(false);
     }
