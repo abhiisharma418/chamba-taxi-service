@@ -36,13 +36,25 @@ interface EarningsData {
 const DriverEarnings: React.FC = () => {
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [earningsData, setEarningsData] = useState<EarningsData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [showBreakdown, setShowBreakdown] = useState(false);
 
-  useEffect(() => {
-    loadEarningsData();
-  }, [selectedPeriod]);
+  // Use React Query hooks for data fetching
+  const {
+    data: earningsResponse,
+    isLoading: earningsLoading,
+    error: earningsError
+  } = useDriverEarnings(selectedPeriod);
+
+  const {
+    data: breakdownResponse,
+    isLoading: breakdownLoading
+  } = useDriverEarningsBreakdown();
+
+  const loading = earningsLoading || breakdownLoading;
+  const earningsData = earningsResponse?.success ? {
+    ...earningsResponse.data,
+    breakdown: breakdownResponse?.success ? breakdownResponse.data : {}
+  } : null;
 
   const loadEarningsData = async () => {
     setLoading(true);
