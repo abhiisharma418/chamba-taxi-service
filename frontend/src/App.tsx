@@ -29,10 +29,6 @@ const DriverRides = React.lazy(() => import('./pages/driver/Rides'));
 const DriverEarnings = React.lazy(() => import('./pages/driver/Earnings'));
 const DriverProfile = React.lazy(() => import('./pages/driver/Profile'));
 
-// Admin pages (for future use)
-const AdminDashboard = React.lazy(() => import('./admin/src/pages/Dashboard'));
-const AdminLogin = React.lazy(() => import('./admin/src/pages/Login'));
-
 function App() {
   // Initialize code splitting and performance monitoring
   useCodeSplitting();
