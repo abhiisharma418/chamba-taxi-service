@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
+import { DriverAPI } from '../../lib/api';
 import {
   Calendar, MapPin, Clock, DollarSign, Star, Filter,
   Search, Download, Eye, MoreHorizontal, Navigation as NavigationIcon,
