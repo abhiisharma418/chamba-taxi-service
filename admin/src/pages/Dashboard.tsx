@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { AdminAPI } from '../lib/api';
-import { 
-  Car, 
-  Users, 
-  DollarSign, 
-  TrendingUp, 
-  MapPin, 
+import {
+  Car,
+  Users,
+  DollarSign,
+  TrendingUp,
+  MapPin,
   Clock,
   Star,
-  Activity
+  Activity,
+  BarChart3,
+  PieChart,
+  Calendar,
+  AlertTriangle,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 
 interface Stats {
