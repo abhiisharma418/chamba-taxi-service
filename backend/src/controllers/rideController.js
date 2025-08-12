@@ -2,6 +2,7 @@ import Joi from 'joi';
 import { Ride } from '../models/rideModel.js';
 import { Vehicle } from '../models/vehicleModel.js';
 import { notifyRide, notifyUser } from '../services/notifyService.js';
+import { sendRideNotification } from '../controllers/whatsappController.js';
 
 const createRideSchema = Joi.object({
   pickup: Joi.object({ address: Joi.string().allow(''), coordinates: Joi.array().items(Joi.number()).length(2).required() }).required(),
