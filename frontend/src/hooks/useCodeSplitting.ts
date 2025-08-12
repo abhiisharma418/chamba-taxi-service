@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { preloadCriticalRoutes, prefetchResources } from '../utils/codeSplitting';
 
