@@ -170,7 +170,7 @@ const BookRide: React.FC = () => {
           {/* Booking Form */}
           <div className="lg:col-span-3 space-y-8">
             {/* Location Inputs */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8">
+            <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8 ${cardVariants.interactive}`} {...getStaggerDelay(0)}>
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Trip Details</h2>
 
               <div className="space-y-6">
