@@ -172,7 +172,8 @@ export const triggerEmergency = async (req, res) => {
       lat: Joi.number().required(),
       lng: Joi.number().required()
     }).required(),
-    message: Joi.string().optional()
+    message: Joi.string().optional(),
+    emergencyType: Joi.string().valid('SAFETY_CONCERN', 'MEDICAL_EMERGENCY', 'VEHICLE_ACCIDENT', 'GENERAL_EMERGENCY').optional()
   });
 
   const { error, value } = schema.validate(req.body);
