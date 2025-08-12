@@ -42,11 +42,24 @@ const DriverDashboard: React.FC = () => {
   const activeRide = driverBookings.find(booking => ['accepted', 'on-trip'].includes(booking.status));
 
   const todayEarnings = driverBookings
-    .filter(booking => 
-      booking.status === 'completed' && 
+    .filter(booking =>
+      booking.status === 'completed' &&
+      new Date(booking.completedAt!).toDateString() === new Date().toDateString()
+    )
+    .reduce((sum, booking) => {
+      const totalFare = booking.fare.actual || booking.fare.estimated;
+      const driverShare = Math.round(totalFare * 0.75); // Driver gets 75%
+      return sum + driverShare;
+    }, 0);
+
+  const totalTodayFares = driverBookings
+    .filter(booking =>
+      booking.status === 'completed' &&
       new Date(booking.completedAt!).toDateString() === new Date().toDateString()
     )
     .reduce((sum, booking) => sum + (booking.fare.actual || booking.fare.estimated), 0);
+
+  const companyCommission = totalTodayFares - todayEarnings;
 
   const handleAcceptRide = async (bookingId: string) => {
     await RidesAPI.updateStatus(bookingId, 'accepted');
