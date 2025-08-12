@@ -232,16 +232,58 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   };
 
   const initiateRazorpayPayment = async () => {
-    // This would integrate with Razorpay
-    // For now, simulate success
-    setTimeout(() => {
+    try {
+      // Create Razorpay payment intent
+      const response = await PaymentAPI.createIntent({
+        provider: 'razorpay',
+        amount: amount * 100, // Convert to paise
+        currency: 'INR'
+      });
+
+      if (response.success) {
+        const { order, paymentId } = response.data;
+
+        // Here you would integrate with Razorpay SDK
+        // For now, simulate success
+        setTimeout(async () => {
+          try {
+            await PaymentAPI.authorize({
+              provider: 'razorpay',
+              providerRef: order.id
+            });
+
+            await PaymentAPI.capture({
+              provider: 'razorpay',
+              providerRef: order.id
+            });
+
+            onPaymentComplete({
+              method: 'card',
+              status: 'success',
+              amount,
+              transactionId: order.id,
+              paymentId
+            });
+          } catch (error) {
+            onPaymentComplete({
+              method: 'card',
+              status: 'failed',
+              amount,
+              paymentId
+            });
+          }
+        }, 2000);
+      } else {
+        throw new Error('Razorpay payment creation failed');
+      }
+    } catch (error) {
+      console.error('Razorpay error:', error);
       onPaymentComplete({
         method: 'card',
-        status: 'success',
-        amount,
-        transactionId: `CARD_${Date.now()}`
+        status: 'failed',
+        amount
       });
-    }, 2000);
+    }
   };
 
   return (
