@@ -10,30 +10,18 @@ export function setToken(token: string | null) {
 }
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
-  // Use mock data for development
-  if (USE_MOCK_DATA) {
-    console.log(`Using mock data for ${path}`);
-    return getMockResponse(path, options);
-  }
-
   const token = getToken();
   const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(options.headers as any) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  try {
-    const res = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || `Request failed: ${res.status}`);
-    }
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('application/json')) return res.json();
-    return res.text();
-  } catch (error) {
-    // Fallback to mock data when API is unavailable
-    console.warn(`API call failed for ${path}, using mock data:`, error);
-    return getMockResponse(path, options);
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `Request failed: ${res.status}`);
   }
+  const ct = res.headers.get('content-type') || '';
+  if (ct.includes('application/json')) return res.json();
+  return res.text();
 }
 
 function getMockResponse(path: string, options: RequestInit) {
