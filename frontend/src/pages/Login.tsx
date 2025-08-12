@@ -180,8 +180,9 @@ const Login: React.FC = () => {
               <p className="text-xs text-slate-600">
                 🔄 Automatically uses demo data if live backend is unavailable
               </p>
-              <p className="text-xs text-blue-600 mt-1 font-mono">
-                Demo: customer@test.com / password
+              <p className="text-xs text-blue-600 mt-1">
+                <span className="font-mono">customer@test.com / password</span> <br/>
+                <span className="text-slate-500">or any email/password in demo mode</span>
               </p>
             </div>
           </div>
