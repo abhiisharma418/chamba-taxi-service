@@ -14,7 +14,9 @@ function getDemoResponse(path: string, options: RequestInit) {
   // Provide demo responses for essential functionality
   if (path === '/api/auth/login' && options.method === 'POST') {
     const body = JSON.parse(options.body as string);
-    // For demo purposes, accept common test credentials
+
+    // In demo mode, be more permissive with credentials
+    // Check for specific demo credentials first
     if ((body.email === 'customer@test.com' || body.email === 'demo@test.com') && body.password === 'password') {
       return {
         success: true,
@@ -30,7 +32,8 @@ function getDemoResponse(path: string, options: RequestInit) {
         }
       };
     }
-    if ((body.email === 'driver@test.com') && body.password === 'password') {
+
+    if (body.email === 'driver@test.com' && body.password === 'password') {
       return {
         success: true,
         data: {
@@ -45,8 +48,23 @@ function getDemoResponse(path: string, options: RequestInit) {
         }
       };
     }
-    // Invalid credentials
-    throw new Error('Invalid credentials');
+
+    // For any other credentials in demo mode, create a demo user
+    // This ensures the app always works even with wrong credentials
+    const userType = body.email.includes('driver') ? 'driver' : 'customer';
+    return {
+      success: true,
+      data: {
+        token: 'demo-token-' + Date.now(),
+        refresh: 'demo-refresh-token',
+        user: {
+          id: Date.now().toString(),
+          name: `Demo ${userType.charAt(0).toUpperCase() + userType.slice(1)}`,
+          email: body.email,
+          role: userType
+        }
+      }
+    };
   }
 
   if (path === '/api/auth/register' && options.method === 'POST') {
