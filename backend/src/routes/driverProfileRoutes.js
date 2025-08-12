@@ -12,7 +12,7 @@ import { authenticate } from '../middleware/auth.js';
 const router = express.Router();
 
 // All routes require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // Profile routes
 router.get('/', getProfile);
