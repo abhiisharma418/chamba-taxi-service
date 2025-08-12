@@ -11,6 +11,12 @@ export function setToken(token: string | null) {
 }
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
+  // Use mock data for development
+  if (USE_MOCK_DATA) {
+    console.log(`Using mock data for ${path}`);
+    return getMockResponse(path, options);
+  }
+
   const token = getToken();
   const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(options.headers as any) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
