@@ -27,6 +27,8 @@ const BookRide: React.FC = () => {
   const [isBooking, setIsBooking] = useState(false);
   const [fareEstimate, setFareEstimate] = useState<number | null>(null);
   const [estimateInfo, setEstimateInfo] = useState<any>(null);
+  const [estimateLoading, setEstimateLoading] = useState(false);
+  const [estimateError, setEstimateError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<'details' | 'payment' | 'confirmation'>('details');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(null);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
