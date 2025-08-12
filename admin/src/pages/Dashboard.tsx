@@ -38,7 +38,9 @@ interface AnalyticsData {
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d'>('7d');
 
   useEffect(() => {
     const fetchStats = async () => {
