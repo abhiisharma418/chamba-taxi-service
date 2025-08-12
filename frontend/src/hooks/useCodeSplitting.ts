@@ -7,19 +7,26 @@ export const useCodeSplitting = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user) {
-      // Preload routes based on user type
-      preloadCriticalRoutes(user.role as 'customer' | 'driver' | 'admin');
-      
-      // Prefetch common resources
-      prefetchResources.images([
-        '/icons/car.svg',
-        '/icons/user.svg',
-        '/icons/map.svg'
-      ]);
-    } else {
-      // Preload public routes for unauthenticated users
-      preloadCriticalRoutes();
+    // Only run in browser environment
+    if (typeof window === 'undefined') return;
+
+    try {
+      if (user) {
+        // Preload routes based on user type
+        preloadCriticalRoutes(user.role as 'customer' | 'driver' | 'admin');
+
+        // Prefetch common resources
+        prefetchResources.images([
+          '/icons/car.svg',
+          '/icons/user.svg',
+          '/icons/map.svg'
+        ]);
+      } else {
+        // Preload public routes for unauthenticated users
+        preloadCriticalRoutes();
+      }
+    } catch (error) {
+      console.debug('Error in code splitting initialization:', error);
     }
   }, [user]);
 
