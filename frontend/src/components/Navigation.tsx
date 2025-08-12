@@ -43,7 +43,11 @@ const Navigation: React.FC = () => {
       case 'driver':
         return [
           { path: '/driver/dashboard', label: 'Dashboard', icon: User },
-          { path: '/driver/rides', label: 'My Rides', icon: MapPin }
+          { path: '/driver/trip-history', label: 'Trip History', icon: MapPin },
+          { path: '/driver/earnings', label: 'Earnings', icon: DollarSign },
+          { path: '/driver/profile', label: 'Profile', icon: User },
+          { path: '/driver/vehicle-management', label: 'Vehicle', icon: Settings },
+          { path: '/driver/support', label: 'Support', icon: HelpCircle }
         ];
       default:
         return [];
