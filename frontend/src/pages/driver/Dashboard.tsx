@@ -10,6 +10,7 @@ const DriverDashboard: React.FC = () => {
   const { user } = useAuth();
   const { bookings, updateBookingStatus, getBookingHistory } = useBooking();
   const [isOnline, setIsOnline] = useState(true);
+  const [offer, setOffer] = useState<{ rideId: string; pickup: any; destination: any } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -30,7 +31,10 @@ const DriverDashboard: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
+
     const sock = io((import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com', { auth: { driverId: user.id } });
+    const sock = io(((import.meta as any).env?.VITE_API_URL || 'http://localhost:5000') + '/driver', { auth: { driverId: user.id } });
+    sock.on('dispatch:offer', (payload: any) => { setOffer({ rideId: payload.rideId, pickup: payload.pickup, destination: payload.destination }); });
     return () => { sock.disconnect(); };
   }, [user]);
 
@@ -55,11 +59,34 @@ const DriverDashboard: React.FC = () => {
     await getBookingHistory();
   };
 
+  const handleOfferResponse = async (accept: boolean) => {
+    if (!offer) return;
+    await LiveAPI.respondOffer(offer.rideId, accept);
+    setOffer(null);
+    await getBookingHistory();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Offer Modal */}
+        {offer && (
+          <div className="mb-6 p-4 border border-amber-300 bg-amber-50 rounded">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-amber-800">New Ride Offer</div>
+                <div className="text-sm text-amber-700">From: {offer.pickup?.address || 'Pickup'} → To: {offer.destination?.address || 'Destination'}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => handleOfferResponse(false)} className="px-3 py-1.5 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 text-sm">Decline</button>
+                <button onClick={() => handleOfferResponse(true)} className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-sm">Accept</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Status Toggle */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <div className="flex items-center justify-between">
@@ -187,15 +214,8 @@ const DriverDashboard: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2 ml-4">
-                      <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                        Decline
-                      </button>
-                      <button
-                        onClick={() => handleAcceptRide(booking.id)}
-                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
-                      >
-                        Accept
-                      </button>
+                      <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors duration-200" onClick={() => handleOfferResponse(false)}>Decline</button>
+                      <button onClick={() => handleAcceptRide(booking.id)} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">Accept</button>
                     </div>
                   </div>
                 </div>
@@ -219,12 +239,7 @@ const DriverDashboard: React.FC = () => {
             <Power className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">You're offline</h3>
             <p className="text-gray-600 mb-4">Go online to start receiving ride requests.</p>
-            <button
-              onClick={() => setIsOnline(true)}
-              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200"
-            >
-              Go Online
-            </button>
+            <button onClick={() => setIsOnline(true)} className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200">Go Online</button>
           </div>
         )}
       </div>

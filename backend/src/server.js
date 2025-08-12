@@ -107,9 +107,13 @@ driverNs.on('connection', (socket) => {
   const driverId = socket.handshake.auth?.driverId;
   if (!driverId) return socket.disconnect(true);
   socket.join(`driver:${driverId}`);
+  socket.on('location', async (payload) => { if (payload?.lng != null && payload?.lat != null) await setDriverLocation(driverId, payload.lng, payload.lat); });
+  socket.on('disconnect', () => { /* could mark as unavailable after grace */ });
+=======
   socket.on('location', async (payload) => {
     if (payload?.lng != null && payload?.lat != null) await setDriverLocation(driverId, payload.lng, payload.lat);
   });
+
 });
 
 // API Routes
