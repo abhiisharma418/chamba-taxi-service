@@ -165,15 +165,25 @@ const Login: React.FC = () => {
         <div className="mt-8 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <p className="text-sm font-semibold text-slate-700">Live Backend Connected</p>
+            <p className="text-sm font-semibold text-slate-700">Smart Backend Mode</p>
           </div>
           <div className="text-sm text-slate-600 space-y-2">
-            <p className="text-center font-medium text-green-700">
-              🚀 Connected to live API at Render.com
-            </p>
-            <p className="text-xs text-slate-500 text-center">
-              Use your registered credentials or create a new account
-            </p>
+            <div className="flex justify-between items-center">
+              <span className="font-medium">Primary:</span>
+              <span className="text-green-600 text-xs">Live API (Render.com)</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-medium">Fallback:</span>
+              <span className="text-blue-600 text-xs">Demo Mode</span>
+            </div>
+            <div className="mt-3 p-2 bg-blue-50 rounded text-center">
+              <p className="text-xs text-slate-600">
+                🔄 Automatically uses demo data if live backend is unavailable
+              </p>
+              <p className="text-xs text-blue-600 mt-1 font-mono">
+                Demo: customer@test.com / password
+              </p>
+            </div>
           </div>
         </div>
       </div>
