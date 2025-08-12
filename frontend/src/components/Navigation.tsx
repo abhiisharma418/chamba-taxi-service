@@ -49,7 +49,7 @@ const Navigation: React.FC = () => {
   const navItems = getNavItems();
 
   return (
-    <nav className={patterns.navigation.container}>
+    <nav className="bg-white/95 dark:bg-dark-card/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100 dark:border-dark-border">
       <div className={patterns.navigation.inner}>
         <div className={patterns.navigation.content}>
           <div className="flex items-center">
