@@ -1,4 +1,5 @@
 import { User } from '../models/userModel.js';
+import { Ride } from '../models/rideModel.js';
 
 export const uploadDocuments = async (req, res) => {
   const user = await User.findById(req.user.id);
