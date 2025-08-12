@@ -133,17 +133,37 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   try {
-    const res = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' });
+    console.log(`Attempting API call to: ${API_URL}${path}`);
+    const res = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers,
+      credentials: 'include',
+      mode: 'cors' // Explicitly set CORS mode
+    });
+
     if (!res.ok) {
+      console.warn(`API call failed with status ${res.status}`);
       const text = await res.text();
       throw new Error(text || `Request failed: ${res.status}`);
     }
+
     const ct = res.headers.get('content-type') || '';
     if (ct.includes('application/json')) return res.json();
     return res.text();
   } catch (error) {
     console.warn(`API call failed for ${path}, using demo fallback:`, error);
-    return getDemoResponse(path, options);
+
+    // Always provide fallback response for essential functionality
+    try {
+      return getDemoResponse(path, options);
+    } catch (demoError) {
+      console.error(`Demo response failed for ${path}:`, demoError);
+      // Ultimate fallback
+      if (path.includes('/api/auth/login')) {
+        throw new Error('Invalid credentials. Please try again.');
+      }
+      throw error;
+    }
   }
 }
 
