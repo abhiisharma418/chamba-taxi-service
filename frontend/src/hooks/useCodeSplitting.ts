@@ -26,26 +26,64 @@ export const useCodeSplitting = () => {
   useEffect(() => {
     // Preload routes on user interaction (hover, focus)
     const handleMouseEnter = (e: MouseEvent) => {
+      // Ensure target exists and is an Element
+      if (!e.target || !(e.target instanceof Element)) {
+        return;
+      }
+
       const target = e.target as HTMLElement;
-      const link = target.closest('a[href]') as HTMLAnchorElement;
-      
+
+      // Safely check if target has closest method and is an anchor or contains one
+      let link: HTMLAnchorElement | null = null;
+
+      try {
+        // First check if the target itself is a link
+        if (target.tagName === 'A' && (target as HTMLAnchorElement).href) {
+          link = target as HTMLAnchorElement;
+        } else {
+          // Then check if it has a parent link
+          link = target.closest('a[href]') as HTMLAnchorElement;
+        }
+      } catch (error) {
+        // Silently handle any errors in closest method
+        console.debug('Error in link detection:', error);
+        return;
+      }
+
       if (link && link.href) {
-        const path = new URL(link.href).pathname;
-        
-        // Preload based on route
-        if (path.includes('/customer/')) {
-          import('../pages/customer/Dashboard');
-        } else if (path.includes('/driver/')) {
-          import('../pages/driver/Dashboard');
+        try {
+          const path = new URL(link.href).pathname;
+
+          // Preload based on route
+          if (path.includes('/customer/')) {
+            import('../pages/customer/Dashboard').catch(() => {
+              // Silently handle import errors
+            });
+          } else if (path.includes('/driver/')) {
+            import('../pages/driver/Dashboard').catch(() => {
+              // Silently handle import errors
+            });
+          }
+        } catch (error) {
+          // Handle URL parsing errors
+          console.debug('Error parsing URL:', error);
         }
       }
     };
 
-    // Add hover preloading
-    document.addEventListener('mouseenter', handleMouseEnter, true);
-    
+    // Add hover preloading with error handling
+    try {
+      document.addEventListener('mouseenter', handleMouseEnter, true);
+    } catch (error) {
+      console.warn('Could not add mouseenter listener:', error);
+    }
+
     return () => {
-      document.removeEventListener('mouseenter', handleMouseEnter, true);
+      try {
+        document.removeEventListener('mouseenter', handleMouseEnter, true);
+      } catch (error) {
+        console.debug('Error removing mouseenter listener:', error);
+      }
     };
   }, []);
 };
