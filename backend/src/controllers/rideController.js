@@ -2,6 +2,7 @@ import Joi from 'joi';
 import { Ride } from '../models/rideModel.js';
 import { Vehicle } from '../models/vehicleModel.js';
 import { notifyRide, notifyUser } from '../services/notifyService.js';
+import { sendRideNotification } from '../controllers/whatsappController.js';
 
 const createRideSchema = Joi.object({
   pickup: Joi.object({ address: Joi.string().allow(''), coordinates: Joi.array().items(Joi.number()).length(2).required() }).required(),
@@ -31,7 +32,16 @@ export const createRide = async (req, res) => {
     pricingContext: { regionType: value.regionType, surgeMultiplier: 1 },
     fare: { estimated: 0, currency: 'INR' }
   });
+
   notifyUser(req.user.id, 'ride:created', { rideId: ride._id });
+
+  // Send WhatsApp booking confirmation
+  try {
+    await sendRideNotification(ride._id, 'booking_confirmed');
+  } catch (error) {
+    console.error('WhatsApp booking confirmation failed:', error);
+  }
+
   res.status(201).json({ success: true, data: ride });
 };
 
@@ -62,9 +72,33 @@ export const updateStatus = async (req, res) => {
   if (value.status === 'on-trip') ride.startedAt = new Date();
   if (value.status === 'completed') ride.completedAt = new Date();
   await ride.save();
+
   notifyRide(ride._id, 'ride:status', { status: ride.status });
   notifyUser(ride.customerId, 'ride:status', { rideId: ride._id, status: ride.status });
   if (ride.driverId) notifyUser(ride.driverId, 'ride:status', { rideId: ride._id, status: ride.status });
+
+  // Send WhatsApp notifications for status updates
+  try {
+    switch (value.status) {
+      case 'accepted':
+        await sendRideNotification(ride._id, 'driver_assigned', { estimatedArrival: 10 });
+        break;
+      case 'arriving':
+        await sendRideNotification(ride._id, 'driver_arrived');
+        break;
+      case 'on-trip':
+        await sendRideNotification(ride._id, 'trip_started');
+        break;
+      case 'completed':
+        await sendRideNotification(ride._id, 'trip_completed', {
+          paymentMethod: ride.paymentMethod || 'Cash'
+        });
+        break;
+    }
+  } catch (error) {
+    console.error('WhatsApp status notification failed:', error);
+  }
+
   res.json({ success: true, data: ride });
 };
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate } from '../middleware/auth.js';
-import { createPaymentIntent, refundPayment, stripeWebhook, razorpayWebhook, getReceipt, authorizePayment, capturePayment } from '../controllers/paymentController.js';
+import { createPaymentIntent, refundPayment, stripeWebhook, razorpayWebhook, getReceipt, authorizePayment, capturePayment, verifyUpiPayment, confirmCodPayment } from '../controllers/paymentController.js';
 import { idempotency } from '../middleware/idempotency.js';
 
 const router = express.Router();
@@ -15,5 +15,7 @@ router.post('/intent', idempotency(), createPaymentIntent);
 router.post('/authorize', idempotency(), authorizePayment);
 router.post('/capture', idempotency(), capturePayment);
 router.post('/refund', idempotency(), refundPayment);
+router.post('/verify-upi', idempotency(), verifyUpiPayment);
+router.post('/confirm-cod', idempotency(), confirmCodPayment);
 
 export default router;

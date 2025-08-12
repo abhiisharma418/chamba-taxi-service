@@ -4,7 +4,36 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title data-default>Vite + React + TS</title>
+    <title data-default>RideWithUs - Your Trusted Ride Partner</title>
+    <!-- Google Maps API - Dynamic loading -->
+    <script>
+      window.initGoogleMaps = function() {
+        window.googleMapsLoaded = true;
+        window.dispatchEvent(new Event('google-maps-loaded'));
+      };
+
+      // Load Google Maps API dynamically
+      function loadGoogleMaps() {
+        const apiKey = import.meta?.env?.VITE_GOOGLE_MAPS_API_KEY;
+        if (apiKey && apiKey !== 'AIzaSyDemo_Key_For_Development_Replace_With_Real') {
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMaps`;
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        } else {
+          console.log('Google Maps API key not configured - using fallback mode');
+          window.googleMapsLoaded = false;
+        }
+      }
+
+      // Load when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadGoogleMaps);
+      } else {
+        loadGoogleMaps();
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

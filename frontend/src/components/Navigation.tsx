@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  Car, 
-  User, 
-  Menu, 
-  X, 
+import {
+  Car,
+  User,
+  Menu,
+  X,
   LogOut,
   MapPin,
   Clock
 } from 'lucide-react';
+import Logo from './Logo';
 
 const Navigation: React.FC = () => {
   const { user, logout } = useAuth();
@@ -45,13 +46,12 @@ const Navigation: React.FC = () => {
   const navItems = getNavItems();
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <Car className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">RideShare</span>
+            <Link to="/" className="flex items-center">
+              <Logo size="md" />
             </Link>
           </div>
 
@@ -63,7 +63,7 @@ const Navigation: React.FC = () => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                    className="flex items-center space-x-1 text-slate-700 hover:text-blue-600 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-blue-50"
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.label}</span>
@@ -80,7 +80,7 @@ const Navigation: React.FC = () => {
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-1 text-gray-700 hover:text-red-600 transition-colors duration-200"
+                    className="flex items-center space-x-1 text-slate-700 hover:text-red-600 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-red-50"
                   >
                     <LogOut className="h-4 w-4" />
                     <span>Logout</span>
@@ -92,7 +92,7 @@ const Navigation: React.FC = () => {
               <div className="md:hidden flex items-center">
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="text-gray-700 hover:text-blue-600"
+                  className="text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all duration-300"
                 >
                   {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 </button>

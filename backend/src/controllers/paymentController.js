@@ -23,11 +23,13 @@ const setRideCompletedOnCapture = async (payment) => {
 
 export const createPaymentIntent = async (req, res) => {
   const schema = Joi.object({
-    provider: Joi.string().valid('razorpay', 'stripe').required(),
+    provider: Joi.string().valid('razorpay', 'stripe', 'upi', 'cod').required(),
     amount: Joi.number().integer().min(100).required(),
     currency: Joi.string().default('INR'),
     rideId: Joi.string().optional(),
-    captureMethod: Joi.string().valid('automatic','manual').default('automatic')
+    captureMethod: Joi.string().valid('automatic','manual').default('automatic'),
+    paymentMethod: Joi.string().valid('phonepe', 'googlepay', 'paytm', 'upi_id', 'cod').optional(),
+    upiId: Joi.string().optional()
   });
   const { error, value } = schema.validate(req.body);
   if (error) return res.status(400).json({ success: false, message: error.message });
@@ -61,6 +63,76 @@ export const createPaymentIntent = async (req, res) => {
     });
     if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'created' });
     return res.json({ success: true, data: { order, paymentId: payment._id } });
+  }
+
+  // Handle UPI payments
+  if (value.provider === 'upi') {
+    const payment = await Payment.create({
+      provider: 'upi',
+      amount: value.amount,
+      currency: value.currency,
+      rideId: value.rideId,
+      providerRef: `UPI_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      status: 'created',
+      meta: {
+        paymentMethod: value.paymentMethod,
+        upiId: value.upiId
+      }
+    });
+    if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'created' });
+
+    // Generate UPI URL
+    const merchantUPI = process.env.MERCHANT_UPI_ID || 'ridewithus@ybl';
+    const merchantName = 'RideWithUs';
+    const transactionNote = `Ride booking payment - ${payment._id}`;
+
+    let upiUrl;
+    switch (value.paymentMethod) {
+      case 'phonepe':
+        upiUrl = `phonepe://pay?pa=${merchantUPI}&pn=${merchantName}&am=${value.amount}&tn=${transactionNote}&cu=INR`;
+        break;
+      case 'googlepay':
+        upiUrl = `tez://upi/pay?pa=${merchantUPI}&pn=${merchantName}&am=${value.amount}&tn=${transactionNote}&cu=INR`;
+        break;
+      case 'paytm':
+        upiUrl = `paytmmp://pay?pa=${merchantUPI}&pn=${merchantName}&am=${value.amount}&tn=${transactionNote}&cu=INR`;
+        break;
+      default:
+        upiUrl = `upi://pay?pa=${merchantUPI}&pn=${merchantName}&am=${value.amount}&tn=${transactionNote}&cu=INR`;
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        paymentId: payment._id,
+        upiUrl,
+        merchantUPI,
+        amount: value.amount,
+        transactionNote
+      }
+    });
+  }
+
+  // Handle COD payments
+  if (value.provider === 'cod') {
+    const payment = await Payment.create({
+      provider: 'cod',
+      amount: value.amount,
+      currency: value.currency,
+      rideId: value.rideId,
+      providerRef: `COD_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      status: 'pending'
+    });
+    if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'pending' });
+
+    return res.json({
+      success: true,
+      data: {
+        paymentId: payment._id,
+        status: 'pending',
+        message: 'Cash on delivery selected. Please pay the driver upon arrival.'
+      }
+    });
   }
 
   return res.status(400).json({ success: false, message: 'Payment provider not configured' });
@@ -186,6 +258,75 @@ export const razorpayWebhook = async (req, res) => {
     }
   }
   res.json({ received: true });
+};
+
+export const verifyUpiPayment = async (req, res) => {
+  const schema = Joi.object({
+    paymentId: Joi.string().required(),
+    transactionId: Joi.string().optional(),
+    status: Joi.string().valid('success', 'failed').required()
+  });
+  const { error, value } = schema.validate(req.body);
+  if (error) return res.status(400).json({ success: false, message: error.message });
+
+  const payment = await Payment.findById(value.paymentId);
+  if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+  if (payment.provider !== 'upi') return res.status(400).json({ success: false, message: 'Not a UPI payment' });
+
+  if (value.status === 'success') {
+    payment.status = 'captured';
+    payment.transactionId = value.transactionId;
+    await payment.save();
+
+    if (payment.rideId) {
+      await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'captured' });
+      await setRideCompletedOnCapture(payment);
+    }
+
+    return res.json({ success: true, message: 'UPI payment verified successfully', data: payment });
+  } else {
+    payment.status = 'failed';
+    await payment.save();
+
+    if (payment.rideId) {
+      await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'failed' });
+    }
+
+    return res.json({ success: false, message: 'UPI payment failed', data: payment });
+  }
+};
+
+export const confirmCodPayment = async (req, res) => {
+  const schema = Joi.object({
+    paymentId: Joi.string().required(),
+    driverId: Joi.string().required(),
+    amount: Joi.number().integer().min(1).required()
+  });
+  const { error, value } = schema.validate(req.body);
+  if (error) return res.status(400).json({ success: false, message: error.message });
+
+  const payment = await Payment.findById(value.paymentId);
+  if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+  if (payment.provider !== 'cod') return res.status(400).json({ success: false, message: 'Not a COD payment' });
+
+  // Verify the driver is authorized to confirm this payment
+  if (payment.rideId) {
+    const ride = await Ride.findById(payment.rideId);
+    if (!ride || ride.driverId.toString() !== value.driverId) {
+      return res.status(403).json({ success: false, message: 'Unauthorized to confirm this payment' });
+    }
+  }
+
+  payment.status = 'captured';
+  payment.meta = { ...payment.meta, confirmedBy: value.driverId, confirmedAt: new Date() };
+  await payment.save();
+
+  if (payment.rideId) {
+    await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'captured' });
+    await setRideCompletedOnCapture(payment);
+  }
+
+  return res.json({ success: true, message: 'COD payment confirmed successfully', data: payment });
 };
 
 export const getReceipt = async (req, res) => {

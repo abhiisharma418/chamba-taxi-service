@@ -22,6 +22,8 @@ import liveRoutes from './routes/liveRoutes.js';
 import deviceRoutes from './routes/deviceRoutes.js';
 import zoneRoutes from './routes/zoneRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
+import whatsappRoutes from './routes/whatsappRoutes.js';
+import trackingRoutes from './routes/trackingRoutes.js';
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
@@ -99,6 +101,51 @@ io.on('connection', (socket) => {
 
   socket.on('ride:join', (rideId) => {
     socket.join(`ride:${rideId}`);
+    console.log(`User ${userId} joined ride room: ${rideId}`);
+  });
+
+  socket.on('ride:leave', (rideId) => {
+    socket.leave(`ride:${rideId}`);
+    console.log(`User ${userId} left ride room: ${rideId}`);
+  });
+
+  // Live tracking events
+  socket.on('tracking:start', async (payload) => {
+    const { rideId, driverId, customerId } = payload;
+    socket.join(`tracking:${rideId}`);
+
+    // Notify tracking service
+    const trackingService = (await import('./services/trackingService.js')).default;
+    await trackingService.startRideTracking(rideId, driverId, customerId);
+  });
+
+  socket.on('tracking:stop', async (payload) => {
+    const { rideId, reason } = payload;
+    socket.leave(`tracking:${rideId}`);
+
+    // Notify tracking service
+    const trackingService = (await import('./services/trackingService.js')).default;
+    await trackingService.stopRideTracking(rideId, reason);
+  });
+
+  socket.on('location:update', async (payload) => {
+    const { lat, lng, heading, speed, accuracy } = payload;
+
+    // Update location in tracking service
+    const trackingService = (await import('./services/trackingService.js')).default;
+    await trackingService.updateDriverLocation(userId, { lat, lng, heading, speed, accuracy });
+  });
+
+  socket.on('trigger:emergency', async (payload) => {
+    const { rideId, location, message } = payload;
+
+    // Trigger emergency through tracking service
+    const trackingService = (await import('./services/trackingService.js')).default;
+    await trackingService.triggerEmergencyTracking(rideId, userId, location);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`User ${userId} disconnected`);
   });
 });
 
@@ -127,6 +174,8 @@ app.use('/api/zones', authenticate, requireActive, zoneRoutes);
 app.use('/api/driver', authenticate, requireActive, driverRoutes);
 app.use('/api/live', authenticate, requireActive, liveRoutes);
 app.use('/api/devices', authenticate, requireActive, deviceRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/tracking', trackingRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server and connect to MongoDB

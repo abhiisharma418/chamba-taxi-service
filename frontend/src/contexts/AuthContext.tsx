@@ -80,7 +80,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
-    try { await AuthAPI.logout(); } catch {}
+    try {
+      await AuthAPI.logout();
+    } catch (error) {
+      console.log('Logout API call failed, proceeding with local logout:', error);
+      // Continue with local logout even if API call fails
+    }
+
+    // Always perform local cleanup regardless of API success/failure
     setToken(null);
     setUser(null);
     localStorage.removeItem('user');
