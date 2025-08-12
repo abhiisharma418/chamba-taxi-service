@@ -250,6 +250,39 @@ const DriverDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* Fare Split Information */}
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <DollarSign className="h-5 w-5 mr-2 text-green-600" />
+            RideWithUs Fare Structure
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg p-4 border border-green-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-700 font-medium">Your Share</span>
+                <span className="text-2xl font-bold text-green-600">75%</span>
+              </div>
+              <p className="text-sm text-gray-600">You keep 75% of every fare</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 border border-blue-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-700 font-medium">Platform Fee</span>
+                <span className="text-2xl font-bold text-blue-600">25%</span>
+              </div>
+              <p className="text-sm text-gray-600">Platform maintenance & support</p>
+            </div>
+          </div>
+          <div className="mt-4 bg-white rounded-lg p-4 border">
+            <div className="flex items-center space-x-2 text-green-700">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm font-medium">No Hidden Charges</span>
+            </div>
+            <p className="text-sm text-gray-600 mt-1">
+              No booking fees, subscription charges, or additional deductions. Simple 75-25 split on all rides.
+            </p>
+          </div>
+        </div>
+
         {/* Offline State */}
         {!isOnline && (
           <div className="bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
