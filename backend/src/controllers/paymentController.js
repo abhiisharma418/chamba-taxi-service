@@ -260,6 +260,75 @@ export const razorpayWebhook = async (req, res) => {
   res.json({ received: true });
 };
 
+export const verifyUpiPayment = async (req, res) => {
+  const schema = Joi.object({
+    paymentId: Joi.string().required(),
+    transactionId: Joi.string().optional(),
+    status: Joi.string().valid('success', 'failed').required()
+  });
+  const { error, value } = schema.validate(req.body);
+  if (error) return res.status(400).json({ success: false, message: error.message });
+
+  const payment = await Payment.findById(value.paymentId);
+  if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+  if (payment.provider !== 'upi') return res.status(400).json({ success: false, message: 'Not a UPI payment' });
+
+  if (value.status === 'success') {
+    payment.status = 'captured';
+    payment.transactionId = value.transactionId;
+    await payment.save();
+
+    if (payment.rideId) {
+      await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'captured' });
+      await setRideCompletedOnCapture(payment);
+    }
+
+    return res.json({ success: true, message: 'UPI payment verified successfully', data: payment });
+  } else {
+    payment.status = 'failed';
+    await payment.save();
+
+    if (payment.rideId) {
+      await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'failed' });
+    }
+
+    return res.json({ success: false, message: 'UPI payment failed', data: payment });
+  }
+};
+
+export const confirmCodPayment = async (req, res) => {
+  const schema = Joi.object({
+    paymentId: Joi.string().required(),
+    driverId: Joi.string().required(),
+    amount: Joi.number().integer().min(1).required()
+  });
+  const { error, value } = schema.validate(req.body);
+  if (error) return res.status(400).json({ success: false, message: error.message });
+
+  const payment = await Payment.findById(value.paymentId);
+  if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+  if (payment.provider !== 'cod') return res.status(400).json({ success: false, message: 'Not a COD payment' });
+
+  // Verify the driver is authorized to confirm this payment
+  if (payment.rideId) {
+    const ride = await Ride.findById(payment.rideId);
+    if (!ride || ride.driverId.toString() !== value.driverId) {
+      return res.status(403).json({ success: false, message: 'Unauthorized to confirm this payment' });
+    }
+  }
+
+  payment.status = 'captured';
+  payment.meta = { ...payment.meta, confirmedBy: value.driverId, confirmedAt: new Date() };
+  await payment.save();
+
+  if (payment.rideId) {
+    await Ride.findByIdAndUpdate(payment.rideId, { paymentStatus: 'captured' });
+    await setRideCompletedOnCapture(payment);
+  }
+
+  return res.json({ success: true, message: 'COD payment confirmed successfully', data: payment });
+};
+
 export const getReceipt = async (req, res) => {
   const payment = await Payment.findById(req.params.id);
   if (!payment) return res.status(404).json({ success: false, message: 'Not found' });
