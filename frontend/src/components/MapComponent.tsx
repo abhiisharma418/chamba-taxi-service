@@ -41,9 +41,17 @@ const MapComponent: React.FC<MapComponentProps> = ({
     const mapInstance = new google.maps.Map(mapRef.current, {
       center: { lat: 31.1048, lng: 77.1734 }, // Default to Shimla, India
       zoom: 13,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
       styles: [
         {
-          featureType: 'poi',
+          featureType: 'poi.business',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }]
+        },
+        {
+          featureType: 'transit',
           elementType: 'labels',
           stylers: [{ visibility: 'off' }]
         }
@@ -55,9 +63,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
       draggable: false,
       suppressMarkers: true,
       polylineOptions: {
-        strokeColor: '#3B82F6',
-        strokeWeight: 4,
-        strokeOpacity: 0.8
+        strokeColor: '#2563eb',
+        strokeWeight: 5,
+        strokeOpacity: 0.9
       }
     });
 
@@ -72,7 +80,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       mapInstance.addListener('click', (event: google.maps.MapMouseEvent) => {
         const lat = event.latLng?.lat();
         const lng = event.latLng?.lng();
-        
+
         if (lat && lng) {
           // Reverse geocoding to get address
           const geocoder = new google.maps.Geocoder();
@@ -82,9 +90,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 address: results[0].formatted_address,
                 coordinates: [lng, lat]
               };
-              
+
               // Determine if this should be pickup or destination
-              // For simplicity, if no pickup is set, make it pickup, otherwise destination
               const type = !pickup ? 'pickup' : 'destination';
               onLocationSelect(type, location);
             }
@@ -92,13 +99,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
         }
       });
     }
+  }, [isLoaded, onLocationSelect, pickup]);
 
-    return () => {
-      // Cleanup markers
-      pickupMarker?.setMap(null);
-      destinationMarker?.setMap(null);
-    };
-  }, [onLocationSelect]);
+  useEffect(() => {
+    if (isLoaded) {
+      initializeMap();
+    }
+  }, [isLoaded, initializeMap]);
 
   // Update pickup marker
   useEffect(() => {
