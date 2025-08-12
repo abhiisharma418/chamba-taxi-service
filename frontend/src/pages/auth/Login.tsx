@@ -188,15 +188,6 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Demo Accounts */}
-          <div className="mt-6 p-4 bg-slate-50 rounded-lg">
-            <p className="text-xs text-slate-500 text-center mb-2">Demo Accounts:</p>
-            <div className="text-xs text-slate-600 space-y-1">
-              <div>Customer: customer@demo.com / password123</div>
-              <div>Driver: driver@demo.com / password123</div>
-              <div>Admin: admin@demo.com / password123</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
