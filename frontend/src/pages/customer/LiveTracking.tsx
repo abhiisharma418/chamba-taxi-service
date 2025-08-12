@@ -327,19 +327,40 @@ const LiveTracking: React.FC = () => {
               </div>
             </div>
 
-            {/* Emergency Button */}
+            {/* Emergency Section */}
             <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Emergency</h3>
+              <h3 className="text-lg font-semibold text-red-800 mb-2 flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Emergency & Safety
+              </h3>
               <p className="text-red-600 text-sm mb-4">
-                In case of emergency, click the button below to alert our support team and emergency contacts.
+                If you feel unsafe or need immediate help, use the options below.
               </p>
-              <button
-                onClick={handleEmergency}
-                className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
-              >
-                <AlertTriangle className="h-5 w-5 inline mr-2" />
-                Emergency Alert
-              </button>
+
+              <div className="space-y-3">
+                <button
+                  onClick={handleEmergencyClick}
+                  className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  <AlertTriangle className="h-5 w-5" />
+                  SOS Emergency Alert
+                </button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleDirectCall('112')}
+                    className="bg-orange-600 text-white py-2 px-3 rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
+                  >
+                    Call 112
+                  </button>
+                  <button
+                    onClick={() => handleDirectCall('+911234567890')}
+                    className="bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  >
+                    Support
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
