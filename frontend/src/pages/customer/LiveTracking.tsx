@@ -45,10 +45,27 @@ const LiveTracking: React.FC = () => {
 
   useEffect(() => {
     if (!rideId || !user) return;
-    
+
     fetchRideDetails();
     fetchTrackingStatus();
+    getCurrentLocation();
   }, [rideId, user]);
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        }
+      );
+    }
+  };
 
   const fetchRideDetails = async () => {
     try {
