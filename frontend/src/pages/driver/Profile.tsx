@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
+import { DriverAPI } from '../../lib/api';
 import { 
   User, Camera, Phone, Mail, MapPin, Calendar, 
   Edit3, Save, X, Upload, Star, Shield, Award,
