@@ -24,10 +24,46 @@ const CustomerDashboard: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+        <Navigation />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Welcome Section Skeleton */}
+          <div className="mb-10">
+            <CardSkeleton className="h-32" />
+          </div>
+
+          {/* Stats Grid Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <StatsCardSkeleton />
+            <StatsCardSkeleton />
+            <StatsCardSkeleton />
+            <StatsCardSkeleton />
+          </div>
+
+          {/* Recent Bookings Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <CardSkeleton className="h-16" />
+              <ListItemSkeleton />
+              <ListItemSkeleton />
+              <ListItemSkeleton />
+            </div>
+            <div className="space-y-6">
+              <CardSkeleton className="h-48" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       <Navigation />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-10">
