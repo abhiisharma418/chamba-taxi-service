@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Car, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import Logo from '../components/Logo';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -44,26 +45,25 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-gray-100">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2">
-            <Car className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">RideShare</span>
+          <Link to="/" className="inline-flex items-center justify-center">
+            <Logo size="lg" />
           </Link>
-          <p className="text-gray-600 mt-2">Welcome back! Please sign in to your account.</p>
+          <p className="text-slate-600 mt-4 text-lg">Welcome back to your trusted ride partner</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* User Type Selection */}
-          <div className="flex space-x-2 bg-gray-100 rounded-lg p-1">
+          <div className="flex space-x-2 bg-slate-100 rounded-xl p-1.5">
             <button
               type="button"
               onClick={() => setUserType('customer')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+              className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
                 userType === 'customer'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-lg transform scale-105'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Customer
@@ -71,10 +71,10 @@ const Login: React.FC = () => {
             <button
               type="button"
               onClick={() => setUserType('driver')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+              className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
                 userType === 'driver'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-lg transform scale-105'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Driver
@@ -83,48 +83,48 @@ const Login: React.FC = () => {
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
               Email Address
             </label>
-            <div className="mt-1 relative">
+            <div className="relative">
               <input
                 id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="appearance-none block w-full px-4 py-3 pl-12 border border-slate-300 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/80"
                 placeholder="Enter your email"
               />
-              <Mail className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
+              <Mail className="h-5 w-5 text-slate-400 absolute left-4 top-3.5" />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
               Password
             </label>
-            <div className="mt-1 relative">
+            <div className="relative">
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="appearance-none block w-full px-4 py-3 pl-12 pr-12 border border-slate-300 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/80"
                 placeholder="Enter your password"
               />
-              <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
+              <Lock className="h-5 w-5 text-slate-400 absolute left-4 top-3.5" />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center hover:text-slate-600 transition-colors duration-300"
               >
                 {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
+                  <EyeOff className="h-5 w-5 text-slate-400" />
                 ) : (
-                  <Eye className="h-5 w-5 text-gray-400" />
+                  <Eye className="h-5 w-5 text-slate-400" />
                 )}
               </button>
             </div>
@@ -139,7 +139,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            className="w-full flex justify-center py-3 px-6 border border-transparent rounded-xl shadow-lg text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-xl"
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -154,7 +154,7 @@ const Login: React.FC = () => {
             Don't have an account?{' '}
             <Link
               to={`/signup?type=${userType}`}
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-300"
             >
               Sign up
             </Link>
@@ -162,11 +162,17 @@ const Login: React.FC = () => {
         </div>
 
         {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">Demo Credentials:</p>
-          <div className="text-xs text-gray-500 space-y-1">
-            <div>Customer: customer@demo.com / password</div>
-            <div>Driver: driver@demo.com / password</div>
+        <div className="mt-8 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200">
+          <p className="text-sm font-semibold text-slate-700 mb-3">Demo Credentials:</p>
+          <div className="text-sm text-slate-600 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-medium">Customer:</span>
+              <span className="text-blue-600 font-mono">customer@test.com / password</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-medium">Driver:</span>
+              <span className="text-blue-600 font-mono">driver@test.com / password</span>
+            </div>
           </div>
         </div>
       </div>
