@@ -128,6 +128,7 @@ app.use('/api/zones', authenticate, requireActive, zoneRoutes);
 app.use('/api/driver', authenticate, requireActive, driverRoutes);
 app.use('/api/live', authenticate, requireActive, liveRoutes);
 app.use('/api/devices', authenticate, requireActive, deviceRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server and connect to MongoDB
