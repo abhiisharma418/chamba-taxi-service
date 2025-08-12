@@ -122,7 +122,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
           onChange(location);
           
           // Reverse geocode to get actual address
-          if (window.google && window.google.maps) {
+          if (window.google && window.google.maps && window.google.maps.Geocoder) {
             const geocoder = new google.maps.Geocoder();
             geocoder.geocode(
               { location: { lat: position.coords.latitude, lng: position.coords.longitude } },
