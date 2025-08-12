@@ -118,7 +118,7 @@ const CustomerDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <div className={`${responsive.grid.cols3} ${responsive.spacing.gap} mb-8 sm:mb-12`}>
-          <Link to="/customer/book-ride" className="group bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 animate-fadeInUp hover-lift" style={{ animationDelay: '0.2s' }}>
+          <Link to="/customer/book-ride" className={`group bg-white/80 backdrop-blur-sm ${responsive.card.default} shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 animate-fadeInUp hover-lift ${touch.target}`} style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center justify-between">
               <div>
                 <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300 mb-4">
