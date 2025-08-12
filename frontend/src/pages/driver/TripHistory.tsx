@@ -42,7 +42,7 @@ interface TripData {
   vehicleType: 'hatchback' | 'sedan' | 'suv' | 'auto';
 }
 
-const TripHistory: React.FC = () => {
+const DriverTripHistory: React.FC = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
