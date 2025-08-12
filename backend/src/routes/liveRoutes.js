@@ -6,8 +6,6 @@ const router = express.Router();
 
 router.post('/driver/heartbeat', authenticate, requireRoles('driver'), driverHeartbeat);
 router.post('/driver/availability', authenticate, requireRoles('driver'), driverSetAvailability);
-router.post('/driver/respond', authenticate, requireRoles('driver'), driverRespondToOffer);
-router.post('/dispatch/search', authenticate, requireRoles('admin', 'customer'), dispatchNearestDriver);
-router.post('/dispatch/start', authenticate, requireRoles('admin', 'customer'), dispatchNearestDriver);
+router.post('/driver/respond', authenticate, requireRoles('driver'), driverRespond);
 
 export default router;
