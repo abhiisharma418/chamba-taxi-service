@@ -23,11 +23,13 @@ const setRideCompletedOnCapture = async (payment) => {
 
 export const createPaymentIntent = async (req, res) => {
   const schema = Joi.object({
-    provider: Joi.string().valid('razorpay', 'stripe').required(),
+    provider: Joi.string().valid('razorpay', 'stripe', 'upi', 'cod').required(),
     amount: Joi.number().integer().min(100).required(),
     currency: Joi.string().default('INR'),
     rideId: Joi.string().optional(),
-    captureMethod: Joi.string().valid('automatic','manual').default('automatic')
+    captureMethod: Joi.string().valid('automatic','manual').default('automatic'),
+    paymentMethod: Joi.string().valid('phonepe', 'googlepay', 'paytm', 'upi_id', 'cod').optional(),
+    upiId: Joi.string().optional()
   });
   const { error, value } = schema.validate(req.body);
   if (error) return res.status(400).json({ success: false, message: error.message });
@@ -61,6 +63,76 @@ export const createPaymentIntent = async (req, res) => {
     });
     if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'created' });
     return res.json({ success: true, data: { order, paymentId: payment._id } });
+  }
+
+  // Handle UPI payments
+  if (value.provider === 'upi') {
+    const payment = await Payment.create({
+      provider: 'upi',
+      amount: value.amount,
+      currency: value.currency,
+      rideId: value.rideId,
+      providerRef: `UPI_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      status: 'created',
+      meta: {
+        paymentMethod: value.paymentMethod,
+        upiId: value.upiId
+      }
+    });
+    if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'created' });
+
+    // Generate UPI URL
+    const merchantUPI = process.env.MERCHANT_UPI_ID || 'ridewithus@ybl';
+    const merchantName = 'RideWithUs';
+    const transactionNote = `Ride booking payment - ${payment._id}`;
+
+    let upiUrl;
+    switch (value.paymentMethod) {
+      case 'phonepe':
+        upiUrl = `phonepe://pay?pa=${merchantUPI}&pn=${merchantName}&am=${value.amount}&tn=${transactionNote}&cu=INR`;
+        break;
+      case 'googlepay':
+        upiUrl = `tez://upi/pay?pa=${merchantUPI}&pn=${merchantName}&am=${value.amount}&tn=${transactionNote}&cu=INR`;
+        break;
+      case 'paytm':
+        upiUrl = `paytmmp://pay?pa=${merchantUPI}&pn=${merchantName}&am=${value.amount}&tn=${transactionNote}&cu=INR`;
+        break;
+      default:
+        upiUrl = `upi://pay?pa=${merchantUPI}&pn=${merchantName}&am=${value.amount}&tn=${transactionNote}&cu=INR`;
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        paymentId: payment._id,
+        upiUrl,
+        merchantUPI,
+        amount: value.amount,
+        transactionNote
+      }
+    });
+  }
+
+  // Handle COD payments
+  if (value.provider === 'cod') {
+    const payment = await Payment.create({
+      provider: 'cod',
+      amount: value.amount,
+      currency: value.currency,
+      rideId: value.rideId,
+      providerRef: `COD_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      status: 'pending'
+    });
+    if (value.rideId) await Ride.findByIdAndUpdate(value.rideId, { paymentId: payment._id, paymentStatus: 'pending' });
+
+    return res.json({
+      success: true,
+      data: {
+        paymentId: payment._id,
+        status: 'pending',
+        message: 'Cash on delivery selected. Please pay the driver upon arrival.'
+      }
+    });
   }
 
   return res.status(400).json({ success: false, message: 'Payment provider not configured' });
