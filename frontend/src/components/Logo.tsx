@@ -37,7 +37,7 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md
       </div>
 
       {showText && (
-        <span className={`${textSizeClasses[size]} font-bold text-slate-900 dark:text-white`}>
+        <span className={`${textSizeClasses[size]} font-bold text-current`}>
           RideWithUs
         </span>
       )}
