@@ -56,75 +56,44 @@ const DriverEarnings: React.FC = () => {
     breakdown: breakdownResponse?.success ? breakdownResponse.data : {}
   } : null;
 
-  const loadEarningsData = async () => {
-    setLoading(true);
-    try {
-      // Fetch real earnings data from backend
-      const [earningsResponse, breakdownResponse] = await Promise.all([
-        DriverAPI.getEarnings(selectedPeriod),
-        DriverAPI.getEarningsBreakdown()
-      ]);
-
-      if (earningsResponse.success && breakdownResponse.success) {
-        const earningsData: EarningsData = {
-          daily: earningsResponse.data.daily || [],
-          weekly: earningsResponse.data.weekly || [],
-          monthly: earningsResponse.data.monthly || [],
-          summary: earningsResponse.data.summary,
-          breakdown: breakdownResponse.data
-        };
-
-        setEarningsData(earningsData);
-      } else {
-        throw new Error('Failed to fetch earnings data');
-      }
-    } catch (error) {
-      console.error('Error loading earnings data:', error);
-
-      // Fallback to mock data if API fails
-      const mockData: EarningsData = {
-        daily: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          amount: Math.floor(Math.random() * 2000) + 500,
-          rides: Math.floor(Math.random() * 15) + 3
-        })).reverse(),
-        weekly: Array.from({ length: 12 }, (_, i) => ({
-          week: `Week ${i + 1}`,
-          amount: Math.floor(Math.random() * 12000) + 8000,
-          rides: Math.floor(Math.random() * 80) + 50
-        })),
-        monthly: Array.from({ length: 12 }, (_, i) => ({
-          month: new Date(2024, i).toLocaleString('default', { month: 'long' }),
-          amount: Math.floor(Math.random() * 45000) + 25000,
-          rides: Math.floor(Math.random() * 300) + 200
-        })),
-        summary: {
-          today: 1250,
-          yesterday: 980,
-          thisWeek: 8750,
-          lastWeek: 7200,
-          thisMonth: 35000,
-          lastMonth: 32000,
-          totalEarnings: 125000,
-          totalRides: 850,
-          avgPerRide: 147,
-          peakHours: ['9:00 AM', '6:00 PM', '10:00 PM'],
-          topEarningDay: 'Saturday'
-        },
-        breakdown: {
-          rideFare: 28000,
-          tips: 3500,
-          incentives: 2000,
-          surge: 1200,
-          cancellationFee: 300
-        }
-      };
-
-      setEarningsData(mockData);
-    } finally {
-      setLoading(false);
+  // Fallback data for error state
+  const getFallbackData = (): EarningsData => ({
+    daily: Array.from({ length: 30 }, (_, i) => ({
+      date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      amount: Math.floor(Math.random() * 2000) + 500,
+      rides: Math.floor(Math.random() * 15) + 3
+    })).reverse(),
+    weekly: Array.from({ length: 12 }, (_, i) => ({
+      week: `Week ${i + 1}`,
+      amount: Math.floor(Math.random() * 12000) + 8000,
+      rides: Math.floor(Math.random() * 80) + 50
+    })),
+    monthly: Array.from({ length: 12 }, (_, i) => ({
+      month: new Date(2024, i).toLocaleString('default', { month: 'long' }),
+      amount: Math.floor(Math.random() * 45000) + 25000,
+      rides: Math.floor(Math.random() * 300) + 200
+    })),
+    summary: {
+      today: 1250,
+      yesterday: 980,
+      thisWeek: 8750,
+      lastWeek: 7200,
+      thisMonth: 35000,
+      lastMonth: 32000,
+      totalEarnings: 125000,
+      totalRides: 850,
+      avgPerRide: 147,
+      peakHours: ['9:00 AM', '6:00 PM', '10:00 PM'],
+      topEarningDay: 'Saturday'
+    },
+    breakdown: {
+      rideFare: 28000,
+      tips: 3500,
+      incentives: 2000,
+      surge: 1200,
+      cancellationFee: 300
     }
-  };
+  });
 
   const getPercentageChange = (current: number, previous: number) => {
     if (previous === 0) return 0;
