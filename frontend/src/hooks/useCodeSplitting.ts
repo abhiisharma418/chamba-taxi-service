@@ -31,23 +31,26 @@ export const useCodeSplitting = () => {
   }, [user]);
 
   useEffect(() => {
+    // Only run in browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
     // Preload routes on user interaction (hover, focus)
-    const handleMouseEnter = (e: MouseEvent) => {
+    const handleMouseEnter = (e: Event) => {
       // Ensure target exists and is an Element
       if (!e.target || !(e.target instanceof Element)) {
         return;
       }
 
-      const target = e.target as HTMLElement;
+      const target = e.target;
 
       // Safely check if target has closest method and is an anchor or contains one
       let link: HTMLAnchorElement | null = null;
 
       try {
         // First check if the target itself is a link
-        if (target.tagName === 'A' && (target as HTMLAnchorElement).href) {
-          link = target as HTMLAnchorElement;
-        } else {
+        if (target.tagName === 'A' && target instanceof HTMLAnchorElement && target.href) {
+          link = target;
+        } else if (typeof target.closest === 'function') {
           // Then check if it has a parent link
           link = target.closest('a[href]') as HTMLAnchorElement;
         }
