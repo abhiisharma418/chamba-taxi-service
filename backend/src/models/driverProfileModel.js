@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const documentSchema = new mongoose.Schema({
   type: {
@@ -230,4 +230,5 @@ driverProfileSchema.methods.checkProfileCompletion = function() {
 
 const DriverProfile = mongoose.model('DriverProfile', driverProfileSchema);
 
-module.exports = DriverProfile;
+export default DriverProfile;
+

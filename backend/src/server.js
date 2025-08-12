@@ -12,7 +12,6 @@ import authRoutes from './routes/authRoutes.js';
 import rideRoutes from './routes/rideRoutes.js';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './docs/swagger.js';
-import vehicleRoutes from './routes/vehicleRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
@@ -25,8 +24,10 @@ import driverRoutes from './routes/driverRoutes.js';
 import whatsappRoutes from './routes/whatsappRoutes.js';
 import trackingRoutes from './routes/trackingRoutes.js';
 import driverProfileRoutes from './routes/driverProfileRoutes.js';
-import vehicleManagementRoutes from './routes/vehicleRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
+import vehicleRoutes from './routes/vehicleRoutes.js';
+import vehicleManagementRoutes from './routes/vehicleRoutes.js';
+
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
@@ -58,13 +59,12 @@ app.use('/uploads', express.static(uploadsPath));
 
 // CORS configuration
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "http://localhost:3000",  // frontend URL now port 3000
+  process.env.FRONTEND_URL || "http://localhost:3000",
   process.env.ADMIN_URL || "http://localhost:5174"
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // allow requests with no origin (like Postman, curl)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     return callback(new Error('Not allowed by CORS'));
@@ -117,7 +117,6 @@ io.on('connection', (socket) => {
     const { rideId, driverId, customerId } = payload;
     socket.join(`tracking:${rideId}`);
 
-    // Notify tracking service
     const trackingService = (await import('./services/trackingService.js')).default;
     await trackingService.startRideTracking(rideId, driverId, customerId);
   });
@@ -126,7 +125,6 @@ io.on('connection', (socket) => {
     const { rideId, reason } = payload;
     socket.leave(`tracking:${rideId}`);
 
-    // Notify tracking service
     const trackingService = (await import('./services/trackingService.js')).default;
     await trackingService.stopRideTracking(rideId, reason);
   });
@@ -134,7 +132,6 @@ io.on('connection', (socket) => {
   socket.on('location:update', async (payload) => {
     const { lat, lng, heading, speed, accuracy } = payload;
 
-    // Update location in tracking service
     const trackingService = (await import('./services/trackingService.js')).default;
     await trackingService.updateDriverLocation(userId, { lat, lng, heading, speed, accuracy });
   });
@@ -142,7 +139,6 @@ io.on('connection', (socket) => {
   socket.on('trigger:emergency', async (payload) => {
     const { rideId, location, message } = payload;
 
-    // Trigger emergency through tracking service
     const trackingService = (await import('./services/trackingService.js')).default;
     await trackingService.triggerEmergencyTracking(rideId, userId, location);
   });
@@ -191,3 +187,7 @@ mongoose.connect(process.env.MONGO_URI)
     server.listen(process.env.PORT || 5000, () => console.log(`Server running on port ${process.env.PORT || 5000}`));
   })
   .catch((err) => console.error(err));
+
+export function getIoInstance() {
+  return io;
+}

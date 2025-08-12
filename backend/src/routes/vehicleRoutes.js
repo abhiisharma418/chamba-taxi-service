@@ -1,6 +1,5 @@
-const express = require('express');
-const router = express.Router();
-const {
+import express from 'express';
+import {
   getVehicles,
   getVehicle,
   createVehicle,
@@ -12,8 +11,10 @@ const {
   getVehicleAlerts,
   toggleVehicleStatus,
   getVehicleStats
-} = require('../controllers/vehicleController');
-const { authenticateToken } = require('../middleware/auth');
+} from '../controllers/vehicleController.js';
+import { authenticateToken } from '../middleware/auth.js';
+
+const router = express.Router();
 
 // All routes require authentication
 router.use(authenticateToken);
@@ -37,4 +38,4 @@ router.post('/:vehicleId/documents/upload', uploadDocument);
 router.post('/:vehicleId/service', addServiceRecord);
 router.post('/:vehicleId/inspection', addInspectionRecord);
 
-module.exports = router;
+export default router;

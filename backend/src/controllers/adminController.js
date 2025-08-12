@@ -1,6 +1,6 @@
 import { User } from '../models/userModel.js';
 import { Ride } from '../models/rideModel.js';
-import { Vehicle } from '../models/vehicleModel.js';
+import  Vehicle  from '../models/vehicleModel.js';
 
 export const getStats = async (req, res) => {
   try {

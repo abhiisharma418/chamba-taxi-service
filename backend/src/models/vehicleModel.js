@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const vehicleDocumentSchema = new mongoose.Schema({
   type: {
@@ -330,4 +330,4 @@ vehicleSchema.statics.getActiveByDriver = function(driverId) {
 
 const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 
-module.exports = Vehicle;
+export default Vehicle;

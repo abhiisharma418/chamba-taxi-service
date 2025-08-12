@@ -1,12 +1,13 @@
-const { FAQ, SupportTicket, FAQFeedback } = require('../models/supportModel');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs').promises;
+// filepath: [supportController.js](http://_vscodecontentref_/1)
+import { FAQ, SupportTicket, FAQFeedback } from '../models/supportModel.js';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs/promises';
 
 // Configure multer for file uploads (ticket attachments)
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../../uploads/support-attachments');
+    const uploadPath = path.join(path.resolve(), 'uploads', 'support-attachments');
     await fs.mkdir(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
@@ -23,7 +24,6 @@ const upload = multer({
     const allowedTypes = /jpeg|jpg|png|pdf|doc|docx|txt/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype) || file.mimetype.includes('document');
-    
     if (mimetype && extname) {
       return cb(null, true);
     } else {
@@ -36,20 +36,11 @@ const upload = multer({
 const getFAQs = async (req, res) => {
   try {
     const { search, category } = req.query;
-    
     const faqs = await FAQ.search(search, category);
-    
-    res.json({
-      success: true,
-      data: faqs
-    });
+    res.json({ success: true, data: faqs });
   } catch (error) {
     console.error('Get FAQs error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch FAQs',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to fetch FAQs', error: error.message });
   }
 };
 
@@ -58,29 +49,15 @@ const recordFAQFeedback = async (req, res) => {
   try {
     const { faqId } = req.params;
     const { helpful, feedback } = req.body;
-    
     const faq = await FAQ.findById(faqId);
-    
     if (!faq) {
-      return res.status(404).json({
-        success: false,
-        message: 'FAQ not found'
-      });
+      return res.status(404).json({ success: false, message: 'FAQ not found' });
     }
-    
     await faq.recordFeedback(req.user.id, helpful, feedback);
-    
-    res.json({
-      success: true,
-      message: 'Feedback recorded successfully'
-    });
+    res.json({ success: true, message: 'Feedback recorded successfully' });
   } catch (error) {
     console.error('Record FAQ feedback error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to record feedback',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to record feedback', error: error.message });
   }
 };
 
@@ -88,20 +65,11 @@ const recordFAQFeedback = async (req, res) => {
 const getTickets = async (req, res) => {
   try {
     const { status } = req.query;
-    
     const tickets = await SupportTicket.getByDriver(req.user.id, status);
-    
-    res.json({
-      success: true,
-      data: tickets
-    });
+    res.json({ success: true, data: tickets });
   } catch (error) {
     console.error('Get tickets error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch tickets',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to fetch tickets', error: error.message });
   }
 };
 
@@ -109,36 +77,18 @@ const getTickets = async (req, res) => {
 const getTicket = async (req, res) => {
   try {
     const { ticketId } = req.params;
-    
     const ticket = await SupportTicket.findOne({
-      $or: [
-        { _id: ticketId },
-        { ticketId: ticketId }
-      ],
+      $or: [{ _id: ticketId }, { ticketId: ticketId }],
       driverId: req.user.id
     });
-    
     if (!ticket) {
-      return res.status(404).json({
-        success: false,
-        message: 'Ticket not found'
-      });
+      return res.status(404).json({ success: false, message: 'Ticket not found' });
     }
-    
-    // Mark messages as read for driver
     await ticket.markMessagesAsRead('driver');
-    
-    res.json({
-      success: true,
-      data: ticket
-    });
+    res.json({ success: true, data: ticket });
   } catch (error) {
     console.error('Get ticket error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch ticket',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to fetch ticket', error: error.message });
   }
 };
 
@@ -146,7 +96,6 @@ const getTicket = async (req, res) => {
 const createTicket = async (req, res) => {
   try {
     const { subject, category, priority, message, metadata } = req.body;
-    
     const ticket = new SupportTicket({
       driverId: req.user.id,
       subject,
@@ -158,60 +107,34 @@ const createTicket = async (req, res) => {
         ipAddress: req.ip
       }
     });
-    
-    // Add initial message
     ticket.messages.push({
       sender: 'driver',
       message,
-      isRead: true // Driver's own message is marked as read
+      isRead: true
     });
-    
     await ticket.save();
-    
-    res.status(201).json({
-      success: true,
-      data: ticket,
-      message: 'Support ticket created successfully'
-    });
+    res.status(201).json({ success: true, data: ticket, message: 'Support ticket created successfully' });
   } catch (error) {
     console.error('Create ticket error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create ticket',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to create ticket', error: error.message });
   }
 };
 
-// Add message to ticket
-const addMessage = async (req, res) => {
+// Add message to ticket (with multer middleware)
+const addMessageHandler = async (req, res) => {
   try {
     const { ticketId } = req.params;
     const { message } = req.body;
-    
     const ticket = await SupportTicket.findOne({
-      $or: [
-        { _id: ticketId },
-        { ticketId: ticketId }
-      ],
+      $or: [{ _id: ticketId }, { ticketId: ticketId }],
       driverId: req.user.id
     });
-    
     if (!ticket) {
-      return res.status(404).json({
-        success: false,
-        message: 'Ticket not found'
-      });
+      return res.status(404).json({ success: false, message: 'Ticket not found' });
     }
-    
     if (ticket.status === 'closed') {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot add message to closed ticket'
-      });
+      return res.status(400).json({ success: false, message: 'Cannot add message to closed ticket' });
     }
-    
-    // Handle file attachments if any
     let attachments = [];
     if (req.files && req.files.length > 0) {
       attachments = req.files.map(file => ({
@@ -221,53 +144,30 @@ const addMessage = async (req, res) => {
         type: file.mimetype
       }));
     }
-    
     await ticket.addMessage('driver', message, attachments);
-    
-    res.json({
-      success: true,
-      data: ticket,
-      message: 'Message added successfully'
-    });
+    res.json({ success: true, data: ticket, message: 'Message added successfully' });
   } catch (error) {
     console.error('Add message error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to add message',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to add message', error: error.message });
   }
 };
+const addMessage = [upload.array('attachments', 5), addMessageHandler];
 
 // Close ticket
 const closeTicket = async (req, res) => {
   try {
     const { ticketId } = req.params;
     const { rating, feedback } = req.body;
-    
     const ticket = await SupportTicket.findOne({
-      $or: [
-        { _id: ticketId },
-        { ticketId: ticketId }
-      ],
+      $or: [{ _id: ticketId }, { ticketId: ticketId }],
       driverId: req.user.id
     });
-    
     if (!ticket) {
-      return res.status(404).json({
-        success: false,
-        message: 'Ticket not found'
-      });
+      return res.status(404).json({ success: false, message: 'Ticket not found' });
     }
-    
     if (ticket.status === 'closed') {
-      return res.status(400).json({
-        success: false,
-        message: 'Ticket is already closed'
-      });
+      return res.status(400).json({ success: false, message: 'Ticket is already closed' });
     }
-    
-    // Add rating and feedback if provided
     if (rating || feedback) {
       if (!ticket.resolution) {
         ticket.resolution = {};
@@ -275,21 +175,11 @@ const closeTicket = async (req, res) => {
       if (rating) ticket.resolution.rating = rating;
       if (feedback) ticket.resolution.feedback = feedback;
     }
-    
     await ticket.close();
-    
-    res.json({
-      success: true,
-      data: ticket,
-      message: 'Ticket closed successfully'
-    });
+    res.json({ success: true, data: ticket, message: 'Ticket closed successfully' });
   } catch (error) {
     console.error('Close ticket error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to close ticket',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to close ticket', error: error.message });
   }
 };
 
@@ -298,67 +188,23 @@ const getTicketStats = async (req, res) => {
   try {
     const stats = await SupportTicket.aggregate([
       { $match: { driverId: req.user.id } },
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
+      { $group: { _id: '$status', count: { $sum: 1 } } }
     ]);
-    
-    const ticketStats = {
-      total: 0,
-      open: 0,
-      pending: 0,
-      resolved: 0,
-      closed: 0
-    };
-    
+    const ticketStats = { total: 0, open: 0, pending: 0, resolved: 0, closed: 0 };
     stats.forEach(stat => {
       ticketStats[stat._id] = stat.count;
       ticketStats.total += stat.count;
     });
-    
-    // Get average resolution time for resolved tickets
     const avgResolutionTime = await SupportTicket.aggregate([
-      { 
-        $match: { 
-          driverId: req.user.id,
-          status: 'resolved',
-          'resolution.resolvedAt': { $exists: true }
-        }
-      },
-      {
-        $project: {
-          resolutionTime: {
-            $divide: [
-              { $subtract: ['$resolution.resolvedAt', '$createdAt'] },
-              1000 * 60 * 60 // Convert to hours
-            ]
-          }
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          avgHours: { $avg: '$resolutionTime' }
-        }
-      }
+      { $match: { driverId: req.user.id, status: 'resolved', 'resolution.resolvedAt': { $exists: true } } },
+      { $project: { resolutionTime: { $divide: [{ $subtract: ['$resolution.resolvedAt', '$createdAt'] }, 1000 * 60 * 60] } } },
+      { $group: { _id: null, avgHours: { $avg: '$resolutionTime' } } }
     ]);
-    
     ticketStats.avgResolutionTimeHours = avgResolutionTime[0]?.avgHours || 0;
-    
-    res.json({
-      success: true,
-      data: ticketStats
-    });
+    res.json({ success: true, data: ticketStats });
   } catch (error) {
     console.error('Get ticket stats error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch ticket statistics',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to fetch ticket statistics', error: error.message });
   }
 };
 
@@ -366,27 +212,15 @@ const getTicketStats = async (req, res) => {
 const getFAQCategories = async (req, res) => {
   try {
     const categories = await FAQ.distinct('category', { isActive: true });
-    
     const categoriesWithCounts = await FAQ.aggregate([
       { $match: { isActive: true } },
       { $group: { _id: '$category', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
     ]);
-    
-    res.json({
-      success: true,
-      data: {
-        categories,
-        categoriesWithCounts
-      }
-    });
+    res.json({ success: true, data: { categories, categoriesWithCounts } });
   } catch (error) {
     console.error('Get FAQ categories error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch FAQ categories',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to fetch FAQ categories', error: error.message });
   }
 };
 
@@ -394,20 +228,13 @@ const getFAQCategories = async (req, res) => {
 const search = async (req, res) => {
   try {
     const { query, type } = req.query;
-    
     if (!query) {
-      return res.status(400).json({
-        success: false,
-        message: 'Search query is required'
-      });
+      return res.status(400).json({ success: false, message: 'Search query is required' });
     }
-    
     const results = {};
-    
     if (!type || type === 'faq') {
       results.faqs = await FAQ.search(query);
     }
-    
     if (!type || type === 'tickets') {
       results.tickets = await SupportTicket.find({
         driverId: req.user.id,
@@ -417,28 +244,20 @@ const search = async (req, res) => {
         ]
       }).sort({ updatedAt: -1 }).limit(10);
     }
-    
-    res.json({
-      success: true,
-      data: results
-    });
+    res.json({ success: true, data: results });
   } catch (error) {
     console.error('Search error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Search failed',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Search failed', error: error.message });
   }
 };
 
-module.exports = {
+export {
   getFAQs,
   recordFAQFeedback,
   getTickets,
   getTicket,
   createTicket,
-  addMessage: [upload.array('attachments', 5), addMessage],
+  addMessage,
   closeTicket,
   getTicketStats,
   getFAQCategories,

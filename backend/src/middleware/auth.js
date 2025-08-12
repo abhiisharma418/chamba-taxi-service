@@ -25,3 +25,4 @@ export const requireActive = (req, res, next) => {
   if (req.user?.isActive === false) return res.status(403).json({ success: false, message: 'Account disabled' });
   next();
 };
+export const authenticateToken = authenticate;

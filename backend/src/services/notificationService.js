@@ -34,6 +34,17 @@ export async function notifyDriver(driverId, type, data) {
   }
 }
 
+export async function broadcastLocationUpdate(driverId, locationData) {
+  try {
+    const io = getIoInstance();
+    io.to(`driver:${driverId}`).emit('location:update', locationData);
+    return { success: true };
+  } catch (error) {
+    console.error('Error broadcasting location update:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // Notify customer about ride updates
 export async function notifyCustomer(customerId, type, data) {
   try {

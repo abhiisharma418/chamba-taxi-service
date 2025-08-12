@@ -1,6 +1,5 @@
-const express = require('express');
-const router = express.Router();
-const {
+import express from 'express';
+import {
   getFAQs,
   recordFAQFeedback,
   getTickets,
@@ -11,11 +10,13 @@ const {
   getTicketStats,
   getFAQCategories,
   search
-} = require('../controllers/supportController');
-const { authenticateToken } = require('../middleware/auth');
+} from '../controllers/supportController.js';
+import { authenticate } from '../middleware/auth.js';
+
+const router = express.Router();
 
 // All routes require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // FAQ routes
 router.get('/faqs', getFAQs);
@@ -33,4 +34,4 @@ router.patch('/tickets/:ticketId/close', closeTicket);
 // Search route
 router.get('/search', search);
 
-module.exports = router;
+export default router;
