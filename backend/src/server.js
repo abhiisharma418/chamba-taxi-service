@@ -101,6 +101,51 @@ io.on('connection', (socket) => {
 
   socket.on('ride:join', (rideId) => {
     socket.join(`ride:${rideId}`);
+    console.log(`User ${userId} joined ride room: ${rideId}`);
+  });
+
+  socket.on('ride:leave', (rideId) => {
+    socket.leave(`ride:${rideId}`);
+    console.log(`User ${userId} left ride room: ${rideId}`);
+  });
+
+  // Live tracking events
+  socket.on('tracking:start', async (payload) => {
+    const { rideId, driverId, customerId } = payload;
+    socket.join(`tracking:${rideId}`);
+
+    // Notify tracking service
+    const trackingService = (await import('./services/trackingService.js')).default;
+    await trackingService.startRideTracking(rideId, driverId, customerId);
+  });
+
+  socket.on('tracking:stop', async (payload) => {
+    const { rideId, reason } = payload;
+    socket.leave(`tracking:${rideId}`);
+
+    // Notify tracking service
+    const trackingService = (await import('./services/trackingService.js')).default;
+    await trackingService.stopRideTracking(rideId, reason);
+  });
+
+  socket.on('location:update', async (payload) => {
+    const { lat, lng, heading, speed, accuracy } = payload;
+
+    // Update location in tracking service
+    const trackingService = (await import('./services/trackingService.js')).default;
+    await trackingService.updateDriverLocation(userId, { lat, lng, heading, speed, accuracy });
+  });
+
+  socket.on('trigger:emergency', async (payload) => {
+    const { rideId, location, message } = payload;
+
+    // Trigger emergency through tracking service
+    const trackingService = (await import('./services/trackingService.js')).default;
+    await trackingService.triggerEmergencyTracking(rideId, userId, location);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`User ${userId} disconnected`);
   });
 });
 
