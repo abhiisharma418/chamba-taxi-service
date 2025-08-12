@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate, requireRoles } from '../middleware/auth.js';
-import { driverHeartbeat, driverSetAvailability, dispatchNearestDriver, driverRespondToOffer } from '../controllers/liveController.js';
+import { driverHeartbeat, driverSetAvailability, driverRespond } from '../controllers/liveController.js';
 
 const router = express.Router();
 
