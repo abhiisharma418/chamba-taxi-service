@@ -107,16 +107,17 @@ const Navigation: React.FC = () => {
 
         {/* Mobile Menu */}
         {user && isMenuOpen && (
-          <div className="md:hidden">
+          <div className={`${responsive.nav.mobileMenu} animate-fadeInDown`}>
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
-              {navItems.map((item) => (
+              {navItems.map((item, index) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center space-x-2 block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 ${touch.target}`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className={touch.icon} />
                   <span>{item.label}</span>
                 </Link>
               ))}
