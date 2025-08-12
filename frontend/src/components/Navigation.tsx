@@ -70,6 +70,7 @@ const Navigation: React.FC = () => {
                     <span>{item.label}</span>
                   </Link>
                 ))}
+                <NotificationBell />
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <img
