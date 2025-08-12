@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
-import { Phone, MessageCircle, Star, Clock, MapPin, AlertTriangle, Navigation as NavigationIcon } from 'lucide-react';
+import { Phone, MessageCircle, Star, Clock, MapPin, AlertTriangle, Navigation as NavigationIcon, Shield, Users, HeadphonesIcon } from 'lucide-react';
 import { RidesAPI, TrackingAPI } from '../../lib/api';
 
 interface RideDetails {
