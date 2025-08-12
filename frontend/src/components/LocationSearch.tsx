@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Navigation2, Search, X } from 'lucide-react';
+import { MapPin, Navigation2, Search, X, Loader } from 'lucide-react';
+import useGoogleMaps from '../hooks/useGoogleMaps';
 
 interface Location {
   address: string;
