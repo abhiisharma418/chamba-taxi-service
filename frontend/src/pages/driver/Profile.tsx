@@ -56,9 +56,11 @@ const DriverProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<'personal' | 'driver' | 'documents' | 'preferences'>('personal');
   const [uploading, setUploading] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<DriverProfile | null>(null);
 
-  // Mock profile data - in real app, this would come from API
-  const [profile, setProfile] = useState<DriverProfile>({
+  // Default profile data
+  const getDefaultProfile = (): DriverProfile => ({
     personalInfo: {
       name: user?.name || 'John Doe',
       email: user?.email || 'john.doe@example.com',
@@ -100,6 +102,28 @@ const DriverProfile: React.FC = () => {
       }
     }
   });
+
+  // Load profile data from API
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await DriverAPI.getProfile();
+        if (response.success) {
+          setProfile(response.data);
+        } else {
+          setProfile(getDefaultProfile());
+        }
+      } catch (error) {
+        console.error('Failed to load profile:', error);
+        setProfile(getDefaultProfile());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, [user]);
 
   const handleSave = async () => {
     // API call to save profile
