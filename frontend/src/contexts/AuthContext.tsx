@@ -41,12 +41,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const bootstrap = async () => {
       try {
-        const saved = localStorage.getItem('user');
-        if (saved) setUser(JSON.parse(saved));
-        // attempt refresh to get new access token
-        const ref = await AuthAPI.refresh();
-        if (ref?.data?.token) setToken(ref.data.token);
-      } catch {}
+        const savedUser = localStorage.getItem('user');
+        const savedToken = localStorage.getItem('token');
+
+        if (savedUser && savedToken) {
+          setUser(JSON.parse(savedUser));
+          setToken(savedToken);
+
+          // Attempt refresh to validate token
+          try {
+            const ref = await AuthAPI.refresh();
+            if (ref?.data?.token) {
+              setToken(ref.data.token);
+            }
+          } catch (refreshError) {
+            // If refresh fails, clear invalid data
+            console.log('Token refresh failed, clearing auth data');
+            setUser(null);
+            setToken(null);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+          }
+        }
+      } catch (error) {
+        console.error('Bootstrap error:', error);
+      }
       setIsLoading(false);
     };
     bootstrap();
