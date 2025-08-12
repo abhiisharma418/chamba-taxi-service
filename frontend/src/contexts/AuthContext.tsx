@@ -3,17 +3,21 @@ import { AuthAPI, setToken } from '../lib/api';
 
 interface User {
   id: string;
+  firstName: string;
+  lastName: string;
   name: string;
   email: string;
   phone?: string;
-  type: 'customer' | 'driver';
+  role: 'customer' | 'driver' | 'admin';
   avatar?: string;
+  licenseNumber?: string;
+  vehicleModel?: string;
+  vehicleNumber?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, userType: 'customer' | 'driver') => Promise<void>;
-  signup: (userData: Omit<User, 'id'> & { password: string }) => Promise<void>;
+  login: (user: User, token: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -37,43 +41,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const bootstrap = async () => {
       try {
-        const saved = localStorage.getItem('user');
-        if (saved) setUser(JSON.parse(saved));
-        // attempt refresh to get new access token
-        const ref = await AuthAPI.refresh();
-        if (ref?.data?.token) setToken(ref.data.token);
-      } catch {}
+        const savedUser = localStorage.getItem('user');
+        const savedToken = localStorage.getItem('token');
+
+        if (savedUser && savedToken) {
+          setUser(JSON.parse(savedUser));
+          setToken(savedToken);
+
+          // Attempt refresh to validate token
+          try {
+            const ref = await AuthAPI.refresh();
+            if (ref?.data?.token) {
+              setToken(ref.data.token);
+            }
+          } catch (refreshError) {
+            // If refresh fails, clear invalid data
+            console.log('Token refresh failed, clearing auth data');
+            setUser(null);
+            setToken(null);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+          }
+        }
+      } catch (error) {
+        console.error('Bootstrap error:', error);
+      }
       setIsLoading(false);
     };
     bootstrap();
   }, []);
 
-  const login = async (email: string, password: string, userType: 'customer' | 'driver') => {
+  const login = async (userData: User, token: string) => {
     setIsLoading(true);
     try {
-      const res = await AuthAPI.login({ email, password, userType });
-      const token = res.data.token;
       setToken(token);
-      const u: User = { id: res.data.user.id, name: res.data.user.name, email: res.data.user.email, type: res.data.user.role as any };
-      setUser(u);
-      localStorage.setItem('user', JSON.stringify(u));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signup = async (userData: Omit<User, 'id'> & { password: string }) => {
-    setIsLoading(true);
-    try {
-      const payload = { name: userData.name, email: userData.email, phone: userData.phone || '', role: userData.type, password: userData.password } as any;
-      const res = await AuthAPI.register(payload);
-      if (res?.data?.token) setToken(res.data.token);
-      // After signup, consider auto-login via refresh
-      const ref = await AuthAPI.refresh();
-      if (ref?.data?.token) setToken(ref.data.token);
-      const u: User = { id: Date.now().toString(), name: userData.name, email: userData.email, type: userData.type };
-      setUser(u);
-      localStorage.setItem('user', JSON.stringify(u));
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', token);
     } finally {
       setIsLoading(false);
     }
@@ -91,10 +95,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,13 +1,40 @@
-import express from 'express';
-import { authenticate, requireRoles } from '../middleware/auth.js';
-import { createVehicle, listVehicles, updateVehicle, setAvailability } from '../controllers/vehicleController.js';
-
+const express = require('express');
 const router = express.Router();
+const {
+  getVehicles,
+  getVehicle,
+  createVehicle,
+  updateVehicle,
+  deleteVehicle,
+  uploadDocument,
+  addServiceRecord,
+  addInspectionRecord,
+  getVehicleAlerts,
+  toggleVehicleStatus,
+  getVehicleStats
+} = require('../controllers/vehicleController');
+const { authenticateToken } = require('../middleware/auth');
 
-router.use(authenticate);
-router.get('/', listVehicles);
-router.post('/', requireRoles('driver'), createVehicle);
-router.patch('/:id', requireRoles('driver'), updateVehicle);
-router.patch('/:id/availability', requireRoles('driver'), setAvailability);
+// All routes require authentication
+router.use(authenticateToken);
 
-export default router;
+// Vehicle CRUD routes
+router.get('/', getVehicles);
+router.post('/', createVehicle);
+router.get('/stats', getVehicleStats);
+router.get('/:vehicleId', getVehicle);
+router.put('/:vehicleId', updateVehicle);
+router.delete('/:vehicleId', deleteVehicle);
+
+// Vehicle status routes
+router.patch('/:vehicleId/status', toggleVehicleStatus);
+router.get('/:vehicleId/alerts', getVehicleAlerts);
+
+// Document routes
+router.post('/:vehicleId/documents/upload', uploadDocument);
+
+// Maintenance routes
+router.post('/:vehicleId/service', addServiceRecord);
+router.post('/:vehicleId/inspection', addInspectionRecord);
+
+module.exports = router;

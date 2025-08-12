@@ -1,13 +1,13 @@
 import express from 'express';
-import { authenticate } from '../middleware/auth.js';
 import {
-  getDriverProfile,
-  updateDriverProfile,
+  getProfile,
+  updateProfile,
   uploadDocument,
-  getDriverEarnings,
-  getDriverStats,
-  upload
+  getDocumentAlerts,
+  verifyDocument,
+  getProfileCompletion
 } from '../controllers/driverProfileController.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -15,14 +15,13 @@ const router = express.Router();
 router.use(authenticate);
 
 // Profile routes
-router.get('/profile', getDriverProfile);
-router.put('/profile', updateDriverProfile);
+router.get('/', getProfile);
+router.put('/', updateProfile);
+router.get('/completion', getProfileCompletion);
 
-// Document upload
-router.post('/upload-document', upload.single('document'), uploadDocument);
-
-// Earnings and statistics
-router.get('/earnings', getDriverEarnings);
-router.get('/stats', getDriverStats);
+// Document routes
+router.post('/documents/upload', uploadDocument);
+router.get('/documents/alerts', getDocumentAlerts);
+router.post('/documents/verify', verifyDocument); // Admin only
 
 export default router;

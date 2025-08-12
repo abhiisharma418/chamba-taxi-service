@@ -3,31 +3,40 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
-import { Phone, MessageCircle, Star, Clock, MapPin, AlertTriangle, Navigation as NavigationIcon } from 'lucide-react';
 import { RidesAPI, TrackingAPI } from '../../lib/api';
+import { ArrowLeft, Clock, MapPin, Star, Phone, MessageCircle, AlertCircle, CheckCircle, Navigation as NavIcon } from 'lucide-react';
 
-interface RideDetails {
+interface RideData {
   _id: string;
-  customerId: string;
-  driverId?: string;
-  pickup: { address: string; coordinates: [number, number] };
-  destination: { address: string; coordinates: [number, number] };
-  status: string;
-  fare: { estimated: number; actual?: number };
-  createdAt: string;
-  startedAt?: string;
-  completedAt?: string;
+  pickup: {
+    address: string;
+    coordinates: [number, number];
+  };
+  destination: {
+    address: string;
+    coordinates: [number, number];
+  };
   driver?: {
+    _id: string;
     name: string;
     phone: string;
     rating: number;
-    vehicleDetails: {
-      make: string;
-      model: string;
-      number: string;
-      color: string;
-    };
+    vehicleModel: string;
+    vehicleNumber: string;
+    photo?: string;
   };
+  status: string;
+  fare: {
+    estimated: number;
+    actual?: number;
+  };
+  vehicleType: string;
+  estimatedDuration?: number;
+  distance?: number;
+  createdAt: string;
+  assignedAt?: string;
+  startedAt?: string;
+  completedAt?: string;
 }
 
 const LiveTracking: React.FC = () => {
@@ -35,114 +44,175 @@ const LiveTracking: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   
-  const [rideDetails, setRideDetails] = useState<RideDetails | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [rideData, setRideData] = useState<RideData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [trackingStatus, setTrackingStatus] = useState<any>(null);
+  const [currentStatus, setCurrentStatus] = useState<string>('');
+  const [trackingActive, setTrackingActive] = useState(false);
 
   useEffect(() => {
-    if (!rideId || !user) return;
-    
-    fetchRideDetails();
-    fetchTrackingStatus();
-  }, [rideId, user]);
+    if (!rideId) {
+      setError('Invalid ride ID');
+      setIsLoading(false);
+      return;
+    }
 
-  const fetchRideDetails = async () => {
+    loadRideData();
+  }, [rideId]);
+
+  const loadRideData = async () => {
     try {
+      setIsLoading(true);
       const response = await RidesAPI.get(rideId!);
+      
       if (response.success) {
-        setRideDetails(response.data);
+        setRideData(response.data);
+        setCurrentStatus(response.data.status);
+        
+        // Start tracking if ride is active
+        if (['driver_assigned', 'driver_arrived', 'on_trip'].includes(response.data.status)) {
+          setTrackingActive(true);
+          await startTracking();
+        }
       } else {
-        setError('Failed to load ride details');
+        setError('Failed to load ride data');
       }
-    } catch (error) {
-      console.error('Error fetching ride details:', error);
-      setError('Failed to load ride details');
+    } catch (err: any) {
+      console.error('Error loading ride:', err);
+      setError(err.message || 'Failed to load ride data');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const fetchTrackingStatus = async () => {
+  const startTracking = async () => {
     try {
-      const response = await TrackingAPI.getTrackingStatus(rideId!);
-      if (response.success) {
-        setTrackingStatus(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching tracking status:', error);
-    }
-  };
-
-  const handleDriverContact = () => {
-    if (rideDetails?.driver?.phone) {
-      window.location.href = `tel:${rideDetails.driver.phone}`;
-    }
-  };
-
-  const handleEmergency = async () => {
-    try {
-      const response = await TrackingAPI.triggerEmergency({
+      await TrackingAPI.startTracking({
         rideId: rideId!,
-        location: { lat: 0, lng: 0 }, // You'd get user's current location here
-        message: 'Emergency triggered from tracking page'
+        customerId: user?.id
       });
-
-      if (response.success) {
-        alert('Emergency alert sent! Support will contact you shortly.');
-      }
     } catch (error) {
-      console.error('Error triggering emergency:', error);
-      alert('Failed to send emergency alert. Please call support directly.');
+      console.error('Failed to start tracking:', error);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'accepted': return 'bg-blue-100 text-blue-800';
-      case 'arriving': return 'bg-yellow-100 text-yellow-800';
-      case 'on-trip': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const handleStatusUpdate = (newStatus: string) => {
+    setCurrentStatus(newStatus);
+    
+    // Stop tracking when ride is completed or cancelled
+    if (['completed', 'cancelled'].includes(newStatus)) {
+      setTrackingActive(false);
+      stopTracking();
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'accepted': return 'Driver Assigned';
-      case 'arriving': return 'Driver Arriving';
-      case 'on-trip': return 'Trip in Progress';
-      case 'completed': return 'Trip Completed';
-      default: return status;
+  const stopTracking = async () => {
+    try {
+      await TrackingAPI.stopTracking({
+        rideId: rideId!,
+        reason: 'completed'
+      });
+    } catch (error) {
+      console.error('Failed to stop tracking:', error);
     }
   };
 
-  if (loading) {
+  const getStatusInfo = (status: string) => {
+    const statusMap = {
+      'requested': {
+        icon: Clock,
+        color: 'text-yellow-600',
+        bg: 'bg-yellow-50',
+        border: 'border-yellow-200',
+        title: 'Finding Driver',
+        description: 'We are looking for a nearby driver for you'
+      },
+      'driver_assigned': {
+        icon: CheckCircle,
+        color: 'text-blue-600',
+        bg: 'bg-blue-50',
+        border: 'border-blue-200',
+        title: 'Driver Assigned',
+        description: 'Your driver is on the way to pick you up'
+      },
+      'driver_arrived': {
+        icon: MapPin,
+        color: 'text-green-600',
+        bg: 'bg-green-50',
+        border: 'border-green-200',
+        title: 'Driver Arrived',
+        description: 'Your driver has arrived at the pickup location'
+      },
+      'on_trip': {
+        icon: NavIcon,
+        color: 'text-purple-600',
+        bg: 'bg-purple-50',
+        border: 'border-purple-200',
+        title: 'Trip Started',
+        description: 'You are on your way to the destination'
+      },
+      'completed': {
+        icon: CheckCircle,
+        color: 'text-green-600',
+        bg: 'bg-green-50',
+        border: 'border-green-200',
+        title: 'Trip Completed',
+        description: 'You have reached your destination'
+      },
+      'cancelled': {
+        icon: AlertCircle,
+        color: 'text-red-600',
+        bg: 'bg-red-50',
+        border: 'border-red-200',
+        title: 'Trip Cancelled',
+        description: 'This trip has been cancelled'
+      }
+    };
+
+    return statusMap[status as keyof typeof statusMap] || statusMap.requested;
+  };
+
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes} mins`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMins = minutes % 60;
+    return `${hours}h ${remainingMins}m`;
+  };
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
         <Navigation />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading ride details...</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         </div>
       </div>
     );
   }
 
-  if (error || !rideDetails) {
+  if (error || !rideData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
         <Navigation />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
-            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-red-800 mb-2">Unable to Load Ride</h2>
-            <p className="text-red-600 mb-4">{error}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Unable to Load Ride</h2>
+            <p className="text-slate-600 mb-6">{error || 'Ride not found'}</p>
             <button
               onClick={() => navigate('/customer/dashboard')}
-              className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               Back to Dashboard
             </button>
@@ -152,43 +222,36 @@ const LiveTracking: React.FC = () => {
     );
   }
 
+  const statusInfo = getStatusInfo(currentStatus);
+  const StatusIcon = statusInfo.icon;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       <Navigation />
-
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => navigate('/customer/dashboard')}
-            className="flex items-center text-blue-600 hover:text-blue-700 mb-4"
+            className="flex items-center space-x-2 text-slate-600 hover:text-slate-800 mb-4 transition-colors"
           >
-            <NavigationIcon className="h-4 w-4 mr-2" />
-            Back to Dashboard
+            <ArrowLeft className="h-5 w-5" />
+            <span>Back to Dashboard</span>
           </button>
           
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-gray-900">Live Tracking</h1>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(rideDetails.status)}`}>
-                {getStatusText(rideDetails.status)}
-              </span>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-sm text-gray-500">Pickup</p>
-                  <p className="font-medium">{rideDetails.pickup.address}</p>
-                </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900 mb-2">Live Tracking</h1>
+                <p className="text-slate-600">Ride ID: {rideData._id.slice(-8).toUpperCase()}</p>
               </div>
               
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-5 text-red-600" />
+              <div className={`flex items-center space-x-3 px-4 py-2 rounded-lg border ${statusInfo.bg} ${statusInfo.border}`}>
+                <StatusIcon className={`h-5 w-5 ${statusInfo.color}`} />
                 <div>
-                  <p className="text-sm text-gray-500">Destination</p>
-                  <p className="font-medium">{rideDetails.destination.address}</p>
+                  <div className={`font-medium ${statusInfo.color}`}>{statusInfo.title}</div>
+                  <div className="text-sm text-slate-600">{statusInfo.description}</div>
                 </div>
               </div>
             </div>
@@ -198,115 +261,179 @@ const LiveTracking: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Map */}
           <div className="lg:col-span-2">
-            <LiveTrackingMap
-              rideId={rideDetails._id}
-              customerId={rideDetails.customerId}
-              driverId={rideDetails.driverId}
-              pickupLocation={{
-                lat: rideDetails.pickup.coordinates[1],
-                lng: rideDetails.pickup.coordinates[0],
-                address: rideDetails.pickup.address
-              }}
-              destinationLocation={{
-                lat: rideDetails.destination.coordinates[1],
-                lng: rideDetails.destination.coordinates[0],
-                address: rideDetails.destination.address
-              }}
-              height="500px"
-              onDriverContact={handleDriverContact}
-              onEmergency={handleEmergency}
-            />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <LiveTrackingMap
+                rideId={rideId!}
+                pickup={{
+                  lat: rideData.pickup.coordinates[1],
+                  lng: rideData.pickup.coordinates[0],
+                  address: rideData.pickup.address
+                }}
+                destination={{
+                  lat: rideData.destination.coordinates[1],
+                  lng: rideData.destination.coordinates[0],
+                  address: rideData.destination.address
+                }}
+                driver={rideData.driver ? {
+                  id: rideData.driver._id,
+                  name: rideData.driver.name,
+                  phone: rideData.driver.phone,
+                  rating: rideData.driver.rating,
+                  vehicleModel: rideData.driver.vehicleModel,
+                  vehicleNumber: rideData.driver.vehicleNumber,
+                  photo: rideData.driver.photo
+                } : undefined}
+                onStatusUpdate={handleStatusUpdate}
+                className="h-96 lg:h-[600px]"
+              />
+            </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Ride Details */}
           <div className="space-y-6">
-            {/* Driver Details */}
-            {rideDetails.driver && (
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Driver Details</h3>
+            {/* Trip Info */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Trip Details</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-3 h-3 bg-green-500 rounded-full mt-2"></div>
+                    <div className="flex-1">
+                      <div className="text-sm text-slate-500">Pickup</div>
+                      <div className="font-medium text-slate-900">{rideData.pickup.address}</div>
+                    </div>
+                  </div>
+                </div>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-3 h-3 bg-red-500 rounded-full mt-2"></div>
+                    <div className="flex-1">
+                      <div className="text-sm text-slate-500">Destination</div>
+                      <div className="font-medium text-slate-900">{rideData.destination.address}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
+                  <div>
+                    <div className="text-sm text-slate-500">Vehicle</div>
+                    <div className="font-medium text-slate-900 capitalize">{rideData.vehicleType}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-slate-500">Fare</div>
+                    <div className="font-medium text-slate-900">₹{rideData.fare.actual || rideData.fare.estimated}</div>
+                  </div>
+                  {rideData.distance && (
                     <div>
-                      <p className="font-medium text-gray-900">{rideDetails.driver.name}</p>
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="text-sm text-gray-600">{rideDetails.driver.rating.toFixed(1)}</span>
-                      </div>
+                      <div className="text-sm text-slate-500">Distance</div>
+                      <div className="font-medium text-slate-900">{rideData.distance} km</div>
                     </div>
-                    
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={handleDriverContact}
-                        className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                      >
-                        <Phone className="h-4 w-4" />
-                      </button>
-                      <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        <MessageCircle className="h-4 w-4" />
-                      </button>
+                  )}
+                  {rideData.estimatedDuration && (
+                    <div>
+                      <div className="text-sm text-slate-500">Duration</div>
+                      <div className="font-medium text-slate-900">{formatDuration(rideData.estimatedDuration)}</div>
                     </div>
-                  </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
-                  <div className="border-t pt-4">
-                    <p className="text-sm text-gray-500 mb-2">Vehicle Details</p>
-                    <p className="font-medium">
-                      {rideDetails.driver.vehicleDetails.color} {rideDetails.driver.vehicleDetails.make} {rideDetails.driver.vehicleDetails.model}
-                    </p>
-                    <p className="text-lg font-bold text-gray-900">
-                      {rideDetails.driver.vehicleDetails.number}
-                    </p>
+            {/* Driver Info */}
+            {rideData.driver && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Driver Information</h3>
+                
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                    {rideData.driver.photo ? (
+                      <img 
+                        src={rideData.driver.photo} 
+                        alt={rideData.driver.name}
+                        className="w-16 h-16 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white font-bold text-xl">
+                        {rideData.driver.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
+                  
+                  <div className="flex-1">
+                    <div className="font-semibold text-slate-900">{rideData.driver.name}</div>
+                    <div className="text-slate-600">{rideData.driver.vehicleModel}</div>
+                    <div className="text-slate-600">{rideData.driver.vehicleNumber}</div>
+                    <div className="flex items-center space-x-1 mt-1">
+                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                      <span className="text-sm text-slate-600">{rideData.driver.rating}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => window.open(`tel:${rideData.driver!.phone}`)}
+                    className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Phone className="h-4 w-4" />
+                    <span>Call</span>
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://wa.me/${rideData.driver!.phone.replace(/\D/g, '')}`)}
+                    className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    <span>Message</span>
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* Trip Details */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Trip Details</h3>
+            {/* Timeline */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Trip Timeline</h3>
               
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Booking ID</span>
-                  <span className="font-medium">{rideDetails._id.slice(-8)}</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-slate-900">Ride Requested</div>
+                    <div className="text-xs text-slate-500">{formatTime(rideData.createdAt)}</div>
+                  </div>
                 </div>
                 
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Fare</span>
-                  <span className="font-medium">₹{rideDetails.fare.actual || rideDetails.fare.estimated}</span>
-                </div>
+                {rideData.assignedAt && (
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-slate-900">Driver Assigned</div>
+                      <div className="text-xs text-slate-500">{formatTime(rideData.assignedAt)}</div>
+                    </div>
+                  </div>
+                )}
                 
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Booked At</span>
-                  <span className="font-medium">
-                    {new Date(rideDetails.createdAt).toLocaleTimeString()}
-                  </span>
-                </div>
-
-                {rideDetails.startedAt && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Started At</span>
-                    <span className="font-medium">
-                      {new Date(rideDetails.startedAt).toLocaleTimeString()}
-                    </span>
+                {rideData.startedAt && (
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-slate-900">Trip Started</div>
+                      <div className="text-xs text-slate-500">{formatTime(rideData.startedAt)}</div>
+                    </div>
+                  </div>
+                )}
+                
+                {rideData.completedAt && (
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-slate-900">Trip Completed</div>
+                      <div className="text-xs text-slate-500">{formatTime(rideData.completedAt)}</div>
+                    </div>
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Emergency Button */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Emergency</h3>
-              <p className="text-red-600 text-sm mb-4">
-                In case of emergency, click the button below to alert our support team and emergency contacts.
-              </p>
-              <button
-                onClick={handleEmergency}
-                className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
-              >
-                <AlertTriangle className="h-5 w-5 inline mr-2" />
-                Emergency Alert
-              </button>
             </div>
           </div>
         </div>

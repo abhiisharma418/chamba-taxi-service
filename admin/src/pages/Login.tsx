@@ -105,21 +105,6 @@ const Login: React.FC = () => {
           </button>
         </form>
 
-        {/* Demo credentials info */}
-        <div className="mt-8 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-            <p className="text-sm font-semibold text-slate-700">Admin Demo Access</p>
-          </div>
-          <div className="text-sm text-slate-600 space-y-2">
-            <div className="text-center">
-              <p className="font-mono text-amber-700">admin@ridewithus.com / admin123</p>
-              <p className="text-xs text-slate-500 mt-2">
-                🔐 Full administrative access for demo
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* Security notice */}
         <div className="mt-6 text-center">

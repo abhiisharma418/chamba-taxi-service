@@ -24,6 +24,9 @@ import zoneRoutes from './routes/zoneRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
 import whatsappRoutes from './routes/whatsappRoutes.js';
 import trackingRoutes from './routes/trackingRoutes.js';
+import driverProfileRoutes from './routes/driverProfileRoutes.js';
+import vehicleManagementRoutes from './routes/vehicleRoutes.js';
+import supportRoutes from './routes/supportRoutes.js';
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
@@ -176,6 +179,9 @@ app.use('/api/live', authenticate, requireActive, liveRoutes);
 app.use('/api/devices', authenticate, requireActive, deviceRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/tracking', trackingRoutes);
+app.use('/api/driver-profile', authenticate, requireActive, driverProfileRoutes);
+app.use('/api/vehicle-management', authenticate, requireActive, vehicleManagementRoutes);
+app.use('/api/support', authenticate, requireActive, supportRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server and connect to MongoDB

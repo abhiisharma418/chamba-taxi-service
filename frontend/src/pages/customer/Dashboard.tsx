@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
+import { StatsCardSkeleton, ListItemSkeleton, CardSkeleton } from '../../components/LoadingSkeletons';
+import { responsive, touch, patterns } from '../../utils/responsive';
 import { Car, MapPin, Clock, Star, Plus, ArrowRight, Receipt } from 'lucide-react';
 
 const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
@@ -10,18 +12,63 @@ const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-s
 const CustomerDashboard: React.FC = () => {
   const { user } = useAuth();
   const { currentBooking, bookings } = useBooking();
+  const [isLoading, setIsLoading] = useState(true);
 
   const userBookings = bookings.filter(booking => booking.customerId === user?.id);
   const recentBookings = userBookings.slice(0, 3);
 
+  // Simulate initial loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-200">
+        <Navigation />
+
+        <div className={`${responsive.container} ${responsive.spacing.section}`}>
+          {/* Welcome Section Skeleton */}
+          <div className="mb-10">
+            <CardSkeleton className="h-32" />
+          </div>
+
+          {/* Stats Grid Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <StatsCardSkeleton />
+            <StatsCardSkeleton />
+            <StatsCardSkeleton />
+            <StatsCardSkeleton />
+          </div>
+
+          {/* Recent Bookings Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <CardSkeleton className="h-16" />
+              <ListItemSkeleton />
+              <ListItemSkeleton />
+              <ListItemSkeleton />
+            </div>
+            <div className="space-y-6">
+              <CardSkeleton className="h-48" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-200">
       <Navigation />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <div className={`${responsive.container} ${responsive.spacing.section}`}>
         {/* Welcome Section */}
-        <div className="mb-10">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-gray-100">
+        <div className="mb-10 animate-fadeInUp">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-2">
               Welcome back, {user?.name}!
             </h1>
@@ -31,7 +78,7 @@ const CustomerDashboard: React.FC = () => {
 
         {/* Current Booking */}
         {currentBooking && (
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 mb-10 text-white shadow-2xl">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 mb-10 text-white shadow-2xl animate-scaleIn hover-lift">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
@@ -70,8 +117,8 @@ const CustomerDashboard: React.FC = () => {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          <Link to="/customer/book-ride" className="group bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+        <div className={`${responsive.grid.cols3} ${responsive.spacing.gap} mb-8 sm:mb-12`}>
+          <Link to="/customer/book-ride" className={`group bg-white/80 backdrop-blur-sm ${responsive.card.default} shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 animate-fadeInUp hover-lift ${touch.target}`} style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center justify-between">
               <div>
                 <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300 mb-4">

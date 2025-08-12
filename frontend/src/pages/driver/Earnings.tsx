@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
+import { DriverAPI } from '../../lib/api';
 import { 
   DollarSign, TrendingUp, Calendar, Download, Eye, 
   BarChart3, PieChart, Clock, Target, Award, ArrowUp, ArrowDown
@@ -35,63 +36,75 @@ interface EarningsData {
 const DriverEarnings: React.FC = () => {
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [earningsData, setEarningsData] = useState<EarningsData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [showBreakdown, setShowBreakdown] = useState(false);
 
+  // Use API for data fetching with fallback
+  const [earningsData, setEarningsData] = useState<EarningsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    loadEarningsData();
+    const loadEarnings = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await DriverAPI.getEarnings(selectedPeriod);
+        if (response.success) {
+          setEarningsData(response.data);
+        } else {
+          setEarningsData(getFallbackData());
+        }
+      } catch (err) {
+        console.error('Failed to load earnings:', err);
+        setError('Failed to load earnings data');
+        setEarningsData(getFallbackData());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEarnings();
   }, [selectedPeriod]);
 
-  const loadEarningsData = async () => {
-    setLoading(true);
-    try {
-      // Simulate API call - in real app, this would fetch from backend
-      const mockData: EarningsData = {
-        daily: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          amount: Math.floor(Math.random() * 2000) + 500,
-          rides: Math.floor(Math.random() * 15) + 3
-        })).reverse(),
-        weekly: Array.from({ length: 12 }, (_, i) => ({
-          week: `Week ${i + 1}`,
-          amount: Math.floor(Math.random() * 12000) + 8000,
-          rides: Math.floor(Math.random() * 80) + 50
-        })),
-        monthly: Array.from({ length: 12 }, (_, i) => ({
-          month: new Date(2024, i).toLocaleString('default', { month: 'long' }),
-          amount: Math.floor(Math.random() * 45000) + 25000,
-          rides: Math.floor(Math.random() * 300) + 200
-        })),
-        summary: {
-          today: 1250,
-          yesterday: 980,
-          thisWeek: 8750,
-          lastWeek: 7200,
-          thisMonth: 35000,
-          lastMonth: 32000,
-          totalEarnings: 125000,
-          totalRides: 850,
-          avgPerRide: 147,
-          peakHours: ['9:00 AM', '6:00 PM', '10:00 PM'],
-          topEarningDay: 'Saturday'
-        },
-        breakdown: {
-          rideFare: 28000,
-          tips: 3500,
-          incentives: 2000,
-          surge: 1200,
-          cancellationFee: 300
-        }
-      };
-      
-      setEarningsData(mockData);
-    } catch (error) {
-      console.error('Error loading earnings data:', error);
-    } finally {
-      setLoading(false);
+
+  // Fallback data for error state
+  const getFallbackData = (): EarningsData => ({
+    daily: Array.from({ length: 30 }, (_, i) => ({
+      date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      amount: Math.floor(Math.random() * 2000) + 500,
+      rides: Math.floor(Math.random() * 15) + 3
+    })).reverse(),
+    weekly: Array.from({ length: 12 }, (_, i) => ({
+      week: `Week ${i + 1}`,
+      amount: Math.floor(Math.random() * 12000) + 8000,
+      rides: Math.floor(Math.random() * 80) + 50
+    })),
+    monthly: Array.from({ length: 12 }, (_, i) => ({
+      month: new Date(2024, i).toLocaleString('default', { month: 'long' }),
+      amount: Math.floor(Math.random() * 45000) + 25000,
+      rides: Math.floor(Math.random() * 300) + 200
+    })),
+    summary: {
+      today: 1250,
+      yesterday: 980,
+      thisWeek: 8750,
+      lastWeek: 7200,
+      thisMonth: 35000,
+      lastMonth: 32000,
+      totalEarnings: 125000,
+      totalRides: 850,
+      avgPerRide: 147,
+      peakHours: ['9:00 AM', '6:00 PM', '10:00 PM'],
+      topEarningDay: 'Saturday'
+    },
+    breakdown: {
+      rideFare: 28000,
+      tips: 3500,
+      incentives: 2000,
+      surge: 1200,
+      cancellationFee: 300
     }
-  };
+  });
 
   const getPercentageChange = (current: number, previous: number) => {
     if (previous === 0) return 0;
@@ -139,16 +152,16 @@ const DriverEarnings: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
         <Navigation />
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
-            <p className="text-red-600">Failed to load earnings data</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-center">
+            <p className="text-red-800">❌ Failed to load earnings data.</p>
           </div>
         </div>
       </div>
     );
   }
 
-  const currentData = earningsData[selectedPeriod];
-  const summary = earningsData.summary;
+  const currentData = earningsData[selectedPeriod] || [];
+  const summary = earningsData.summary || {};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">

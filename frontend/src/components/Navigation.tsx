@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import NotificationBell from './NotificationBell';
+import ThemeToggle from './ThemeToggle';
+import { responsive, touch, patterns } from '../utils/responsive';
 import {
   Car,
   User,
@@ -8,7 +11,11 @@ import {
   X,
   LogOut,
   MapPin,
-  Clock
+  Clock,
+  DollarSign,
+  FileText,
+  Settings,
+  HelpCircle
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -36,7 +43,11 @@ const Navigation: React.FC = () => {
       case 'driver':
         return [
           { path: '/driver/dashboard', label: 'Dashboard', icon: User },
-          { path: '/driver/rides', label: 'My Rides', icon: MapPin }
+          { path: '/driver/trip-history', label: 'Trip History', icon: MapPin },
+          { path: '/driver/earnings', label: 'Earnings', icon: DollarSign },
+          { path: '/driver/profile', label: 'Profile', icon: User },
+          { path: '/driver/vehicle-management', label: 'Vehicle', icon: Settings },
+          { path: '/driver/support', label: 'Support', icon: HelpCircle }
         ];
       default:
         return [];
@@ -46,9 +57,9 @@ const Navigation: React.FC = () => {
   const navItems = getNavItems();
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+    <nav className="bg-white/95 dark:bg-dark-card/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100 dark:border-dark-border">
+      <div className={patterns.navigation.inner}>
+        <div className={patterns.navigation.content}>
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <Logo size="md" />
@@ -69,6 +80,8 @@ const Navigation: React.FC = () => {
                     <span>{item.label}</span>
                   </Link>
                 ))}
+                <NotificationBell />
+                <ThemeToggle />
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <img
@@ -89,12 +102,13 @@ const Navigation: React.FC = () => {
               </div>
 
               {/* Mobile Navigation */}
-              <div className="md:hidden flex items-center">
+              <div className={`${responsive.nav.mobile} ${responsive.flex.center} gap-2`}>
+                <NotificationBell />
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all duration-300"
+                  className={`text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all duration-300 ${touch.target}`}
                 >
-                  {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                  {isMenuOpen ? <X className={touch.icon} /> : <Menu className={touch.icon} />}
                 </button>
               </div>
             </>
@@ -103,16 +117,17 @@ const Navigation: React.FC = () => {
 
         {/* Mobile Menu */}
         {user && isMenuOpen && (
-          <div className="md:hidden">
+          <div className={`${responsive.nav.mobileMenu} animate-fadeInDown`}>
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
-              {navItems.map((item) => (
+              {navItems.map((item, index) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center space-x-2 block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 ${touch.target}`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className={touch.icon} />
                   <span>{item.label}</span>
                 </Link>
               ))}

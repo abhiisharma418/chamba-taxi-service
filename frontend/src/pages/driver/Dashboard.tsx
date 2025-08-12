@@ -42,11 +42,24 @@ const DriverDashboard: React.FC = () => {
   const activeRide = driverBookings.find(booking => ['accepted', 'on-trip'].includes(booking.status));
 
   const todayEarnings = driverBookings
-    .filter(booking => 
-      booking.status === 'completed' && 
+    .filter(booking =>
+      booking.status === 'completed' &&
+      new Date(booking.completedAt!).toDateString() === new Date().toDateString()
+    )
+    .reduce((sum, booking) => {
+      const totalFare = booking.fare.actual || booking.fare.estimated;
+      const driverShare = Math.round(totalFare * 0.75); // Driver gets 75%
+      return sum + driverShare;
+    }, 0);
+
+  const totalTodayFares = driverBookings
+    .filter(booking =>
+      booking.status === 'completed' &&
       new Date(booking.completedAt!).toDateString() === new Date().toDateString()
     )
     .reduce((sum, booking) => sum + (booking.fare.actual || booking.fare.estimated), 0);
+
+  const companyCommission = totalTodayFares - todayEarnings;
 
   const handleAcceptRide = async (bookingId: string) => {
     await RidesAPI.updateStatus(bookingId, 'accepted');
@@ -134,7 +147,12 @@ const DriverDashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <div className="text-2xl font-bold text-gray-900">₹{todayEarnings}</div>
-                <div className="text-gray-600">Today's Earnings</div>
+                <div className="text-gray-600">Your Earning (75%)</div>
+                {totalTodayFares > 0 && (
+                  <div className="text-sm text-gray-500 mt-1">
+                    Total: ₹{totalTodayFares} • Commission: ₹{companyCommission}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -231,6 +249,39 @@ const DriverDashboard: React.FC = () => {
             <p className="text-gray-600">Stay online and we'll notify you when new ride requests come in.</p>
           </div>
         )}
+
+        {/* Fare Split Information */}
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <DollarSign className="h-5 w-5 mr-2 text-green-600" />
+            RideWithUs Fare Structure
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg p-4 border border-green-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-700 font-medium">Your Share</span>
+                <span className="text-2xl font-bold text-green-600">75%</span>
+              </div>
+              <p className="text-sm text-gray-600">You keep 75% of every fare</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 border border-blue-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-700 font-medium">Platform Fee</span>
+                <span className="text-2xl font-bold text-blue-600">25%</span>
+              </div>
+              <p className="text-sm text-gray-600">Platform maintenance & support</p>
+            </div>
+          </div>
+          <div className="mt-4 bg-white rounded-lg p-4 border">
+            <div className="flex items-center space-x-2 text-green-700">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm font-medium">No Hidden Charges</span>
+            </div>
+            <p className="text-sm text-gray-600 mt-1">
+              No booking fees, subscription charges, or additional deductions. Simple 75-25 split on all rides.
+            </p>
+          </div>
+        </div>
 
         {/* Offline State */}
         {!isOnline && (
