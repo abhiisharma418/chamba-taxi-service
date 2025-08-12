@@ -1,5 +1,5 @@
 const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
-const USE_DEMO_MODE = false; // Use live backend for admin
+// Removed demo mode - using live backend only
 
 export function getToken(): string | null {
   try { return localStorage.getItem('admin-token'); } catch { return null; }
