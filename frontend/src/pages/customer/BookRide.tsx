@@ -437,7 +437,7 @@ const BookRide: React.FC = () => {
               />
             </div>
 
-            {fareEstimate && (
+            {fareEstimate && fareBreakdown && (
               <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-2xl shadow-xl p-8 text-white">
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                   <Zap className="h-6 w-6" />
@@ -453,28 +453,65 @@ const BookRide: React.FC = () => {
                     <span className="font-semibold">{estimateInfo?.durationMin || '12'} min</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-green-100">Region</span>
-                    <span className="font-semibold capitalize">{estimateInfo?.regionType || 'City'}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
                     <span className="text-green-100">Vehicle</span>
                     <span className="font-semibold capitalize">{vehicleType}</span>
                   </div>
-                  {estimateInfo?.surge && estimateInfo.surge > 1 && (
+                  {fareBreakdown.surgeMultiplier > 1 && (
                     <div className="flex items-center justify-between">
                       <span className="text-green-100">Surge Pricing</span>
-                      <span className="font-semibold text-yellow-200">{estimateInfo.surge}x</span>
+                      <span className="font-semibold text-yellow-200">{fareBreakdown.surgeMultiplier}x</span>
                     </div>
                   )}
+
+                  {/* Fare Breakdown */}
+                  <div className="border-t border-green-500 pt-4 space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-green-100">Base Fare</span>
+                      <span>₹{fareBreakdown.baseAmount}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-green-100">Distance Charge</span>
+                      <span>₹{fareBreakdown.distanceAmount}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-green-100">Time Charge</span>
+                      <span>₹{fareBreakdown.timeAmount}</span>
+                    </div>
+                    {fareBreakdown.taxes > 0 && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-green-100">Taxes</span>
+                        <span>₹{fareBreakdown.taxes}</span>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="border-t border-green-500 pt-4">
                     <div className="flex items-center justify-between text-2xl font-bold">
                       <span>Total Fare</span>
                       <span>₹{fareEstimate}</span>
                     </div>
-                    {estimateInfo?.surge && estimateInfo.surge > 1 && (
+
+                    {/* Commission Split Info */}
+                    <div className="mt-4 bg-green-800/30 rounded-xl p-4">
+                      <p className="text-green-100 text-sm font-medium mb-2">Fare Distribution:</p>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-green-200">Driver Earning (75%)</span>
+                          <span className="font-semibold">₹{fareBreakdown.driverEarning}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-green-200">Platform Fee (25%)</span>
+                          <span className="font-semibold">₹{fareBreakdown.companyCommission}</span>
+                        </div>
+                      </div>
+                      <p className="text-green-300 text-xs mt-2">*No additional booking fees</p>
+                    </div>
+
+                    {fareBreakdown.surgeMultiplier > 1 && (
                       <p className="text-green-200 text-sm mt-2">*Higher demand in your area</p>
                     )}
                   </div>
+
                   <div className="flex items-center justify-center space-x-2 text-green-100 bg-green-800/30 rounded-xl p-3">
                     <CreditCard className="h-5 w-5" />
                     <span>Multiple Payment Options Available</span>
