@@ -247,7 +247,7 @@ const LiveTracking: React.FC = () => {
               }}
               height="500px"
               onDriverContact={handleDriverContact}
-              onEmergency={handleEmergency}
+              onEmergency={handleEmergencyClick}
             />
           </div>
 
