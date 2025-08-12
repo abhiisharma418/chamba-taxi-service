@@ -214,6 +214,16 @@ const BookRide: React.FC = () => {
               </div>
             </div>
 
+            {/* WhatsApp Notifications */}
+            {currentStep === 'details' && (
+              <WhatsAppNotification
+                isEnabled={whatsappEnabled}
+                phoneNumber={whatsappPhone}
+                onToggle={setWhatsappEnabled}
+                onPhoneUpdate={setWhatsappPhone}
+              />
+            )}
+
             {currentStep === 'details' && (
               <div className="flex gap-4">
                 <button
