@@ -243,11 +243,15 @@ const BookRide: React.FC = () => {
               <div className="flex gap-4">
                 <button
                   onClick={handleEstimate}
-                  disabled={!pickupLocation.address || !destinationLocation.address}
+                  disabled={!pickupLocation.address || !destinationLocation.address || estimateLoading}
                   className="flex-1 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 text-slate-900 font-semibold py-4 px-6 rounded-xl transition-all duration-300 disabled:cursor-not-allowed"
                 >
-                  <Zap className="h-5 w-5 inline mr-2" />
-                  Get Estimate
+                  {estimateLoading ? (
+                    <Loader2 className="h-5 w-5 inline mr-2 animate-spin" />
+                  ) : (
+                    <Zap className="h-5 w-5 inline mr-2" />
+                  )}
+                  {estimateLoading ? 'Calculating...' : 'Get Estimate'}
                 </button>
                 <button
                   onClick={handleContinueToPayment}
