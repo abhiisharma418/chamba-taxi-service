@@ -73,6 +73,7 @@ const Navigation: React.FC = () => {
                   </Link>
                 ))}
                 <NotificationBell />
+                <ThemeToggle />
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <img
