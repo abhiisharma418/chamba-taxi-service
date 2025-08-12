@@ -671,4 +671,4 @@ const TripHistory: React.FC = () => {
   );
 };
 
-export default DriverTrips;
+export default DriverTripHistory;
