@@ -295,4 +295,3 @@ export const sendRideNotification = async (rideId, event, additionalData = {}) =
   }
 };
 
-export { sendRideNotification };
