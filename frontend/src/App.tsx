@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
@@ -7,18 +7,30 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { queryClient } from './lib/queryClient';
 
-// Pages
-import LandingPage from './pages/LandingPage';
-import Login from './pages/Login';
-import Signup from './pages/SignUp';
-import CustomerDashboard from './pages/customer/Dashboard';
-import CustomerBookRide from './pages/customer/BookRide';
-import CustomerHistory from './pages/customer/History';
-import DriverDashboard from './pages/driver/Dashboard';
-import DriverRides from './pages/driver/Rides';
-
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
+import { PageSkeleton } from './components/LoadingSkeletons';
+
+// Lazy load pages for better performance
+const LandingPage = React.lazy(() => import('./pages/LandingPage'));
+const Login = React.lazy(() => import('./pages/Login'));
+const Signup = React.lazy(() => import('./pages/SignUp'));
+
+// Customer pages
+const CustomerDashboard = React.lazy(() => import('./pages/customer/Dashboard'));
+const CustomerBookRide = React.lazy(() => import('./pages/customer/BookRide'));
+const CustomerHistory = React.lazy(() => import('./pages/customer/History'));
+const CustomerLiveTracking = React.lazy(() => import('./pages/customer/LiveTracking'));
+
+// Driver pages
+const DriverDashboard = React.lazy(() => import('./pages/driver/Dashboard'));
+const DriverRides = React.lazy(() => import('./pages/driver/Rides'));
+const DriverEarnings = React.lazy(() => import('./pages/driver/Earnings'));
+const DriverProfile = React.lazy(() => import('./pages/driver/Profile'));
+
+// Admin pages (for future use)
+const AdminDashboard = React.lazy(() => import('./admin/src/pages/Dashboard'));
+const AdminLogin = React.lazy(() => import('./admin/src/pages/Login'));
 
 function App() {
   return (
