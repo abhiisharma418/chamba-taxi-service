@@ -13,38 +13,27 @@ export function setToken(token: string | null) {
 // Demo responses removed - using live backend only
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
-  // Use demo mode when enabled
-  if (USE_DEMO_MODE) {
-    console.log(`Admin demo mode active for: ${path}`);
-    return getDemoResponse(path, options);
-  }
-
   const token = getToken();
   const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(options.headers as any) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  try {
-    console.log(`Admin API call to: ${API_URL}${path}`);
-    const res = await fetch(`${API_URL}${path}`, { 
-      ...options, 
-      headers, 
-      credentials: 'include',
-      mode: 'cors'
-    });
-    
-    if (!res.ok) {
-      console.warn(`Admin API call failed with status ${res.status}`);
-      const text = await res.text();
-      throw new Error(text || `Request failed: ${res.status}`);
-    }
-    
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('application/json')) return res.json();
-    return res.text();
-  } catch (error) {
-    console.warn(`Admin API call failed for ${path}, using demo fallback:`, error);
-    return getDemoResponse(path, options);
+  console.log(`Admin API call to: ${API_URL}${path}`);
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers,
+    credentials: 'include',
+    mode: 'cors'
+  });
+
+  if (!res.ok) {
+    console.warn(`Admin API call failed with status ${res.status}`);
+    const text = await res.text();
+    throw new Error(text || `Request failed: ${res.status}`);
   }
+
+  const ct = res.headers.get('content-type') || '';
+  if (ct.includes('application/json')) return res.json();
+  return res.text();
 }
 
 export const AdminAPI = {
