@@ -20,15 +20,16 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md
   };
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
-      <img
-        src="https://cdn.builder.io/api/v1/image/assets%2Fb5fd1e57bd4244fe81b312d7e7579ba5%2F41d29b6806c84d6abfb0a013666ca367?format=webp&width=800"
-        alt="RideWithUs Logo"
-        className={`${sizeClasses[size]} object-contain`}
-      />
+    <div className={`flex items-center space-x-3 ${className}`}>
+      {/* RWS Circle Logo */}
+      <div className={`${sizeClasses[size]} relative`}>
+        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+          <span className="text-white font-bold text-sm">RWS</span>
+        </div>
+      </div>
 
       {showText && (
-        <span className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent`}>
+        <span className={`${textSizeClasses[size]} font-bold text-slate-900 dark:text-white`}>
           RideWithUs
         </span>
       )}
