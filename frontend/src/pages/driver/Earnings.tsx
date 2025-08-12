@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
-import { DriverAPI } from '../../lib/api';
+import { useDriverEarnings, useDriverEarningsBreakdown } from '../../hooks/useQueries';
 import { 
   DollarSign, TrendingUp, Calendar, Download, Eye, 
   BarChart3, PieChart, Clock, Target, Award, ArrowUp, ArrowDown
