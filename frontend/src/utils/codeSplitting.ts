@@ -2,46 +2,40 @@ import React from 'react';
 
 // Utility for creating lazy-loaded components with better error handling
 export const createLazyComponent = (
-  importFn: () => Promise<{ default: React.ComponentType<any> }>,
-  fallback?: React.ComponentType
+  importFn: () => Promise<{ default: React.ComponentType<any> }>
 ) => {
-  const LazyComponent = React.lazy(async () => {
+  return React.lazy(async () => {
     try {
       return await importFn();
     } catch (error) {
       console.error('Failed to load component:', error);
       
-      // Return fallback component or a simple error component
-      if (fallback) {
-        return { default: fallback };
-      }
-      
-      // Default error component
-      const ErrorComponent = () => (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center p-8">
-            <div className="mb-4">
-              <svg className="w-16 h-16 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Failed to Load Page</h2>
-            <p className="text-gray-600 mb-4">There was an error loading this page.</p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Reload Page
-            </button>
-          </div>
-        </div>
+      // Return a simple error component
+      const ErrorComponent = () => React.createElement(
+        'div',
+        { 
+          className: 'min-h-screen flex items-center justify-center bg-gray-50',
+          style: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+        },
+        React.createElement(
+          'div',
+          { className: 'text-center p-8' },
+          React.createElement('h2', { className: 'text-xl font-semibold text-gray-900 mb-2' }, 'Failed to Load Page'),
+          React.createElement('p', { className: 'text-gray-600 mb-4' }, 'There was an error loading this page.'),
+          React.createElement(
+            'button',
+            {
+              className: 'bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors',
+              onClick: () => window.location.reload()
+            },
+            'Reload Page'
+          )
+        )
       );
       
       return { default: ErrorComponent };
     }
   });
-  
-  return LazyComponent;
 };
 
 // Preload utility for critical routes
@@ -72,12 +66,6 @@ export const routes = {
     rides: () => import('../pages/driver/Rides'),
     earnings: () => import('../pages/driver/Earnings'),
     profile: () => import('../pages/driver/Profile'),
-  },
-  
-  // Admin routes (load on demand)
-  admin: {
-    dashboard: () => import('../../admin/src/pages/Dashboard'),
-    login: () => import('../../admin/src/pages/Login'),
   }
 };
 
@@ -98,30 +86,7 @@ export const preloadCriticalRoutes = (userType?: 'customer' | 'driver' | 'admin'
       preloadRoute(routes.driver.dashboard);
       preloadRoute(routes.driver.rides);
       break;
-    case 'admin':
-      preloadRoute(routes.admin.dashboard);
-      break;
   }
-};
-
-// Component-level code splitting for heavy components
-export const createLazySection = (
-  importFn: () => Promise<{ default: React.ComponentType<any> }>,
-  loadingComponent?: React.ComponentType
-) => {
-  const LazySectionComponent = React.lazy(importFn);
-  
-  return (props: any) => (
-    <React.Suspense 
-      fallback={
-        loadingComponent ? 
-          React.createElement(loadingComponent) : 
-          <div className="animate-pulse bg-gray-200 rounded-lg h-32"></div>
-      }
-    >
-      <LazySectionComponent {...props} />
-    </React.Suspense>
-  );
 };
 
 // Dynamic import with retry logic
@@ -163,41 +128,28 @@ export const prefetchResources = {
       link.as = 'script';
       document.head.appendChild(link);
     });
-  },
-  
-  // Prefetch API endpoints
-  api: (endpoints: string[]) => {
-    endpoints.forEach(endpoint => {
-      fetch(endpoint, { method: 'HEAD' }).catch(() => {
-        // Silently fail prefetch attempts
-      });
-    });
   }
 };
 
-// Bundle splitting recommendations
-export const bundleConfig = {
-  // Vendor chunks
-  vendor: [
-    'react',
-    'react-dom',
-    'react-router-dom',
-    '@tanstack/react-query'
-  ],
+// Performance monitoring for code splitting
+export const performanceMonitor = {
+  // Track component load times
+  trackComponentLoad: (componentName: string, startTime: number) => {
+    const loadTime = performance.now() - startTime;
+    console.log(`${componentName} loaded in ${loadTime.toFixed(2)}ms`);
+    
+    // Send to analytics if needed
+    if (window.gtag) {
+      window.gtag('event', 'component_load', {
+        component_name: componentName,
+        load_time: loadTime
+      });
+    }
+  },
   
-  // Common chunks
-  common: [
-    './src/lib/api',
-    './src/contexts',
-    './src/components/Navigation',
-    './src/components/LoadingSkeletons'
-  ],
-  
-  // Page chunks (automatically split by route)
-  pages: {
-    customer: ['./src/pages/customer'],
-    driver: ['./src/pages/driver'],
-    admin: ['./src/admin']
+  // Track bundle sizes
+  trackBundleSize: (bundleName: string, size: number) => {
+    console.log(`${bundleName} bundle size: ${(size / 1024).toFixed(2)}KB`);
   }
 };
 
@@ -205,9 +157,8 @@ export default {
   createLazyComponent,
   preloadRoute,
   preloadCriticalRoutes,
-  createLazySection,
   dynamicImport,
   prefetchResources,
-  routes,
-  bundleConfig
+  performanceMonitor,
+  routes
 };
