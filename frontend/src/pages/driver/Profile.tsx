@@ -126,8 +126,22 @@ const DriverProfile: React.FC = () => {
   }, [user]);
 
   const handleSave = async () => {
-    // API call to save profile
-    setIsEditing(false);
+    if (!profile) return;
+
+    try {
+      setLoading(true);
+      const response = await DriverAPI.updateProfile(profile);
+      if (response.success) {
+        setProfile(response.data);
+        setIsEditing(false);
+      } else {
+        console.error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFileUpload = async (documentType: keyof DriverProfile['documents'], file: File) => {
