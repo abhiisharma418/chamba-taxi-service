@@ -43,19 +43,55 @@ const Dashboard: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d'>('7d');
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const response = await AdminAPI.getStats();
-        setStats(response.data);
+        const [statsResponse] = await Promise.all([
+          AdminAPI.getStats(),
+          // AdminAPI.getAnalytics(selectedPeriod) // Would add this API later
+        ]);
+
+        setStats(statsResponse.data);
+
+        // Mock analytics data for now
+        const mockAnalytics: AnalyticsData = {
+          revenueChart: Array.from({ length: parseInt(selectedPeriod) }, (_, i) => ({
+            date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            amount: Math.floor(Math.random() * 15000) + 5000
+          })).reverse(),
+          ridesChart: Array.from({ length: parseInt(selectedPeriod) }, (_, i) => ({
+            date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            rides: Math.floor(Math.random() * 50) + 20
+          })).reverse(),
+          hourlyDistribution: Array.from({ length: 24 }, (_, i) => ({
+            hour: i,
+            rides: Math.floor(Math.random() * 20) + 5
+          })),
+          topRoutes: [
+            { from: 'Mall Road', to: 'The Ridge', count: 125 },
+            { from: 'Bus Stand', to: 'Jakhu Temple', count: 98 },
+            { from: 'Railway Station', to: 'Scandal Point', count: 87 },
+            { from: 'ISBT', to: 'Kufri', count: 65 },
+            { from: 'Shimla Airport', to: 'City Center', count: 54 }
+          ],
+          driverPerformance: [
+            { name: 'Rajesh Kumar', earnings: 45670, rating: 4.8, rides: 234 },
+            { name: 'Vikram Singh', earnings: 38900, rating: 4.6, rides: 198 },
+            { name: 'Amit Sharma', earnings: 42100, rating: 4.7, rides: 211 },
+            { name: 'Suresh Thakur', earnings: 35400, rating: 4.5, rides: 167 },
+            { name: 'Rohit Verma', earnings: 41200, rating: 4.9, rides: 189 }
+          ]
+        };
+
+        setAnalytics(mockAnalytics);
       } catch (error) {
-        console.error('Failed to fetch stats:', error);
+        console.error('Failed to fetch data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStats();
-  }, []);
+    fetchData();
+  }, [selectedPeriod]);
 
   if (loading) {
     return (
