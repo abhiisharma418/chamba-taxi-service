@@ -42,6 +42,17 @@ const BookRide: React.FC = () => {
     return () => { sock.disconnect(); };
   }, [user]);
 
+  // Auto-estimate when both locations are set
+  useEffect(() => {
+    if (pickupLocation.address && destinationLocation.address && !estimateLoading) {
+      const timer = setTimeout(() => {
+        handleEstimate();
+      }, 1000); // Debounce for 1 second
+
+      return () => clearTimeout(timer);
+    }
+  }, [pickupLocation.address, destinationLocation.address, vehicleType]);
+
   const handleCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
