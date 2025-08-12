@@ -147,24 +147,21 @@ const DriverEarnings: React.FC = () => {
     );
   }
 
-  if (earningsError) {
-    // Use fallback data on error
-    const fallbackData = getFallbackData();
+  if (!earningsData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
         <Navigation />
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 text-center">
-            <p className="text-yellow-800">⚠️ Using offline data. Check your connection.</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-center">
+            <p className="text-red-800">❌ Failed to load earnings data.</p>
           </div>
-          {/* Render component with fallback data */}
         </div>
       </div>
     );
   }
 
-  const currentData = earningsData[selectedPeriod];
-  const summary = earningsData.summary;
+  const currentData = earningsData[selectedPeriod] || [];
+  const summary = earningsData.summary || {};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
