@@ -127,40 +127,76 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   };
 
   const handleCurrentLocation = () => {
-    if (navigator.geolocation && onCurrentLocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by this browser.');
+      return;
+    }
+
+    setIsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+
+        // Reverse geocode to get actual address
+        if (isLoaded && window.google && window.google.maps) {
+          const geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ location: coords }, (results, status) => {
+            setIsLoading(false);
+            if (status === 'OK' && results && results[0]) {
+              const location: Location = {
+                address: results[0].formatted_address,
+                coordinates: [coords.lng, coords.lat]
+              };
+              setQuery(location.address);
+              onChange(location);
+              setIsOpen(false);
+            } else {
+              // Fallback if geocoding fails
+              const location: Location = {
+                address: `Current Location (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`,
+                coordinates: [coords.lng, coords.lat]
+              };
+              setQuery(location.address);
+              onChange(location);
+            }
+          });
+        } else {
+          setIsLoading(false);
+          // Fallback without geocoding
           const location: Location = {
             address: 'Current Location',
-            coordinates: [position.coords.longitude, position.coords.latitude]
+            coordinates: [coords.lng, coords.lat]
           };
-          
-          setQuery('Current Location');
+          setQuery(location.address);
           onChange(location);
-          
-          // Reverse geocode to get actual address
-          if (window.google && window.google.maps && window.google.maps.Geocoder) {
-            const geocoder = new google.maps.Geocoder();
-            geocoder.geocode(
-              { location: { lat: position.coords.latitude, lng: position.coords.longitude } },
-              (results, status) => {
-                if (status === 'OK' && results && results[0]) {
-                  const actualLocation: Location = {
-                    address: results[0].formatted_address,
-                    coordinates: [position.coords.longitude, position.coords.latitude]
-                  };
-                  setQuery(actualLocation.address);
-                  onChange(actualLocation);
-                }
-              }
-            );
-          }
-        },
-        (error) => {
-          console.error('Error getting current location:', error);
         }
-      );
-    }
+      },
+      (error) => {
+        setIsLoading(false);
+        console.error('Error getting current location:', error);
+        let errorMessage = 'Unable to get current location.';
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied by user.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information unavailable.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timeout.';
+            break;
+        }
+        alert(errorMessage);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
   };
 
   const clearInput = () => {
