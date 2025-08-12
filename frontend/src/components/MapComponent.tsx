@@ -28,8 +28,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [destinationMarker, setDestinationMarker] = useState<google.maps.Marker | null>(null);
 
   useEffect(() => {
-    // Initialize Google Maps
-    if (!mapRef.current) return;
+    // Initialize Google Maps only if available
+    if (!mapRef.current || !window.google || !window.google.maps) return;
 
     const mapInstance = new google.maps.Map(mapRef.current, {
       center: { lat: 31.1048, lng: 77.1734 }, // Default to Shimla, India
