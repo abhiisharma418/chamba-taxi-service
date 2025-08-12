@@ -85,13 +85,21 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     const newQuery = e.target.value;
     setQuery(newQuery);
     setIsOpen(true);
-    
+
+    // Clear existing timer
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
     // Debounce search
-    const timeoutId = setTimeout(() => {
-      searchPlaces(newQuery);
-    }, 300);
-    
-    return () => clearTimeout(timeoutId);
+    if (newQuery.length > 2) {
+      debounceTimer.current = setTimeout(() => {
+        searchPlaces(newQuery);
+      }, 300);
+    } else {
+      setSuggestions([]);
+      setIsLoading(false);
+    }
   };
 
   const selectPlace = (prediction: google.maps.places.AutocompletePrediction) => {
