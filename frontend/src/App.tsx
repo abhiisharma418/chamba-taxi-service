@@ -41,56 +41,82 @@ function App() {
             <BookingProvider>
               <Router>
                 <div className="min-h-screen bg-gray-50 dark:bg-dark-surface transition-colors duration-200">
-                  <Routes>
-                    {/* Public Routes */}
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
+                  <Suspense fallback={<PageSkeleton />}>
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/" element={<LandingPage />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup" element={<Signup />} />
 
-                    {/* Customer Routes */}
-                    <Route
-                      path="/customer/dashboard"
-                      element={
-                        <ProtectedRoute userType="customer">
-                          <CustomerDashboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/customer/book-ride"
-                      element={
-                        <ProtectedRoute userType="customer">
-                          <CustomerBookRide />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/customer/history"
-                      element={
-                        <ProtectedRoute userType="customer">
-                          <CustomerHistory />
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Customer Routes */}
+                      <Route
+                        path="/customer/dashboard"
+                        element={
+                          <ProtectedRoute userType="customer">
+                            <CustomerDashboard />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/customer/book-ride"
+                        element={
+                          <ProtectedRoute userType="customer">
+                            <CustomerBookRide />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/customer/history"
+                        element={
+                          <ProtectedRoute userType="customer">
+                            <CustomerHistory />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/customer/live-tracking/:rideId"
+                        element={
+                          <ProtectedRoute userType="customer">
+                            <CustomerLiveTracking />
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Driver Routes */}
-                    <Route
-                      path="/driver/dashboard"
-                      element={
-                        <ProtectedRoute userType="driver">
-                          <DriverDashboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/driver/rides"
-                      element={
-                        <ProtectedRoute userType="driver">
-                          <DriverRides />
-                        </ProtectedRoute>
-                      }
-                    />
-                  </Routes>
+                      {/* Driver Routes */}
+                      <Route
+                        path="/driver/dashboard"
+                        element={
+                          <ProtectedRoute userType="driver">
+                            <DriverDashboard />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/driver/rides"
+                        element={
+                          <ProtectedRoute userType="driver">
+                            <DriverRides />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/driver/earnings"
+                        element={
+                          <ProtectedRoute userType="driver">
+                            <DriverEarnings />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/driver/profile"
+                        element={
+                          <ProtectedRoute userType="driver">
+                            <DriverProfile />
+                          </ProtectedRoute>
+                        }
+                      />
+                    </Routes>
+                  </Suspense>
                 </div>
               </Router>
             </BookingProvider>
