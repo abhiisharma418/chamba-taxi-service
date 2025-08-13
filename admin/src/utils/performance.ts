@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Performance monitoring utilities for admin portal
 interface PerformanceMetrics {
   componentName: string;
