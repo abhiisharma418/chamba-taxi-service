@@ -1,4 +1,4 @@
-import { api } from '../lib/api';
+import { apiFetch } from '../lib/api';
 
 export interface Location {
   address: string;

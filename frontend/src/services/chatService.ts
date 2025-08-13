@@ -1,4 +1,4 @@
-import { api } from '../lib/api';
+import { apiFetch } from '../lib/api';
 import { io, Socket } from 'socket.io-client';
 
 export interface ChatMessage {
