@@ -15,7 +15,8 @@ import {
   BarChart3,
   CheckCircle,
   HelpCircle,
-  FileText
+  FileText,
+  Gift
 } from 'lucide-react';
 
 interface LayoutProps {
