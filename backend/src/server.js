@@ -185,6 +185,7 @@ app.use('/api/driver-profile', authenticate, requireActive, driverProfileRoutes)
 app.use('/api/vehicle-management', authenticate, requireActive, vehicleManagementRoutes);
 app.use('/api/support', authenticate, requireActive, supportRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/driver-documents', driverDocumentRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server and connect to MongoDB
