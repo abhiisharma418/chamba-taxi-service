@@ -11,6 +11,10 @@ interface FreeMapComponentProps {
   destination?: Location;
   driverLocation?: [number, number];
   onMapReady?: () => void;
+  onPickupChange?: (location: Location) => void;
+  onDestinationChange?: (location: Location) => void;
+  showSearch?: boolean;
+  interactive?: boolean;
   className?: string;
 }
 
