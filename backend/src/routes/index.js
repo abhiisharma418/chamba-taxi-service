@@ -8,3 +8,4 @@ export { default as ticketRoutes } from './ticketRoutes.js';
 export { default as adminRoutes } from './adminRoutes.js';
 export { default as pricingRoutes } from './pricingRoutes.js';
 export { default as whatsappRoutes } from './whatsappRoutes.js';
+export { default as chatRoutes } from './chatRoutes.js';
