@@ -24,6 +24,10 @@ const FreeMapComponent: React.FC<FreeMapComponentProps> = ({
   destination,
   driverLocation,
   onMapReady,
+  onPickupChange,
+  onDestinationChange,
+  showSearch = false,
+  interactive = true,
   className = ''
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
