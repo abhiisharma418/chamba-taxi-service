@@ -294,18 +294,46 @@ const Dashboard: React.FC = () => {
               <DollarSign className="h-5 w-5 text-blue-600" />
               Revenue Trend
             </h3>
-            <div className="h-48 flex items-end justify-between space-x-1">
-              {analytics?.revenueChart.slice(-7).map((data, index) => (
-                <div key={index} className="flex flex-col items-center flex-1">
-                  <div
-                    className="bg-blue-600 rounded-t w-full transition-all duration-300 hover:bg-blue-700"
-                    style={{ height: `${(data.amount / 20000) * 100}%`, minHeight: '20px' }}
-                  ></div>
-                  <span className="text-xs text-slate-600 mt-2 transform -rotate-45">
-                    {new Date(data.date).getDate()}
-                  </span>
-                </div>
-              ))}
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={analytics?.revenueChart || []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis
+                    dataKey="date"
+                    stroke="#64748b"
+                    fontSize={12}
+                    tickFormatter={(value) => new Date(value).getDate().toString()}
+                  />
+                  <YAxis
+                    stroke="#64748b"
+                    fontSize={12}
+                    tickFormatter={(value) => `₹${(value/1000)}k`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                    }}
+                    formatter={(value: any) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="amount"
+                    stroke="#2563eb"
+                    fill="url(#revenueGradient)"
+                    strokeWidth={2}
+                  />
+                  <defs>
+                    <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
             <div className="text-center mt-4">
               <p className="text-2xl font-bold text-slate-900">
