@@ -1,14 +1,12 @@
 import React from 'react';
-import '../styles/logo-animations.css';
 
 interface LogoProps {
   className?: string;
   showText?: boolean;
   size?: 'sm' | 'md' | 'lg';
-  enableRotation?: boolean; // Control rotation
 }
 
-const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md', enableRotation = false }) => {
+const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md' }) => {
   const sizeClasses = {
     sm: 'h-6 w-6',
     md: 'h-8 w-8',
@@ -21,131 +19,21 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md
     lg: 'text-3xl'
   };
 
-  const rwuTextSize = {
-    sm: 'text-xs',
-    md: 'text-sm',
-    lg: 'text-base'
-  };
-
   return (
-    <div className={`flex items-center space-x-3 ${className} ${enableRotation ? 'rwu-logo-container' : ''}`}>
-      {/* Premium Combined RWU Logo */}
-      <div className={`${sizeClasses[size]} relative group cursor-pointer ${enableRotation ? 'rwu-3d-effect' : ''}`}>
-        <div className={`w-full h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-2xl flex items-center justify-center ${enableRotation ? 'shadow-2xl group-hover:shadow-none' : 'shadow-lg'} border-2 border-blue-400/30 ${enableRotation ? 'group-hover:scale-110 group-hover:rotate-[360deg]' : ''} transition-all duration-700 ease-in-out overflow-hidden transform-gpu ${enableRotation ? 'rwu-pulse-border-effect' : ''}`}>
-          {/* Premium Background Pattern */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-          <div className="absolute top-1 left-1 w-2 h-2 bg-white/40 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-blue-300/60 rounded-full animate-pulse delay-1000"></div>
-
-          {/* Enhanced RWU Design - Clearly Represents RideWithUs */}
-          <div className={`relative z-10 ${rwuTextSize[size]} rwu-premium-text`}>
-            {/* Main RWU Text */}
-            <div
-              className={`relative font-black tracking-tighter drop-shadow-lg transform ${enableRotation ? 'group-hover:scale-110 rwu-glow-effect' : ''} transition-all duration-500 inline-block`}
-              style={{
-                fontFamily: 'Inter, system-ui, sans-serif',
-                letterSpacing: '-0.08em'
-              }}
-            >
-              {/* R - Ride */}
-              <span
-                className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[8deg]' : ''} transition-transform duration-300 relative`}
-                style={{
-                  background: 'linear-gradient(135deg, #ffffff 0%, #fbbf24 50%, #f59e0b 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}
-                title="Ride"
-              >
-                R
-                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[6px] font-normal text-white/60 whitespace-nowrap">
-                  ide
-                </span>
-              </span>
-
-              {/* W - With */}
-              <span
-                className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[-5deg]' : ''} transition-transform duration-300 delay-75 relative mx-0.5`}
-                style={{
-                  background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #60a5fa 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}
-                title="With"
-              >
-                W
-                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[6px] font-normal text-white/60 whitespace-nowrap">
-                  ith
-                </span>
-              </span>
-
-              {/* U - Us */}
-              <span
-                className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[8deg]' : ''} transition-transform duration-300 delay-150 relative`}
-                style={{
-                  background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #8b5cf6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}
-                title="Us"
-              >
-                U
-                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[6px] font-normal text-white/60 whitespace-nowrap">
-                  s
-                </span>
-              </span>
-            </div>
-
-            {/* Descriptive Arc */}
-            <div className="absolute -bottom-2 left-0 right-0 flex justify-center">
-              <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">
-                <span className="text-[6px] font-medium text-white/80 tracking-wider">
-                  RIDE•WITH•US
-                </span>
-              </div>
-            </div>
-
-            {/* Connecting line effect to bind letters */}
-            {enableRotation && (
-              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-white/40 via-blue-200/60 to-white/40 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out"></div>
-            )}
-
-            {/* Binding glow effect */}
-            {enableRotation && (
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-white/30 to-blue-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
-            )}
+    <div className={`flex items-center space-x-3 ${className}`}>
+      {/* Simple RWU Logo */}
+      <div className={`${sizeClasses[size]} relative`}>
+        <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center shadow-md border border-blue-400/30">
+          <div className="text-white font-bold text-sm">
+            RWU
           </div>
-
-          {/* Enhanced shimmer effect */}
-          {enableRotation && (
-            <div className="absolute inset-0 rwu-shimmer-effect opacity-0 group-hover:opacity-100 transition-opacity duration-500 skew-x-12"></div>
-          )}
-
-          {/* Rotating border effect */}
-          {enableRotation && (
-            <div className="absolute inset-0 rounded-2xl border-2 border-gradient-to-r from-blue-400/50 via-white/30 to-blue-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          )}
-
-          {/* Pulsing glow effect - No background shadow during rotation */}
-          {enableRotation && (
-            <div className="absolute -inset-1 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-2xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
-          )}
         </div>
       </div>
 
       {showText && (
-        <div className="flex flex-col group-hover:translate-x-1 transition-transform duration-300">
-          <span className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tight leading-none group-hover:from-blue-500 group-hover:to-blue-700 transition-all duration-300 rwu-premium-text`}>
-            <span className="inline-block transform group-hover:scale-105 transition-transform duration-300 group-hover:text-shadow-lg">Ride</span>
-            <span className="inline-block transform group-hover:scale-105 transition-transform duration-300 delay-75">With</span>
-            <span className="inline-block transform group-hover:scale-105 transition-transform duration-300 delay-150">Us</span>
-          </span>
-          <span className="text-xs font-semibold text-blue-600 tracking-wide uppercase opacity-80 -mt-1 group-hover:opacity-100 transition-opacity duration-300 group-hover:tracking-wider">
-            <span className="inline-block transform group-hover:scale-105 transition-transform duration-200">Premium</span>
-            <span className="inline-block transform group-hover:scale-105 transition-transform duration-200 delay-100 ml-1">Mobility</span>
+        <div className="flex flex-col">
+          <span className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tight leading-none`}>
+            RideWithUs
           </span>
         </div>
       )}
