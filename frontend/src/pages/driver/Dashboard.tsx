@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
-import { Car, Power, MapPin, Clock, DollarSign, Star, Bell, MessageCircle } from 'lucide-react';
+import { Car, Power, MapPin, Clock, DollarSign, Star, Bell, MessageCircle, HelpCircle } from 'lucide-react';
 import { LiveAPI, RidesAPI } from '../../lib/api';
 import { io } from 'socket.io-client';
 import ChatInterface from '../../components/ChatInterface';
+import SupportInterface from '../../components/SupportInterface';
 
 const DriverDashboard: React.FC = () => {
   const { user } = useAuth();
