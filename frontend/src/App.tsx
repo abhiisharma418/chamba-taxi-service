@@ -31,9 +31,7 @@ const DriverProfile = React.lazy(() => import('./pages/driver/Profile'));
 const DriverVehicleManagement = React.lazy(() => import('./pages/driver/VehicleManagement'));
 const DriverSupport = React.lazy(() => import('./pages/driver/Support'));
 
-// Inner app component that has access to all providers
 const AppRoutes: React.FC = () => {
-  // Initialize code splitting and performance monitoring
   useCodeSplitting();
   usePerformanceMonitoring();
 
@@ -47,7 +45,6 @@ const AppRoutes: React.FC = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* Customer Routes */}
             <Route
               path="/customer/dashboard"
               element={

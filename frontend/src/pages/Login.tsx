@@ -48,9 +48,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-gray-100">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center justify-center">
             <Logo size="lg" />
-          </Link>
           <p className="text-slate-600 mt-4 text-lg">Welcome back to your trusted ride partner</p>
         </div>
 

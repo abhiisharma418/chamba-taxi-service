@@ -61,9 +61,9 @@ const Navigation: React.FC = () => {
       <div className={patterns.navigation.inner}>
         <div className={patterns.navigation.content}>
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
+            {/* <Link to="/" className="flex items-center"> */}
               <Logo size="md" />
-            </Link>
+            {/* </Link> */}
           </div>
 
           {user && (
