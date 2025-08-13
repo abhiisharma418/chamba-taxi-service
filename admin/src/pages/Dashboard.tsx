@@ -686,25 +686,58 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <h2 className="text-xl font-bold text-slate-900 mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors duration-300 text-left">
-            <Car className="h-6 w-6 text-blue-600 mb-2" />
-            <h3 className="font-semibold text-slate-900">Manage Rides</h3>
-            <p className="text-sm text-slate-600">View and manage all ride requests</p>
-          </button>
-          <button className="p-4 bg-green-50 hover:bg-green-100 rounded-xl transition-colors duration-300 text-left">
-            <Users className="h-6 w-6 text-green-600 mb-2" />
-            <h3 className="font-semibold text-slate-900">Driver Management</h3>
-            <p className="text-sm text-slate-600">Approve and manage drivers</p>
-          </button>
-          <button className="p-4 bg-amber-50 hover:bg-amber-100 rounded-xl transition-colors duration-300 text-left">
-            <DollarSign className="h-6 w-6 text-amber-600 mb-2" />
-            <h3 className="font-semibold text-slate-900">Pricing Settings</h3>
-            <p className="text-sm text-slate-600">Configure fare and pricing</p>
-          </button>
+      {/* Premium Quick Actions */}
+      <div className="relative bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/30 via-purple-50/20 to-pink-50/30"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+
+        <div className="relative z-10 p-10">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg">
+              <Activity className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-indigo-800 to-purple-800 bg-clip-text text-transparent">
+                Quick Actions
+              </h2>
+              <p className="text-slate-600 font-medium">Manage your platform efficiently</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <button className="group relative p-8 bg-white/70 backdrop-blur-xl hover:bg-white/90 rounded-2xl transition-all duration-500 text-left border border-white/40 hover:shadow-2xl hover:scale-105 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="relative z-10">
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg w-fit mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Car className="h-7 w-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors duration-300">Manage Rides</h3>
+                <p className="text-slate-600 font-medium leading-relaxed">View and manage all ride requests with real-time updates</p>
+              </div>
+            </button>
+
+            <button className="group relative p-8 bg-white/70 backdrop-blur-xl hover:bg-white/90 rounded-2xl transition-all duration-500 text-left border border-white/40 hover:shadow-2xl hover:scale-105 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 via-transparent to-emerald-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="relative z-10">
+                <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg w-fit mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-7 w-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-green-600 transition-colors duration-300">Driver Management</h3>
+                <p className="text-slate-600 font-medium leading-relaxed">Approve, suspend and manage driver accounts seamlessly</p>
+              </div>
+            </button>
+
+            <button className="group relative p-8 bg-white/70 backdrop-blur-xl hover:bg-white/90 rounded-2xl transition-all duration-500 text-left border border-white/40 hover:shadow-2xl hover:scale-105 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-orange-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="relative z-10">
+                <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg w-fit mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <DollarSign className="h-7 w-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-amber-600 transition-colors duration-300">Pricing Settings</h3>
+                <p className="text-slate-600 font-medium leading-relaxed">Configure dynamic fare and surge pricing algorithms</p>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
