@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const scheduledRideSchema = new mongoose.Schema({
   rideId: {
@@ -415,4 +415,4 @@ scheduledRideSchema.statics.getDriverSchedule = function(driverId, startDate, en
 
 const ScheduledRide = mongoose.model('ScheduledRide', scheduledRideSchema);
 
-module.exports = ScheduledRide;
+export default ScheduledRide;
