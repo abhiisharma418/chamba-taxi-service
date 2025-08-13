@@ -50,6 +50,7 @@ const LiveTracking: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = useState<string>('');
   const [trackingActive, setTrackingActive] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     if (!rideId) {
