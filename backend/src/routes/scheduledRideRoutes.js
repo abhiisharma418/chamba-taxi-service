@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { body, param, query } = require('express-validator');
-const auth = require('../middleware/auth');
-const rateLimit = require('../middleware/rateLimit');
-const scheduledRideController = require('../controllers/scheduledRideController');
+import { body, param, query } from 'express-validator';
+import auth from '../middleware/auth.js';
+import rateLimit from '../middleware/rateLimit.js';
+import scheduledRideController from '../controllers/scheduledRideController.js';
 
 // Rate limiting for scheduled ride operations
 const createScheduledRideLimit = rateLimit({
@@ -391,4 +391,4 @@ router.get('/admin/stats',
   }
 );
 
-module.exports = router;
+export default router;
