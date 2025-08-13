@@ -196,4 +196,4 @@ router.get('/admin/export',
   adminEmergencyController.exportIncidents
 );
 
-module.exports = router;
+export default router;
