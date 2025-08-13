@@ -12,6 +12,7 @@ const Login = React.lazy(() => import('./pages/Login'));
 const AppRoutes: React.FC = () => {
   useCodeSplitting();
   usePerformanceMonitoring();
+  useRoutePreloading();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-25 dark:via-dark-50/30 dark:to-dark-100/50 transition-colors duration-200">
