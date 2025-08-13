@@ -583,7 +583,7 @@ function convertToCSV(data) {
   return [headers, ...rows].join('\n');
 }
 
-module.exports = {
+export {
   getAnalyticsDashboard,
   getRideAnalytics,
   getUserAnalytics,
