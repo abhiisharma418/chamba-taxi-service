@@ -490,11 +490,51 @@ const BookRide: React.FC = () => {
                     )}
                   </div>
 
+                  {/* Promo Code Section */}
+                  <div className="border-t border-green-500 pt-4">
+                    {selectedPromo ? (
+                      <div className="bg-green-800/30 rounded-xl p-4 mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <Gift className="h-4 w-4 text-green-200" />
+                            <span className="text-green-100 font-medium">Promo Applied</span>
+                          </div>
+                          <button
+                            onClick={() => setSelectedPromo(null)}
+                            className="text-green-200 hover:text-white text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-green-200 font-mono">{selectedPromo.code}</span>
+                          <span className="text-green-200">-₹{selectedPromo.discount?.savings || 0}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowPromoCodeInterface(true)}
+                        className="w-full bg-green-800/30 rounded-xl p-4 mb-4 border border-green-600 hover:bg-green-800/50 transition-colors"
+                      >
+                        <div className="flex items-center justify-center space-x-2 text-green-100">
+                          <Gift className="h-5 w-5" />
+                          <span>Apply Promo Code</span>
+                        </div>
+                      </button>
+                    )}
+                  </div>
+
                   <div className="border-t border-green-500 pt-4">
                     <div className="flex items-center justify-between text-2xl font-bold">
                       <span>Total Fare</span>
-                      <span>₹{fareEstimate}</span>
+                      <span>₹{selectedPromo ? selectedPromo.discount?.finalAmount || fareEstimate : fareEstimate}</span>
                     </div>
+                    {selectedPromo && (
+                      <div className="flex items-center justify-between text-sm text-green-200 mt-1">
+                        <span>Original Fare</span>
+                        <span className="line-through">₹{fareEstimate}</span>
+                      </div>
+                    )}
 
                     {/* Commission Split Info */}
                     <div className="mt-4 bg-green-800/30 rounded-xl p-4">
