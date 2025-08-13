@@ -227,6 +227,13 @@ const BookRide: React.FC = () => {
     navigate('/customer/dashboard');
   };
 
+  const handlePromoSelected = (promo: PromoCode) => {
+    setSelectedPromo(promo);
+    if (!originalFare && fareEstimate) {
+      setOriginalFare(fareEstimate);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       <Navigation />
