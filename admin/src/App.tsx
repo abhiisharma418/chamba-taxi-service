@@ -9,6 +9,7 @@ import LiveRideMonitoring from './pages/LiveRideMonitoring';
 import FinancialManagement from './pages/FinancialManagement';
 import SupportManagement from './pages/SupportManagement';
 import FinancialReporting from './pages/FinancialReporting';
+import PromoCodeManagement from './pages/PromoCodeManagement';
 
 function App() {
   const { user, isLoading } = useAuth();
