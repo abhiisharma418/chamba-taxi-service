@@ -18,7 +18,8 @@ import {
   HelpCircle,
   FileText,
   Gift,
-  ShieldAlert
+  ShieldAlert,
+  Calendar
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -33,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Car, label: 'Live Rides', path: '/rides' },
+    { icon: Calendar, label: 'Scheduled Rides', path: '/scheduled-rides' },
     { icon: Users, label: 'User Management', path: '/users' },
     { icon: ShieldAlert, label: 'Emergency', path: '/emergency' },
     { icon: HelpCircle, label: 'Support', path: '/support' },

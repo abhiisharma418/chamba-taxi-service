@@ -11,6 +11,7 @@ import SupportManagement from './pages/SupportManagement';
 import FinancialReporting from './pages/FinancialReporting';
 import PromoCodeManagement from './pages/PromoCodeManagement';
 import EmergencyManagement from './pages/EmergencyManagement';
+import ScheduledRidesManagement from './pages/ScheduledRidesManagement';
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -42,6 +43,7 @@ function App() {
         <Route path="/financial-reports" element={<FinancialReporting />} />
         <Route path="/financial" element={<FinancialManagement />} />
         <Route path="/emergency" element={<EmergencyManagement />} />
+        <Route path="/scheduled-rides" element={<ScheduledRidesManagement />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
