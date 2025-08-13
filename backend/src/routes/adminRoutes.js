@@ -14,6 +14,15 @@ import {
   updatePricing
 } from '../controllers/adminController.js';
 
+import {
+  getAnalyticsDashboard,
+  getRideAnalytics,
+  getUserAnalytics,
+  getFinancialAnalytics,
+  getOperationalAnalytics,
+  generateCustomReport
+} from '../controllers/adminAnalyticsController.js';
+
 const router = express.Router();
 
 router.use(authenticate, requireRoles('admin'));
