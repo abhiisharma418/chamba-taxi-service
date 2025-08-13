@@ -4,14 +4,18 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
 import { animations, cardVariants, buttonVariants, getStaggerDelay } from '../../utils/animations';
-import GoogleMapComponent from '../../components/GoogleMapComponent';
+import FreeMapComponent from '../../components/FreeMapComponent';
 import { getEstimateForTrip, formatFareBreakdown, FareBreakdown } from '../../utils/fareCalculation';
 import LocationSearch from '../../components/LocationSearch';
 import PaymentMethod from '../../components/PaymentMethod';
 import WhatsAppNotification from '../../components/WhatsAppNotification';
-import { Car, Clock, CreditCard, Bike, Users, Zap, ArrowLeft, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import PromoCodeInterface from '../../components/PromoCodeInterface';
+import SOSButton from '../../components/SOSButton';
+import { Car, Clock, CreditCard, Bike, Users, Zap, ArrowLeft, CheckCircle, Loader2, AlertCircle, Gift, MessageCircle } from 'lucide-react';
+import { PromoCode } from '../../services/promoCodeService';
 import { RidesAPI, PaymentAPI } from '../../lib/api';
 import { io } from 'socket.io-client';
+import ChatInterface from '../../components/ChatInterface';
 
 interface Location {
   address: string;
@@ -25,6 +29,8 @@ const BookRide: React.FC = () => {
 
   const [pickupLocation, setPickupLocation] = useState<Location>({ address: '', coordinates: [0, 0] });
   const [destinationLocation, setDestinationLocation] = useState<Location>({ address: '', coordinates: [0, 0] });
+  const [mapRef, setMapRef] = useState<any>(null);
+  const [isMapReady, setIsMapReady] = useState(false);
   const [vehicleType, setVehicleType] = useState<'car' | 'bike'>('car');
   const [isBooking, setIsBooking] = useState(false);
   const [fareEstimate, setFareEstimate] = useState<number | null>(null);
@@ -38,6 +44,11 @@ const BookRide: React.FC = () => {
   const [bookingData, setBookingData] = useState<any>(null);
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
   const [whatsappPhone, setWhatsappPhone] = useState(user?.phone || '');
+  const [selectedPromo, setSelectedPromo] = useState<PromoCode | null>(null);
+  const [showPromoCodeInterface, setShowPromoCodeInterface] = useState(false);
+  const [originalFare, setOriginalFare] = useState<number | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeChatRide, setActiveChatRide] = useState<any>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -222,17 +233,77 @@ const BookRide: React.FC = () => {
     navigate('/customer/dashboard');
   };
 
+  const handlePromoSelected = (promo: PromoCode) => {
+    setSelectedPromo(promo);
+    if (!originalFare && fareEstimate) {
+      setOriginalFare(fareEstimate);
+    }
+  };
+
+  // Enhanced location handlers with map integration
+  const handlePickupLocationChange = (location: Location) => {
+    setPickupLocation(location);
+
+    // Update map if ready
+    if (mapRef && isMapReady) {
+      try {
+        if (mapRef.updatePickupLocation) {
+          mapRef.updatePickupLocation(location);
+        }
+      } catch (error) {
+        console.log('Map update failed:', error);
+      }
+    }
+
+    // Reset fare estimate
+    setFareEstimate(null);
+    setEstimateError(null);
+  };
+
+  const handleDestinationLocationChange = (location: Location) => {
+    setDestinationLocation(location);
+
+    // Update map if ready
+    if (mapRef && isMapReady) {
+      try {
+        if (mapRef.updateDestinationLocation) {
+          mapRef.updateDestinationLocation(location);
+        }
+      } catch (error) {
+        console.log('Map update failed:', error);
+      }
+    }
+
+    // Reset fare estimate
+    setFareEstimate(null);
+    setEstimateError(null);
+  };
+
+  const handleMapReady = (mapInstance: any) => {
+    setMapRef(mapInstance);
+    setIsMapReady(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-300">
       <Navigation />
+
+      {/* SOS Button - Always visible */}
+      <SOSButton
+        variant="floating"
+        size="medium"
+        onSosTriggered={(incidentId) => {
+          alert(`Emergency alert sent! Incident ID: ${incidentId}`);
+        }}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-10">
-          <div className={`bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-gray-100 ${animations.fadeInDown} ${animations.hoverLift}`}>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-2">
+          <div className={`bg-white/80 dark:bg-dark-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg dark:shadow-dark-lg border border-gray-100 dark:border-dark-border ${animations.fadeInDown} ${animations.hoverLift}`}>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-dark-800 dark:to-dark-600 bg-clip-text text-transparent mb-2">
               Book Your Ride
             </h1>
-            <p className="text-slate-600 text-lg">Where would you like to go today?</p>
+            <p className="text-slate-600 dark:text-dark-500 text-lg">Where would you like to go today?</p>
           </div>
         </div>
 
@@ -240,15 +311,15 @@ const BookRide: React.FC = () => {
           {/* Booking Form */}
           <div className="lg:col-span-3 space-y-8">
             {/* Location Inputs */}
-            <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8 ${cardVariants.interactive}`} {...getStaggerDelay(0)}>
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Trip Details</h2>
+            <div className={`bg-white/80 dark:bg-dark-card/80 backdrop-blur-sm rounded-2xl shadow-xl dark:shadow-dark-xl border border-gray-100 dark:border-dark-border p-8 ${cardVariants.interactive}`} {...getStaggerDelay(0)}>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-800 mb-6">Trip Details</h2>
 
               <div className="space-y-6">
                 <LocationSearch
                   label="Pickup Location"
                   placeholder="Where are you?"
                   value={pickupLocation.address}
-                  onChange={setPickupLocation}
+                  onChange={handlePickupLocationChange}
                   onCurrentLocation={handleCurrentLocation}
                   type="pickup"
                 />
@@ -257,7 +328,7 @@ const BookRide: React.FC = () => {
                   label="Destination"
                   placeholder="Where to?"
                   value={destinationLocation.address}
-                  onChange={setDestinationLocation}
+                  onChange={handleDestinationLocationChange}
                   type="destination"
                 />
               </div>
@@ -412,12 +483,28 @@ const BookRide: React.FC = () => {
                   </div>
                 )}
 
-                <button
-                  onClick={handleProceedToDashboard}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Go to Dashboard
-                </button>
+                <div className="space-y-4">
+                  {/* Chat with Driver Button */}
+                  {bookingData?.driverId && (
+                    <button
+                      onClick={() => {
+                        setActiveChatRide(bookingData);
+                        setIsChatOpen(true);
+                      }}
+                      className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle className="h-5 w-5" />
+                      Chat with Driver
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleProceedToDashboard}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    Go to Dashboard
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -426,14 +513,15 @@ const BookRide: React.FC = () => {
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6">
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Live Route</h2>
-              <GoogleMapComponent
+              <FreeMapComponent
                 pickup={pickupLocation.address ? pickupLocation : undefined}
                 destination={destinationLocation.address ? destinationLocation : undefined}
-                onPickupChange={setPickupLocation}
-                onDestinationChange={setDestinationLocation}
-                height="400px"
-                showRoute={!!(pickupLocation.address && destinationLocation.address)}
+                onPickupChange={handlePickupLocationChange}
+                onDestinationChange={handleDestinationLocationChange}
+                onMapReady={handleMapReady}
+                showSearch={true}
                 interactive={true}
+                className="h-96 w-full"
               />
             </div>
 
@@ -485,11 +573,51 @@ const BookRide: React.FC = () => {
                     )}
                   </div>
 
+                  {/* Promo Code Section */}
+                  <div className="border-t border-green-500 pt-4">
+                    {selectedPromo ? (
+                      <div className="bg-green-800/30 rounded-xl p-4 mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <Gift className="h-4 w-4 text-green-200" />
+                            <span className="text-green-100 font-medium">Promo Applied</span>
+                          </div>
+                          <button
+                            onClick={() => setSelectedPromo(null)}
+                            className="text-green-200 hover:text-white text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-green-200 font-mono">{selectedPromo.code}</span>
+                          <span className="text-green-200">-₹{selectedPromo.discount?.savings || 0}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowPromoCodeInterface(true)}
+                        className="w-full bg-green-800/30 rounded-xl p-4 mb-4 border border-green-600 hover:bg-green-800/50 transition-colors"
+                      >
+                        <div className="flex items-center justify-center space-x-2 text-green-100">
+                          <Gift className="h-5 w-5" />
+                          <span>Apply Promo Code</span>
+                        </div>
+                      </button>
+                    )}
+                  </div>
+
                   <div className="border-t border-green-500 pt-4">
                     <div className="flex items-center justify-between text-2xl font-bold">
                       <span>Total Fare</span>
-                      <span>₹{fareEstimate}</span>
+                      <span>₹{selectedPromo ? selectedPromo.discount?.finalAmount || fareEstimate : fareEstimate}</span>
                     </div>
+                    {selectedPromo && (
+                      <div className="flex items-center justify-between text-sm text-green-200 mt-1">
+                        <span>Original Fare</span>
+                        <span className="line-through">₹{fareEstimate}</span>
+                      </div>
+                    )}
 
                     {/* Commission Split Info */}
                     <div className="mt-4 bg-green-800/30 rounded-xl p-4">
@@ -528,13 +656,42 @@ const BookRide: React.FC = () => {
                 <div>
                   <h3 className="text-xl font-bold mb-1">Live Tracking</h3>
                   <p className="text-blue-100">Track your driver in real-time after booking</p>
-                  <p className="text-blue-200 text-sm mt-2">• Driver details • Live location • ETA updates</p>
+                  <p className="text-blue-200 text-sm mt-2">��� Driver details • Live location • ETA updates</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Promo Code Interface */}
+      <PromoCodeInterface
+        isOpen={showPromoCodeInterface}
+        onClose={() => setShowPromoCodeInterface(false)}
+        orderAmount={fareEstimate || 0}
+        vehicleType={vehicleType}
+        city={pickupLocation.address.split(',').pop()?.trim()}
+        onPromoSelected={handlePromoSelected}
+        selectedPromo={selectedPromo}
+      />
+
+      {/* Chat Interface */}
+      {activeChatRide && (
+        <ChatInterface
+          rideId={activeChatRide.id || activeChatRide._id}
+          isOpen={isChatOpen}
+          onClose={() => {
+            setIsChatOpen(false);
+            setActiveChatRide(null);
+          }}
+          otherParty={{
+            id: activeChatRide.driverId,
+            name: activeChatRide.driverName || 'Driver',
+            type: 'driver',
+            avatar: activeChatRide.driverAvatar
+          }}
+        />
+      )}
     </div>
   );
 };

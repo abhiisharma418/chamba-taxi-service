@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // User Activity Log Schema
 const userActivitySchema = new mongoose.Schema({
@@ -321,7 +321,7 @@ const UserSuspension = mongoose.model('UserSuspension', userSuspensionSchema);
 const UserVerification = mongoose.model('UserVerification', userVerificationSchema);
 const AdminAction = mongoose.model('AdminAction', adminActionSchema);
 
-module.exports = {
+export {
   UserActivity,
   UserSuspension,
   UserVerification,

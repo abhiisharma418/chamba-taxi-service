@@ -27,6 +27,14 @@ import driverProfileRoutes from './routes/driverProfileRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
 import vehicleRoutes from './routes/vehicleRoutes.js';
 import vehicleManagementRoutes from './routes/vehicleRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import driverDocumentRoutes from './routes/driverDocumentRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+import supportTicketRoutes from './routes/supportTicketRoutes.js';
+import financialReportRoutes from './routes/financialReportRoutes.js';
+import promoCodeRoutes from './routes/promoCodeRoutes.js';
+import emergencyRoutes from './routes/emergencyRoutes.js';
+import scheduledRideRoutes from './routes/scheduledRideRoutes.js';
 
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
@@ -35,6 +43,7 @@ import path from 'path';
 import fs from 'fs';
 import { setDriverLocation } from './utils/liveStore.js';
 import { setIO } from './services/notifyService.js';
+import notificationService from './services/notificationService.js';
 import cookieParser from 'cookie-parser';
 import { authenticate, requireActive } from './middleware/auth.js';
 
@@ -93,6 +102,12 @@ const io = new SocketIOServer(server, {
   },
 });
 setIO(io);
+
+// Make io globally available for emergency alerts
+global.io = io;
+
+// Initialize notification service
+notificationService.initialize(server);
 
 io.on('connection', (socket) => {
   const userId = socket.handshake.auth?.userId;
@@ -178,6 +193,14 @@ app.use('/api/tracking', trackingRoutes);
 app.use('/api/driver-profile', authenticate, requireActive, driverProfileRoutes);
 app.use('/api/vehicle-management', authenticate, requireActive, vehicleManagementRoutes);
 app.use('/api/support', authenticate, requireActive, supportRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/driver-documents', driverDocumentRoutes);
+app.use('/api/chat', authenticate, requireActive, chatRoutes);
+app.use('/api/support', authenticate, requireActive, supportTicketRoutes);
+app.use('/api/financial', authenticate, requireActive, financialReportRoutes);
+app.use('/api/promo-codes', authenticate, requireActive, promoCodeRoutes);
+app.use('/api/emergency', authenticate, requireActive, emergencyRoutes);
+app.use('/api/scheduled-rides', authenticate, requireActive, scheduledRideRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server and connect to MongoDB

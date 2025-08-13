@@ -1,301 +1,340 @@
-import { getIoInstance } from '../server.js';
-import { WhatsAppAPI } from '../lib/api.js';
+import { Server } from 'socket.io';
+import { User } from '../models/userModel.js';
+import { Ride } from '../models/rideModel.js';
 
-// Notify driver about ride offer or updates
-export async function notifyDriver(driverId, type, data) {
-  try {
-    const io = getIoInstance();
-    
-    // Send real-time notification via Socket.IO
-    io.to(`driver:${driverId}`).emit('notification', {
-      type,
-      data,
-      timestamp: new Date().toISOString()
+class NotificationService {
+  constructor() {
+    this.io = null;
+    this.connectedUsers = new Map();
+  }
+
+  initialize(server) {
+    this.io = new Server(server, {
+      cors: {
+        origin: process.env.FRONTEND_URL || "http://localhost:3000",
+        methods: ["GET", "POST"],
+        credentials: true
+      }
     });
-    
-    // Also send specific event based on type
-    switch (type) {
-      case 'ride_offer':
-        io.to(`driver:${driverId}`).emit('ride:offer', data);
-        break;
-      case 'ride_cancelled':
-        io.to(`driver:${driverId}`).emit('ride:cancelled', data);
-        break;
-      case 'ride_completed':
-        io.to(`driver:${driverId}`).emit('ride:completed', data);
-        break;
-    }
-    
-    console.log(`Notification sent to driver ${driverId}: ${type}`);
-    return { success: true };
-  } catch (error) {
-    console.error('Error notifying driver:', error);
-    return { success: false, error: error.message };
-  }
-}
 
-export async function broadcastLocationUpdate(driverId, locationData) {
-  try {
-    const io = getIoInstance();
-    io.to(`driver:${driverId}`).emit('location:update', locationData);
-    return { success: true };
-  } catch (error) {
-    console.error('Error broadcasting location update:', error);
-    return { success: false, error: error.message };
-  }
-}
+    this.io.on('connection', (socket) => {
+      console.log('User connected:', socket.id);
 
-// Notify customer about ride updates
-export async function notifyCustomer(customerId, type, data) {
-  try {
-    const io = getIoInstance();
-    
-    // Send real-time notification via Socket.IO
-    io.to(`customer:${customerId}`).emit('notification', {
-      type,
-      data,
-      timestamp: new Date().toISOString()
+      // User authentication and registration
+      socket.on('authenticate', (userData) => {
+        if (userData && userData.userId) {
+          this.connectedUsers.set(userData.userId, socket.id);
+          socket.userId = userData.userId;
+          socket.userType = userData.userType;
+          
+          console.log(`User ${userData.userId} (${userData.userType}) authenticated`);
+          
+          // Send welcome notification
+          this.sendNotification(userData.userId, {
+            type: 'system',
+            title: 'Connected',
+            message: 'You are now connected to real-time notifications',
+            timestamp: new Date()
+          });
+        }
+      });
+
+      // Handle disconnection
+      socket.on('disconnect', () => {
+        if (socket.userId) {
+          this.connectedUsers.delete(socket.userId);
+          console.log(`User ${socket.userId} disconnected`);
+        }
+      });
+
+      // Handle notification acknowledgment
+      socket.on('notification_received', (notificationId) => {
+        console.log(`Notification ${notificationId} acknowledged by user ${socket.userId}`);
+      });
+
+      // Handle chat events
+      socket.on('join_chat', (rideId) => {
+        socket.join(`chat_${rideId}`);
+        console.log(`User ${socket.userId} joined chat for ride ${rideId}`);
+      });
+
+      socket.on('leave_chat', (rideId) => {
+        socket.leave(`chat_${rideId}`);
+        console.log(`User ${socket.userId} left chat for ride ${rideId}`);
+      });
+
+      socket.on('typing', (data) => {
+        socket.to(`chat_${data.rideId}`).emit('user_typing', {
+          userId: socket.userId,
+          userType: socket.userType,
+          isTyping: data.isTyping
+        });
+      });
     });
-    
-    // Also send specific event based on type
-    switch (type) {
-      case 'driver_assigned':
-        io.to(`customer:${customerId}`).emit('ride:driver_assigned', data);
-        break;
-      case 'driver_arrived':
-        io.to(`customer:${customerId}`).emit('ride:driver_arrived', data);
-        break;
-      case 'ride_started':
-        io.to(`customer:${customerId}`).emit('ride:started', data);
-        break;
-      case 'ride_completed':
-        io.to(`customer:${customerId}`).emit('ride:completed', data);
-        break;
-      case 'no_drivers_available':
-        io.to(`customer:${customerId}`).emit('ride:no_drivers', data);
-        break;
-    }
-    
-    console.log(`Notification sent to customer ${customerId}: ${type}`);
-    return { success: true };
-  } catch (error) {
-    console.error('Error notifying customer:', error);
-    return { success: false, error: error.message };
   }
-}
 
-// Send WhatsApp notification
-export async function sendWhatsAppNotification(phone, type, data) {
-  try {
-    let message = '';
-    
-    switch (type) {
-      case 'booking_confirmed':
-        message = `🚗 RideWithUs - Booking Confirmed!
-        
-Booking ID: ${data.bookingId}
-Pickup: ${data.pickup}
-Destination: ${data.destination}
-Vehicle: ${data.vehicleType}
-Fare: ₹${data.fare}
+  // Send notification to specific user
+  sendNotification(userId, notification) {
+    const socketId = this.connectedUsers.get(userId);
+    if (socketId && this.io) {
+      const notificationWithId = {
+        id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        ...notification,
+        timestamp: notification.timestamp || new Date()
+      };
 
-We're finding a driver for you. You'll get updates here.`;
-        break;
-        
-      case 'driver_assigned':
-        message = `🚗 Driver Assigned!
-        
-Driver: ${data.driver.name}
-Phone: ${data.driver.phone}
-Vehicle: ${data.driver.vehicleModel} (${data.driver.vehicleNumber})
-Rating: ${data.driver.rating}⭐
-ETA: ${data.estimatedArrival} minutes
-
-Track your ride in the app.`;
-        break;
-        
-      case 'driver_arrived':
-        message = `🚗 Driver Arrived!
-        
-Your driver ${data.driver.name} has arrived at the pickup location.
-Vehicle: ${data.driver.vehicleNumber}
-
-Please come out when ready.`;
-        break;
-        
-      case 'ride_started':
-        message = `🚗 Trip Started!
-        
-Your ride has started to ${data.destination}.
-Estimated arrival: ${data.estimatedArrival}
-
-Have a safe journey!`;
-        break;
-        
-      case 'ride_completed':
-        message = `🚗 Trip Completed!
-        
-Fare: ₹${data.fare}
-Payment: ${data.paymentMethod}
-Distance: ${data.distance}km
-
-Thank you for choosing RideWithUs!
-Rate your driver in the app.`;
-        break;
-        
-      case 'ride_cancelled':
-        message = `🚗 Booking Cancelled
-        
-Your booking ${data.bookingId} has been cancelled.
-${data.reason || ''}
-
-Book again anytime through the app.`;
-        break;
+      this.io.to(socketId).emit('notification', notificationWithId);
+      console.log(`Notification sent to user ${userId}:`, notificationWithId.title);
+      return true;
     }
-    
-    if (message) {
-      // Here you would integrate with actual WhatsApp Business API
-      // For now, just log the message
-      console.log(`WhatsApp to ${phone}: ${message}`);
-      
-      // You can integrate with services like:
-      // - WhatsApp Business API
-      // - Twilio WhatsApp
-      // - MessageBird
-      // - etc.
-    }
-    
-    return { success: true };
-  } catch (error) {
-    console.error('Error sending WhatsApp notification:', error);
-    return { success: false, error: error.message };
+    console.log(`User ${userId} not connected, notification queued`);
+    return false;
   }
-}
 
-// Send push notification (for mobile apps)
-export async function sendPushNotification(userId, type, data) {
-  try {
-    // Here you would integrate with push notification services like:
-    // - Firebase Cloud Messaging (FCM)
-    // - Apple Push Notification Service (APNS)
-    // - OneSignal
-    // - etc.
-    
+  // Send notification to multiple users
+  sendBulkNotification(userIds, notification) {
+    let sentCount = 0;
+    userIds.forEach(userId => {
+      if (this.sendNotification(userId, notification)) {
+        sentCount++;
+      }
+    });
+    return sentCount;
+  }
+
+  // Ride-related notifications
+  async notifyRideUpdate(rideId, updateType, additionalData = {}) {
+    try {
+      const ride = await Ride.findById(rideId)
+        .populate('customerId', 'name phone')
+        .populate('driverId', 'name phone vehicle');
+
+      if (!ride) {
+        console.error('Ride not found:', rideId);
+        return;
+      }
+
+      let notification = {
+        type: 'ride_update',
+        rideId: rideId,
+        ...additionalData
+      };
+
+      switch (updateType) {
+        case 'driver_assigned':
+          notification = {
+            ...notification,
+            title: '🚗 Driver Assigned',
+            message: `${ride.driverId?.name} is your driver. Vehicle: ${ride.driverId?.vehicle?.make} ${ride.driverId?.vehicle?.model}`,
+            action: 'track_driver'
+          };
+          this.sendNotification(ride.customerId._id, notification);
+          break;
+
+        case 'driver_arriving':
+          notification = {
+            ...notification,
+            title: '📍 Driver Arriving',
+            message: `Your driver is ${additionalData.eta || '2-3'} minutes away`,
+            action: 'prepare_pickup'
+          };
+          this.sendNotification(ride.customerId._id, notification);
+          break;
+
+        case 'ride_started':
+          notification = {
+            ...notification,
+            title: '🚀 Ride Started',
+            message: 'Your ride has begun. Enjoy your journey!',
+            action: 'track_ride'
+          };
+          this.sendNotification(ride.customerId._id, notification);
+          break;
+
+        case 'ride_completed':
+          notification = {
+            ...notification,
+            title: '✅ Ride Completed',
+            message: `Trip completed. Fare: ₹${ride.fare?.actual || ride.fare?.estimated}`,
+            action: 'rate_driver'
+          };
+          this.sendNotification(ride.customerId._id, notification);
+          break;
+
+        case 'payment_processed':
+          notification = {
+            ...notification,
+            title: '💳 Payment Processed',
+            message: `Payment of ₹${additionalData.amount} completed successfully`,
+            action: 'view_receipt'
+          };
+          this.sendNotification(ride.customerId._id, notification);
+          break;
+
+        case 'new_ride_request':
+          notification = {
+            ...notification,
+            title: '🔔 New Ride Request',
+            message: `Pickup from ${ride.pickup?.address || 'location'} to ${ride.destination?.address || 'destination'}`,
+            action: 'accept_ride'
+          };
+          this.sendNotification(ride.driverId, notification);
+          break;
+      }
+
+    } catch (error) {
+      console.error('Error sending ride notification:', error);
+    }
+  }
+
+  // System notifications
+  async sendSystemNotification(userIds, title, message, type = 'system') {
     const notification = {
-      title: getNotificationTitle(type),
-      body: getNotificationBody(type, data),
+      type,
+      title,
+      message,
+      timestamp: new Date()
+    };
+
+    if (Array.isArray(userIds)) {
+      return this.sendBulkNotification(userIds, notification);
+    } else {
+      return this.sendNotification(userIds, notification);
+    }
+  }
+
+  // Emergency notifications
+  async sendEmergencyAlert(rideId, alertType) {
+    try {
+      const ride = await Ride.findById(rideId)
+        .populate('customerId driverId');
+
+      const emergency = {
+        type: 'emergency',
+        priority: 'high',
+        title: '🚨 Emergency Alert',
+        rideId: rideId
+      };
+
+      switch (alertType) {
+        case 'panic_button':
+          emergency.message = 'Panic button activated. Emergency services notified.';
+          break;
+        case 'route_deviation':
+          emergency.message = 'Route deviation detected. Monitoring situation.';
+          break;
+        case 'vehicle_breakdown':
+          emergency.message = 'Vehicle breakdown reported. Assistance on the way.';
+          break;
+      }
+
+      // Notify customer and driver
+      if (ride.customerId) {
+        this.sendNotification(ride.customerId._id, emergency);
+      }
+      if (ride.driverId) {
+        this.sendNotification(ride.driverId._id, emergency);
+      }
+
+      // Notify admin users
+      const adminUsers = await User.find({ role: 'admin' });
+      adminUsers.forEach(admin => {
+        this.sendNotification(admin._id, {
+          ...emergency,
+          title: '🚨 Admin Alert',
+          message: `Emergency in ride ${rideId}: ${emergency.message}`
+        });
+      });
+
+    } catch (error) {
+      console.error('Error sending emergency alert:', error);
+    }
+  }
+
+  // Chat message notifications
+  sendChatMessage(userId, chatData) {
+    const socketId = this.connectedUsers.get(userId);
+    if (socketId && this.io) {
+      // Send to specific chat room
+      this.io.to(`chat_${chatData.rideId}`).emit('new_message', chatData.chatMessage);
+
+      // Send notification if user is not in chat room
+      this.sendNotification(userId, {
+        type: 'chat_message',
+        title: `New message from ${chatData.senderName}`,
+        message: chatData.chatMessage.message.text,
+        rideId: chatData.rideId,
+        data: {
+          senderType: chatData.senderType,
+          messageId: chatData.chatMessage._id
+        }
+      });
+
+      return true;
+    }
+    return false;
+  }
+
+  // Check if user is online
+  isUserOnline(userId) {
+    return this.connectedUsers.has(userId);
+  }
+
+  // Get all connected users
+  getConnectedUsers() {
+    return Array.from(this.connectedUsers.keys());
+  }
+
+  // Send typing indicator
+  sendTypingIndicator(rideId, userId, userType, isTyping) {
+    if (this.io) {
+      this.io.to(`chat_${rideId}`).emit('user_typing', {
+        userId,
+        userType,
+        isTyping
+      });
+    }
+  }
+
+  // Promotional notifications
+  async sendPromotionalNotification(userIds, promotion) {
+    const notification = {
+      type: 'promotion',
+      title: `🎉 ${promotion.title}`,
+      message: promotion.description,
+      action: 'view_offer',
       data: {
-        type,
-        rideId: data.rideId,
-        ...data
+        promoCode: promotion.code,
+        discount: promotion.discount,
+        validUntil: promotion.validUntil
       }
     };
-    
-    console.log(`Push notification to user ${userId}:`, notification);
-    
-    return { success: true };
-  } catch (error) {
-    console.error('Error sending push notification:', error);
-    return { success: false, error: error.message };
-  }
-}
 
-// Send email notification
-export async function sendEmailNotification(email, type, data) {
-  try {
-    // Here you would integrate with email services like:
-    // - SendGrid
-    // - Amazon SES
-    // - Mailgun
-    // - etc.
-    
-    const emailData = {
-      to: email,
-      subject: getEmailSubject(type),
-      template: type,
-      data
-    };
-    
-    console.log(`Email notification to ${email}:`, emailData);
-    
-    return { success: true };
-  } catch (error) {
-    console.error('Error sending email notification:', error);
-    return { success: false, error: error.message };
+    return this.sendBulkNotification(userIds, notification);
   }
-}
 
-// Broadcast to all drivers in a radius
-export async function broadcastToNearbyDrivers(lat, lng, radiusKm, type, data) {
-  try {
-    const io = getIoInstance();
-    
-    // This would typically query for drivers in the radius
-    // For now, broadcast to all connected drivers
-    io.to('drivers').emit('broadcast', {
-      type,
-      location: { lat, lng, radius: radiusKm },
-      data,
-      timestamp: new Date().toISOString()
+  // Get connected users count
+  getConnectedUsersCount() {
+    return this.connectedUsers.size;
+  }
+
+  // Get connected users by type
+  getConnectedUsersByType(userType) {
+    const users = [];
+    this.io.sockets.sockets.forEach(socket => {
+      if (socket.userType === userType) {
+        users.push({
+          userId: socket.userId,
+          socketId: socket.id,
+          userType: socket.userType
+        });
+      }
     });
-    
-    return { success: true };
-  } catch (error) {
-    console.error('Error broadcasting to nearby drivers:', error);
-    return { success: false, error: error.message };
+    return users;
   }
 }
 
-// Helper functions for notification content
-function getNotificationTitle(type) {
-  const titles = {
-    'ride_offer': '🚗 New Ride Request',
-    'driver_assigned': '✅ Driver Assigned',
-    'driver_arrived': '📍 Driver Arrived',
-    'ride_started': '🛣️ Trip Started',
-    'ride_completed': '✅ Trip Completed',
-    'ride_cancelled': '❌ Trip Cancelled',
-    'no_drivers_available': '😔 No Drivers Available'
-  };
-  
-  return titles[type] || 'RideWithUs Update';
-}
+// Create singleton instance
+const notificationService = new NotificationService();
 
-function getNotificationBody(type, data) {
-  const bodies = {
-    'ride_offer': `Pickup: ${data.pickup?.address || 'Unknown'} • Fare: ₹${data.fare || 0}`,
-    'driver_assigned': `${data.driver?.name || 'Driver'} is coming • ETA: ${data.estimatedArrival || 'Unknown'} min`,
-    'driver_arrived': `Your driver has arrived at the pickup location`,
-    'ride_started': `Trip started to ${data.destination?.address || 'destination'}`,
-    'ride_completed': `Trip completed • Fare: ₹${data.fare || 0}`,
-    'ride_cancelled': `Your booking has been cancelled`,
-    'no_drivers_available': `No drivers available. Please try again later.`
-  };
-  
-  return bodies[type] || 'You have a new update';
-}
-
-function getEmailSubject(type) {
-  const subjects = {
-    'booking_confirmed': 'RideWithUs - Booking Confirmed',
-    'driver_assigned': 'RideWithUs - Driver Assigned',
-    'ride_completed': 'RideWithUs - Trip Completed',
-    'ride_cancelled': 'RideWithUs - Booking Cancelled'
-  };
-  
-  return subjects[type] || 'RideWithUs Update';
-}
-
-// Notification preferences management
-export async function updateNotificationPreferences(userId, preferences) {
-  try {
-    // Store user notification preferences
-    // This would typically be saved to database
-    console.log(`Updated notification preferences for user ${userId}:`, preferences);
-    
-    return { success: true };
-  } catch (error) {
-    console.error('Error updating notification preferences:', error);
-    return { success: false, error: error.message };
-  }
-}
+export default notificationService;

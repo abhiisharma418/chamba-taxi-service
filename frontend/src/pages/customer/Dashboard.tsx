@@ -5,7 +5,10 @@ import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
 import { StatsCardSkeleton, ListItemSkeleton, CardSkeleton } from '../../components/LoadingSkeletons';
 import { responsive, touch, patterns } from '../../utils/responsive';
-import { Car, MapPin, Clock, Star, Plus, ArrowRight, Receipt } from 'lucide-react';
+import { Car, MapPin, Clock, Star, Plus, ArrowRight, Receipt, HelpCircle, MessageCircle } from 'lucide-react';
+import SupportInterface from '../../components/SupportInterface';
+import FinancialWidget from '../../components/FinancialWidget';
+import ChatInterface from '../../components/ChatInterface';
 
 const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
 
@@ -13,6 +16,9 @@ const CustomerDashboard: React.FC = () => {
   const { user } = useAuth();
   const { currentBooking, bookings } = useBooking();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeChatRide, setActiveChatRide] = useState<any>(null);
 
   const userBookings = bookings.filter(booking => booking.customerId === user?.id);
   const recentBookings = userBookings.slice(0, 3);
@@ -27,7 +33,7 @@ const CustomerDashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-200">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-300">
         <Navigation />
 
         <div className={`${responsive.container} ${responsive.spacing.section}`}>
@@ -62,7 +68,7 @@ const CustomerDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-200">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-300">
       <Navigation />
 
       <div className={`${responsive.container} ${responsive.spacing.section}`}>
@@ -144,25 +150,25 @@ const CustomerDashboard: React.FC = () => {
             </div>
           </Link>
 
-          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100">
+          <button
+            onClick={() => setIsSupportOpen(true)}
+            className="group bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-left w-full"
+          >
             <div className="flex items-center justify-between">
               <div>
-                <div className="bg-gradient-to-br from-purple-600 to-purple-700 p-4 rounded-2xl mb-4">
-                  <Star className="h-8 w-8 text-white" />
+                <div className="bg-gradient-to-br from-orange-600 to-orange-700 p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300 mb-4">
+                  <HelpCircle className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Your Rating</h3>
-                <div className="flex items-center space-x-2">
-                  <span className="text-3xl font-bold text-purple-600">4.8</span>
-                  <div className="flex space-x-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className={`h-5 w-5 ${star <= 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
-                    ))}
-                  </div>
-                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Get Support</h3>
+                <p className="text-slate-600">Need help? Contact us</p>
               </div>
+              <ArrowRight className="h-6 w-6 text-orange-600 group-hover:translate-x-1 transition-transform duration-300" />
             </div>
-          </div>
+          </button>
         </div>
+
+        {/* Financial Overview */}
+        <FinancialWidget userType="customer" />
 
         {/* Recent Rides */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100">
@@ -209,13 +215,28 @@ const CustomerDashboard: React.FC = () => {
                           <span className="text-sm font-medium text-slate-600">{booking.rating}</span>
                         </div>
                       )}
-                      {booking.paymentId && (
-                        <a href={`${API_URL}/api/payments/receipt/${booking.paymentId}.pdf`} target="_blank"
-                           className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
-                          <Receipt className="h-4 w-4" />
-                          Receipt
-                        </a>
-                      )}
+                      <div className="space-y-2">
+                        {booking.paymentId && (
+                          <a href={`${API_URL}/api/payments/receipt/${booking.paymentId}.pdf`} target="_blank"
+                             className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                            <Receipt className="h-4 w-4" />
+                            Receipt
+                          </a>
+                        )}
+                        {/* Chat Button for Active/Completed Rides */}
+                        {(booking.status === 'in-progress' || booking.status === 'completed') && booking.driverId && (
+                          <button
+                            onClick={() => {
+                              setActiveChatRide(booking);
+                              setIsChatOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 text-sm font-medium transition-colors bg-green-50 hover:bg-green-100 px-3 py-1 rounded-full"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                            Chat Driver
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -237,6 +258,30 @@ const CustomerDashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Support Interface */}
+      <SupportInterface
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+      />
+
+      {/* Chat Interface */}
+      {activeChatRide && (
+        <ChatInterface
+          rideId={activeChatRide.id}
+          isOpen={isChatOpen}
+          onClose={() => {
+            setIsChatOpen(false);
+            setActiveChatRide(null);
+          }}
+          otherParty={{
+            id: activeChatRide.driverId,
+            name: activeChatRide.driverName || 'Driver',
+            type: 'driver',
+            avatar: activeChatRide.driverAvatar
+          }}
+        />
+      )}
     </div>
   );
 };

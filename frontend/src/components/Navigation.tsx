@@ -15,7 +15,9 @@ import {
   DollarSign,
   FileText,
   Settings,
-  HelpCircle
+  HelpCircle,
+  Shield,
+  Calendar
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -38,7 +40,9 @@ const Navigation: React.FC = () => {
         return [
           { path: '/customer/dashboard', label: 'Dashboard', icon: User },
           { path: '/customer/book-ride', label: 'Book Ride', icon: Car },
-          { path: '/customer/history', label: 'History', icon: Clock }
+          { path: '/customer/scheduled-rides', label: 'Scheduled', icon: Calendar },
+          { path: '/customer/history', label: 'History', icon: Clock },
+          { path: '/customer/emergency', label: 'Emergency', icon: Shield }
         ];
       case 'driver':
         return [
@@ -54,48 +58,73 @@ const Navigation: React.FC = () => {
     }
   };
 
+  const getHomePath = () => {
+    if (!user) return '/';
+    return user.type === 'customer' ? '/customer/dashboard' : '/driver/dashboard';
+  };
+
   const navItems = getNavItems();
 
   return (
-    <nav className="bg-white/95 dark:bg-dark-card/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100 dark:border-dark-border">
-      <div className={patterns.navigation.inner}>
+    <nav className="relative bg-white/80 dark:bg-dark-card/80 backdrop-blur-2xl shadow-2xl sticky top-0 z-50 border-b border-white/30 dark:border-dark-border/30 overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-blue-50/20 dark:from-dark-card/10"></div>
+
+      <div className={`${patterns.navigation.inner} relative z-10`}>
         <div className={patterns.navigation.content}>
           <div className="flex items-center">
-            {/* <Link to="/" className="flex items-center"> */}
-              <Logo size="md" />
-            {/* </Link> */}
+            <Link to={getHomePath()} className="group flex items-center transition-transform duration-300 hover:scale-105">
+              <div className="p-2 bg-white/50 dark:bg-dark-card/50 backdrop-blur-xl rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 border border-white/40">
+                <Logo size="md" enableRotation={true} />
+              </div>
+            </Link>
           </div>
 
           {user && (
             <>
-              {/* Desktop Navigation */}
-              <div className="hidden md:flex items-center space-x-8">
+              {/* Luxury Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-6">
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="flex items-center space-x-1 text-slate-700 hover:text-blue-600 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-blue-50"
+                    className="group flex items-center space-x-2 text-slate-700 hover:text-blue-600 transition-all duration-300 px-4 py-3 rounded-2xl hover:bg-white/60 dark:hover:bg-dark-card/60 backdrop-blur-sm border border-transparent hover:border-blue-200/50 hover:shadow-lg font-semibold"
                   >
-                    <item.icon className="h-4 w-4" />
+                    <div className="p-1 rounded-lg bg-slate-100 group-hover:bg-blue-100 transition-colors duration-300">
+                      <item.icon className="h-4 w-4" />
+                    </div>
                     <span>{item.label}</span>
                   </Link>
                 ))}
+
+                <div className="h-6 w-0.5 bg-gradient-to-b from-slate-200 to-slate-300 mx-2"></div>
+
                 <NotificationBell />
                 <ThemeToggle />
+
                 <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="h-8 w-8 rounded-full"
-                    />
-                    <span className="text-sm text-gray-700">{user.name}</span>
+                  <div className="flex items-center space-x-3 px-4 py-2 bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl rounded-2xl border border-white/40 shadow-lg">
+                    <div className="relative">
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="h-10 w-10 rounded-2xl border-2 border-white shadow-lg"
+                      />
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">{user.name}</span>
+                      <span className="text-xs text-slate-600 dark:text-slate-400 capitalize">{user.type}</span>
+                    </div>
                   </div>
+
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-1 text-slate-700 hover:text-red-600 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-red-50"
+                    className="group flex items-center space-x-2 text-slate-700 hover:text-red-600 transition-all duration-300 px-4 py-3 rounded-2xl hover:bg-red-50 dark:hover:bg-red-900/20 border border-transparent hover:border-red-200/50 hover:shadow-lg font-semibold"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <div className="p-1 rounded-lg bg-slate-100 group-hover:bg-red-100 transition-colors duration-300">
+                      <LogOut className="h-4 w-4" />
+                    </div>
                     <span>Logout</span>
                   </button>
                 </div>

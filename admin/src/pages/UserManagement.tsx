@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, Search, Filter, Plus, Edit, Trash2, 
-  Shield, AlertCircle, CheckCircle, Clock, 
-  Eye, MoreHorizontal, Download, Ban, UserCheck
+import {
+  Users, Search, Filter, Plus, Edit, Trash2,
+  Shield, AlertCircle, CheckCircle, Clock,
+  Eye, MoreHorizontal, Download, Ban, UserCheck, FileText
 } from 'lucide-react';
+import DriverDocumentVerification from '../components/DriverDocumentVerification';
 
 interface User {
   _id: string;
@@ -35,6 +36,8 @@ const UserManagement: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [showDocumentVerification, setShowDocumentVerification] = useState(false);
+  const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
   
   const [filters, setFilters] = useState<UserFilters>({
     role: 'all',
@@ -201,10 +204,32 @@ const UserManagement: React.FC = () => {
     try {
       // Mock API call
       console.log('Deleting user:', userId);
-      
+
       setUsers(prev => prev.filter(user => user._id !== userId));
     } catch (error) {
       console.error('Failed to delete user:', error);
+    }
+  };
+
+  const handleVerificationComplete = (driverId: string, status: string) => {
+    try {
+      console.log('Driver verification completed:', driverId, status);
+
+      setUsers(prev => prev.map(user =>
+        user._id === driverId
+          ? {
+              ...user,
+              verified: status === 'approved',
+              verificationStatus: status === 'approved' ? 'verified' : 'pending',
+              status: status === 'approved' ? 'active' : 'inactive'
+            }
+          : user
+      ));
+
+      setShowDocumentVerification(false);
+      setSelectedDriverId(null);
+    } catch (error) {
+      console.error('Failed to update driver verification:', error);
     }
   };
 
@@ -629,6 +654,19 @@ const UserManagement: React.FC = () => {
                             <Eye className="h-4 w-4" />
                           </button>
                           
+                          {user.role === 'driver' && (
+                            <button
+                              onClick={() => {
+                                setSelectedDriverId(user._id);
+                                setShowDocumentVerification(true);
+                              }}
+                              className="text-purple-600 hover:text-purple-900"
+                              title="Verify Documents"
+                            >
+                              <FileText className="h-4 w-4" />
+                            </button>
+                          )}
+
                           {!user.verified && (
                             <button
                               onClick={() => handleVerifyUser(user._id)}
@@ -725,6 +763,18 @@ const UserManagement: React.FC = () => {
             setSelectedUser(null);
           }}
           onSuspend={(reason) => handleSuspendUser(selectedUser._id, reason)}
+        />
+      )}
+
+      {/* Driver Document Verification Modal */}
+      {showDocumentVerification && selectedDriverId && (
+        <DriverDocumentVerification
+          driverId={selectedDriverId}
+          onClose={() => {
+            setShowDocumentVerification(false);
+            setSelectedDriverId(null);
+          }}
+          onVerificationComplete={handleVerificationComplete}
         />
       )}
     </div>

@@ -5,6 +5,7 @@ import Navigation from '../../components/Navigation';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
 import { RidesAPI, TrackingAPI } from '../../lib/api';
 import { ArrowLeft, Clock, MapPin, Star, Phone, MessageCircle, AlertCircle, CheckCircle, Navigation as NavIcon } from 'lucide-react';
+import ChatInterface from '../../components/ChatInterface';
 
 interface RideData {
   _id: string;
@@ -49,6 +50,7 @@ const LiveTracking: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = useState<string>('');
   const [trackingActive, setTrackingActive] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     if (!rideId) {
@@ -381,11 +383,11 @@ const LiveTracking: React.FC = () => {
                     <span>Call</span>
                   </button>
                   <button
-                    onClick={() => window.open(`https://wa.me/${rideData.driver!.phone.replace(/\D/g, '')}`)}
-                    className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
+                    onClick={() => setIsChatOpen(true)}
+                    className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    <span>Message</span>
+                    <span>Chat</span>
                   </button>
                 </div>
               </div>
@@ -438,6 +440,21 @@ const LiveTracking: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Chat Interface */}
+      {rideData.driver && (
+        <ChatInterface
+          rideId={rideId!}
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          otherParty={{
+            id: rideData.driver._id,
+            name: rideData.driver.name,
+            type: 'driver',
+            avatar: rideData.driver.photo
+          }}
+        />
+      )}
     </div>
   );
 };

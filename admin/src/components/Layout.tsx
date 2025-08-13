@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from './Logo';
+import ThemeToggle from './ThemeToggle';
 import {
   LogOut,
   User,
@@ -12,7 +13,13 @@ import {
   Car,
   Users,
   DollarSign,
-  BarChart3
+  BarChart3,
+  CheckCircle,
+  HelpCircle,
+  FileText,
+  Gift,
+  ShieldAlert,
+  Calendar
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -27,22 +34,36 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Car, label: 'Live Rides', path: '/rides' },
+    { icon: Calendar, label: 'Scheduled Rides', path: '/scheduled-rides' },
     { icon: Users, label: 'User Management', path: '/users' },
+    { icon: ShieldAlert, label: 'Emergency', path: '/emergency' },
+    { icon: HelpCircle, label: 'Support', path: '/support' },
+    { icon: Gift, label: 'Promo Codes', path: '/promo-codes' },
+    { icon: FileText, label: 'Financial Reports', path: '/financial-reports' },
     { icon: DollarSign, label: 'Financial', path: '/financial' },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
-      {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-white/95 backdrop-blur-md shadow-xl border-r border-gray-100">
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-6 border-b border-gray-100">
-            <Logo size="md" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-300">
+      {/* Premium Sidebar */}
+      <div className="fixed inset-y-0 left-0 w-72 bg-white/90 dark:bg-dark-card/90 backdrop-blur-2xl shadow-2xl dark:shadow-dark-2xl border-r border-white/30 dark:border-dark-border overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-slate-50/20 dark:from-dark-100/10 dark:to-dark-200/20"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
+        <div className="relative z-10 flex flex-col h-full">
+          {/* Premium Logo Section */}
+          <div className="p-8 border-b border-white/20 dark:border-dark-border">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full hover:scale-105 transition-all duration-300 group"
+            >
+              <div className="p-3 bg-gradient-to-br from-white/50 to-white/30 dark:from-dark-card/50 dark:to-dark-card/30 backdrop-blur-xl rounded-2xl border border-white/40 dark:border-dark-border group-hover:shadow-xl dark:group-hover:shadow-dark-xl transition-all duration-300">
+                <Logo size="md" enableRotation={true} />
+              </div>
+            </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          {/* Premium Navigation */}
+          <nav className="flex-1 p-6 space-y-3">
             {menuItems.map((item) => {
               const IconComponent = item.icon;
               const isActive = location.pathname === item.path;
@@ -50,72 +71,118 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
+                  className={`group w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-left transition-all duration-300 font-semibold ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                      : 'text-slate-700 hover:bg-blue-50 hover:text-blue-600'
+                      ? 'bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white shadow-xl dark:shadow-dark-xl scale-105 border border-blue-300/50 dark:border-blue-400/50'
+                      : 'text-slate-700 dark:text-dark-600 hover:bg-white/60 dark:hover:bg-dark-100/60 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-102 hover:shadow-lg dark:hover:shadow-dark-lg backdrop-blur-sm border border-transparent hover:border-blue-200/50 dark:hover:border-blue-400/30'
                   }`}
                 >
-                  <IconComponent className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <div className={`p-2 rounded-xl transition-all duration-300 ${
+                    isActive
+                      ? 'bg-white/20 dark:bg-dark-accent-blue/20 backdrop-blur-sm'
+                      : 'bg-slate-100 dark:bg-dark-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30'
+                  }`}>
+                    <IconComponent className="h-5 w-5" />
+                  </div>
+                  <span className="font-semibold tracking-wide">{item.label}</span>
+
+                  {isActive && (
+                    <div className="ml-auto">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    </div>
+                  )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Bottom Section */}
-          <div className="p-4 border-t border-gray-100">
-            <div className="mb-4">
-              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 transition-all duration-300">
-                <Settings className="h-5 w-5" />
-                <span className="font-medium">Settings</span>
+          {/* Premium Bottom Section */}
+          <div className="p-6 border-t border-white/20 dark:border-dark-border">
+            <div className="mb-6">
+              <button className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-slate-700 dark:text-dark-600 hover:bg-white/60 dark:hover:bg-dark-100/60 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 font-semibold backdrop-blur-sm border border-transparent hover:border-blue-200/50 dark:hover:border-blue-400/30 hover:shadow-lg dark:hover:shadow-dark-lg">
+                <div className="p-2 rounded-xl bg-slate-100 dark:bg-dark-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-all duration-300">
+                  <Settings className="h-5 w-5" />
+                </div>
+                <span className="font-semibold tracking-wide">Settings</span>
               </button>
             </div>
-            
-            {/* User Info */}
-            <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center">
-                  <User className="h-5 w-5 text-white" />
+
+            {/* Premium User Info */}
+            <div className="relative bg-gradient-to-br from-white/70 via-white/50 to-slate-50/70 backdrop-blur-xl rounded-2xl p-6 border border-white/40 shadow-xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20"></div>
+
+              <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="relative">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <User className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-slate-900 truncate text-lg">{user?.name}</p>
+                    <p className="text-sm text-slate-600 truncate font-medium">{user?.email}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-emerald-600 font-semibold">Administrator</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-slate-900 truncate">{user?.name}</p>
-                  <p className="text-sm text-slate-600 truncate">{user?.email}</p>
-                </div>
+
+                <button
+                  onClick={logout}
+                  className="w-full flex items-center justify-center gap-3 px-5 py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl font-semibold tracking-wide hover:scale-105"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
               </div>
-              <button
-                onClick={logout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 rounded-lg transition-all duration-300 border border-slate-200"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="font-medium">Logout</span>
-              </button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="ml-64">
-        {/* Top Bar */}
-        <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Admin Portal</h1>
-              <p className="text-slate-600">Manage your RideWithUs operations</p>
+      <div className="ml-72">
+        {/* Premium Top Bar */}
+        <header className="relative bg-white/80 dark:bg-dark-card/80 backdrop-blur-2xl shadow-xl dark:shadow-dark-xl border-b border-white/30 dark:border-dark-border px-10 py-6 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-blue-50/30 dark:from-dark-100/10 dark:to-dark-200/30"></div>
+          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
+
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <h1 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-dark-800 dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                  Admin Portal
+                </h1>
+              </div>
+              <p className="text-slate-600 dark:text-dark-500 font-semibold tracking-wide">Manage your RideWithUs operations with premium control</p>
             </div>
-            
-            <div className="flex items-center gap-4">
-              {/* Notifications */}
-              <button className="relative p-2 bg-slate-100 hover:bg-blue-100 rounded-xl transition-colors duration-300">
-                <Bell className="h-5 w-5 text-slate-600" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+
+            <div className="flex items-center gap-6">
+              {/* Premium Notifications */}
+              <button className="relative group p-4 bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl hover:bg-white/90 dark:hover:bg-dark-card/90 rounded-2xl transition-all duration-300 border border-white/40 dark:border-dark-border hover:shadow-xl dark:hover:shadow-dark-xl hover:scale-105">
+                <Bell className="h-6 w-6 text-slate-600 dark:text-dark-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300" />
+                <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                  <div className="w-4 h-4 bg-gradient-to-r from-red-500 to-rose-600 rounded-full animate-pulse"></div>
+                  <div className="absolute w-2 h-2 bg-white rounded-full"></div>
+                </div>
               </button>
-              
-              {/* Admin Badge */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl border border-amber-200">
-                <Shield className="h-4 w-4 text-amber-600" />
-                <span className="text-sm font-semibold text-amber-700">Admin</span>
+
+              {/* Premium Admin Badge */}
+              <ThemeToggle />
+              <div className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 dark:from-amber-500 dark:via-orange-600 dark:to-red-600 rounded-2xl shadow-lg dark:shadow-dark-lg border border-orange-200/50 dark:border-orange-300/30 backdrop-blur-sm">
+                <div className="p-1 bg-white/20 dark:bg-white/30 rounded-lg backdrop-blur-sm">
+                  <Shield className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-sm font-black text-white tracking-wide uppercase">Administrator</span>
+              </div>
+
+              {/* Premium Status Indicator */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl border border-emerald-200 dark:border-emerald-700/50">
+                <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">ONLINE</span>
               </div>
             </div>
           </div>

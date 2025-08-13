@@ -14,6 +14,15 @@ import {
   updatePricing
 } from '../controllers/adminController.js';
 
+import {
+  getAnalyticsDashboard,
+  getRideAnalytics,
+  getUserAnalytics,
+  getFinancialAnalytics,
+  getOperationalAnalytics,
+  generateCustomReport
+} from '../controllers/adminAnalyticsController.js';
+
 const router = express.Router();
 
 router.use(authenticate, requireRoles('admin'));
@@ -40,5 +49,13 @@ router.get('/customers', getCustomers);
 // Pricing management
 router.get('/pricing', getPricing);
 router.put('/pricing', updatePricing);
+
+// Analytics
+router.get('/analytics/dashboard', getAnalyticsDashboard);
+router.get('/analytics/rides', getRideAnalytics);
+router.get('/analytics/users', getUserAnalytics);
+router.get('/analytics/financial', getFinancialAnalytics);
+router.get('/analytics/operational', getOperationalAnalytics);
+router.post('/analytics/reports', generateCustomReport);
 
 export default router;

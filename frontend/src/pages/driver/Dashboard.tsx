@@ -2,15 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
-import { Car, Power, MapPin, Clock, DollarSign, Star, Bell } from 'lucide-react';
+import { Car, Power, MapPin, Clock, DollarSign, Star, Bell, MessageCircle, HelpCircle } from 'lucide-react';
 import { LiveAPI, RidesAPI } from '../../lib/api';
 import { io } from 'socket.io-client';
+import ChatInterface from '../../components/ChatInterface';
+import SupportInterface from '../../components/SupportInterface';
+import FinancialWidget from '../../components/FinancialWidget';
 
 const DriverDashboard: React.FC = () => {
   const { user } = useAuth();
   const { bookings, updateBookingStatus, getBookingHistory } = useBooking();
   const [isOnline, setIsOnline] = useState(true);
   const [offer, setOffer] = useState<{ rideId: string; pickup: any; destination: any } | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -132,6 +137,13 @@ const DriverDashboard: React.FC = () => {
                 {activeRide.status === 'on-trip' && (
                   <button onClick={() => handleStatusUpdate(activeRide.id, 'completed')} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">Complete Trip</button>
                 )}
+                <button
+                  onClick={() => setIsChatOpen(true)}
+                  className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span>Chat</span>
+                </button>
                 <button className="px-4 py-2 border border-blue-300 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors duration-200">Navigate</button>
               </div>
             </div>
@@ -183,18 +195,24 @@ const DriverDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <button
+            onClick={() => setIsSupportOpen(true)}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all group text-left w-full"
+          >
             <div className="flex items-center">
-              <div className="bg-amber-100 p-3 rounded-full">
-                <Clock className="h-6 w-6 text-amber-600" />
+              <div className="bg-orange-100 p-3 rounded-full group-hover:scale-110 transition-transform">
+                <HelpCircle className="h-6 w-6 text-orange-600" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-gray-900">8.2</div>
-                <div className="text-gray-600">Hours Online</div>
+                <div className="text-lg font-bold text-gray-900">Get Support</div>
+                <div className="text-gray-600">Need help?</div>
               </div>
             </div>
-          </div>
+          </button>
         </div>
+
+        {/* Financial Overview */}
+        <FinancialWidget userType="driver" className="mb-8" />
 
         {/* Pending Requests */}
         {isOnline && pendingRequests.length > 0 && !activeRide && (
@@ -293,6 +311,26 @@ const DriverDashboard: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Chat Interface */}
+      {activeRide && (
+        <ChatInterface
+          rideId={activeRide.id}
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          otherParty={{
+            id: activeRide.customerId || '',
+            name: activeRide.customerName || 'Customer',
+            type: 'customer'
+          }}
+        />
+      )}
+
+      {/* Support Interface */}
+      <SupportInterface
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+      />
     </div>
   );
 };

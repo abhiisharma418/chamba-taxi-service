@@ -84,7 +84,7 @@ const Login: React.FC = () => {
         {/* Back to Home */}
         <div className="mb-8 text-center">
           <Link to="/" className="inline-flex items-center text-slate-600 hover:text-blue-600 transition-colors">
-            <Logo size="sm" />
+            <Logo size="lg" />
           </Link>
         </div>
 

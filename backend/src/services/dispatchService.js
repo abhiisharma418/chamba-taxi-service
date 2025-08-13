@@ -1,7 +1,7 @@
 import { getRedis } from '../utils/redis.js';
 import { assignDriverToRide } from './driverMatchingService.js';
 import { Ride } from '../models/rideModel.js';
-import { notifyDriver, notifyCustomer } from './notificationService.js';
+import notificationService from './notificationService.js';
 
 // Start dispatch process for a ride
 export async function startDispatch(rideId, pickup, nearbyDrivers) {
@@ -96,7 +96,12 @@ export async function offerToNextDriver(rideId) {
     };
     
     // Send real-time notification to driver
-    await notifyDriver(driverId, 'ride_offer', offerData);
+    await notificationService.sendNotification(driverId, {
+      type: 'ride_offer',
+      title: '🚖 New Ride Request',
+      message: `New ride from ${pickup.address}`,
+      data: offerData
+    });
     
     // Set timeout to auto-decline if no response
     setTimeout(async () => {
@@ -152,16 +157,21 @@ export async function handleDriverResponse(rideId, driverId, accepted) {
         await redis.del(`dispatch:info:${rideId}`);
         
         // Notify customer about driver assignment
-        await notifyCustomer(ride.customerId, 'driver_assigned', {
+        await notificationService.sendNotification(ride.customerId, {
+          type: 'driver_assigned',
+          title: '🚗 Driver Assigned',
+          message: 'Your driver is on the way!',
           rideId: rideId.toString(),
-          driver: {
-            name: 'Driver', // Would get from driver profile
-            phone: '+91XXXXXXXXXX', // Would get from driver profile
-            vehicleNumber: 'DL 01 AB 1234', // Would get from driver profile
-            vehicleModel: 'Swift Dzire', // Would get from driver profile
-            rating: 4.8
-          },
-          estimatedArrival: 5 // minutes
+          data: {
+            driver: {
+              name: 'Driver', // Would get from driver profile
+              phone: '+91XXXXXXXXXX', // Would get from driver profile
+              vehicleNumber: 'DL 01 AB 1234', // Would get from driver profile
+              vehicleModel: 'Swift Dzire', // Would get from driver profile
+              rating: 4.8
+            },
+            estimatedArrival: 5 // minutes
+          }
         });
         
         console.log(`Ride ${rideId} assigned to driver ${driverId}`);
@@ -202,9 +212,11 @@ async function handleNoDriversAvailable(rideId) {
     // Notify customer
     const ride = await Ride.findById(rideId);
     if (ride) {
-      await notifyCustomer(ride.customerId, 'no_drivers_available', {
-        rideId: rideId.toString(),
-        message: 'No drivers available at the moment. Please try again later.'
+      await notificationService.sendNotification(ride.customerId, {
+        type: 'no_drivers_available',
+        title: '❌ No Drivers Available',
+        message: 'No drivers available at the moment. Please try again later.',
+        rideId: rideId.toString()
       });
     }
     
@@ -245,9 +257,11 @@ export async function cancelDispatch(rideId) {
     
     if (pendingDriverId) {
       // Notify driver that ride was cancelled
-      await notifyDriver(pendingDriverId, 'ride_cancelled', {
-        rideId: rideId.toString(),
-        message: 'Ride was cancelled by customer'
+      await notificationService.sendNotification(pendingDriverId, {
+        type: 'ride_cancelled',
+        title: '🚫 Ride Cancelled',
+        message: 'Ride was cancelled by customer',
+        rideId: rideId.toString()
       });
     }
     

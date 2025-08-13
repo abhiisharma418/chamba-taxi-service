@@ -22,24 +22,26 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md
   const rwuTextSize = {
     sm: 'text-xs',
     md: 'text-sm',
-    lg: 'text-base'
+    lg: 'text-lg'
   };
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
-      {/* Premium RWS Circle Logo */}
+      {/* Simple RWU Logo */}
       <div className={`${sizeClasses[size]} relative`}>
-        <div className="w-full h-full bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-lg">
-          <span className={`text-white font-black ${rwuTextSize[size]} tracking-tighter`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center shadow-md border border-blue-400/30">
+          <div className={`text-white font-bold ${rwuTextSize[size]}`}>
             RWU
-          </span>
+          </div>
         </div>
       </div>
 
       {showText && (
-        <span className={`${textSizeClasses[size]} font-bold text-current`}>
-          RideWithUs
-        </span>
+        <div className="flex flex-col">
+          <span className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tight leading-none`}>
+            RideWithUs
+          </span>
+        </div>
       )}
     </div>
   );

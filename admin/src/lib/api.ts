@@ -87,6 +87,58 @@ function getMockResponse(path: string) {
     return { success: true, data: mockData.rides };
   }
 
+  // Analytics endpoints
+  if (path.includes('/api/admin/analytics/dashboard')) {
+    return {
+      success: true,
+      data: {
+        overview: mockData.stats,
+        trends: [
+          { period: 'today', rides: 45, revenue: 5670, growth: 12 },
+          { period: 'yesterday', rides: 40, revenue: 5200, growth: 8 },
+          { period: 'last_week', rides: 280, revenue: 35400, growth: 15 }
+        ]
+      }
+    };
+  }
+
+  if (path.includes('/api/admin/analytics/rides')) {
+    return {
+      success: true,
+      data: {
+        timeline: [
+          { _id: '2024-03-01', count: 45, revenue: 5670 },
+          { _id: '2024-02-29', count: 40, revenue: 5200 },
+          { _id: '2024-02-28', count: 38, revenue: 4900 },
+          { _id: '2024-02-27', count: 42, revenue: 5100 },
+          { _id: '2024-02-26', count: 35, revenue: 4200 },
+          { _id: '2024-02-25', count: 32, revenue: 3800 },
+          { _id: '2024-02-24', count: 28, revenue: 3200 }
+        ],
+        insights: {
+          peakHours: [
+            { hour: '08:00', rides: 12 },
+            { hour: '09:00', rides: 18 },
+            { hour: '10:00', rides: 15 },
+            { hour: '17:00', rides: 20 },
+            { hour: '18:00', rides: 22 },
+            { hour: '19:00', rides: 16 }
+          ],
+          topRoutes: [
+            { from: 'Mall Road', to: 'The Ridge', count: 45 },
+            { from: 'Bus Stand', to: 'Jakhu Temple', count: 32 },
+            { from: 'Shimla Station', to: 'Mall Road', count: 28 }
+          ],
+          driverPerformance: [
+            { name: 'John Driver', earnings: 12500, rating: 4.8, rides: 85 },
+            { name: 'Mike Smith', earnings: 11200, rating: 4.6, rides: 78 },
+            { name: 'Sarah Jones', earnings: 10800, rating: 4.7, rides: 72 }
+          ]
+        }
+      }
+    };
+  }
+
   return { success: true, data: {} };
 }
 
@@ -112,4 +164,11 @@ export const AdminAPI = {
   // Pricing management
   getPricing: () => apiFetch('/api/admin/pricing'),
   updatePricing: (pricing: any) => apiFetch('/api/admin/pricing', { method: 'PUT', body: JSON.stringify(pricing) }),
+
+  // Analytics
+  getAnalyticsDashboard: (period = '30d') => apiFetch(`/api/admin/analytics/dashboard?period=${period}`),
+  getRideAnalytics: (period = '30d', groupBy = 'day') => apiFetch(`/api/admin/analytics/rides?period=${period}&groupBy=${groupBy}`),
+  getUserAnalytics: (period = '30d') => apiFetch(`/api/admin/analytics/users?period=${period}`),
+  getFinancialAnalytics: (period = '30d') => apiFetch(`/api/admin/analytics/financial?period=${period}`),
+  getOperationalAnalytics: (period = '30d') => apiFetch(`/api/admin/analytics/operational?period=${period}`),
 };
