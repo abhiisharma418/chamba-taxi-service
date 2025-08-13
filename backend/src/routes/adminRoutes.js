@@ -50,4 +50,12 @@ router.get('/customers', getCustomers);
 router.get('/pricing', getPricing);
 router.put('/pricing', updatePricing);
 
+// Analytics
+router.get('/analytics/dashboard', getAnalyticsDashboard);
+router.get('/analytics/rides', getRideAnalytics);
+router.get('/analytics/users', getUserAnalytics);
+router.get('/analytics/financial', getFinancialAnalytics);
+router.get('/analytics/operational', getOperationalAnalytics);
+router.post('/analytics/reports', generateCustomReport);
+
 export default router;
