@@ -33,8 +33,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
-      {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-white/95 backdrop-blur-md shadow-xl border-r border-gray-100">
+      {/* Premium Sidebar */}
+      <div className="fixed inset-y-0 left-0 w-72 bg-white/90 backdrop-blur-2xl shadow-2xl border-r border-white/30 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-slate-50/20"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-gray-100">
