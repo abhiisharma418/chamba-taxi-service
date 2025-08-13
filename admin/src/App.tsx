@@ -17,39 +17,56 @@ const PromoCodeManagement = React.lazy(() => import('./pages/PromoCodeManagement
 const EmergencyManagement = React.lazy(() => import('./pages/EmergencyManagement'));
 const ScheduledRidesManagement = React.lazy(() => import('./pages/ScheduledRidesManagement'));
 
+const AppRoutes: React.FC = () => {
+  useCodeSplitting();
+  usePerformanceMonitoring();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-25 dark:via-dark-50/30 dark:to-dark-100/50 transition-colors duration-200">
+      <Suspense fallback={<AdminPageSkeleton />}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/users" element={<UserManagement />} />
+          <Route path="/rides" element={<LiveRideMonitoring />} />
+          <Route path="/support" element={<SupportManagement />} />
+          <Route path="/promo-codes" element={<PromoCodeManagement />} />
+          <Route path="/financial-reports" element={<FinancialReporting />} />
+          <Route path="/financial" element={<FinancialManagement />} />
+          <Route path="/emergency" element={<EmergencyManagement />} />
+          <Route path="/scheduled-rides" element={<ScheduledRidesManagement />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Suspense>
+    </div>
+  );
+};
+
 function App() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-dark-25 dark:via-dark-50 dark:to-dark-100 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center bg-white/70 dark:bg-dark-100/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 dark:border-dark-75/20 p-8">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600 text-lg">Loading Admin Portal...</p>
+          <p className="text-slate-600 dark:text-gray-300 text-lg">Loading Admin Portal...</p>
         </div>
       </div>
     );
   }
 
   if (!user) {
-    return <Login />;
+    return (
+      <Suspense fallback={<AdminPageSkeleton showSidebar={false} />}>
+        <Login />
+      </Suspense>
+    );
   }
 
   return (
     <Layout>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/users" element={<UserManagement />} />
-        <Route path="/rides" element={<LiveRideMonitoring />} />
-        <Route path="/support" element={<SupportManagement />} />
-        <Route path="/promo-codes" element={<PromoCodeManagement />} />
-        <Route path="/financial-reports" element={<FinancialReporting />} />
-        <Route path="/financial" element={<FinancialManagement />} />
-        <Route path="/emergency" element={<EmergencyManagement />} />
-        <Route path="/scheduled-rides" element={<ScheduledRidesManagement />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+      <AppRoutes />
     </Layout>
   );
 }
