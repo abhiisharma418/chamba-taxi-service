@@ -302,6 +302,20 @@ const DriverDashboard: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Chat Interface */}
+      {activeRide && (
+        <ChatInterface
+          rideId={activeRide.id}
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          otherParty={{
+            id: activeRide.customerId || '',
+            name: activeRide.customerName || 'Customer',
+            type: 'customer'
+          }}
+        />
+      )}
     </div>
   );
 };
