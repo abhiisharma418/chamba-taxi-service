@@ -5,6 +5,7 @@ interface LogoProps {
   className?: string;
   showText?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  enableRotation?: boolean;
 }
 
 const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md' }) => {
