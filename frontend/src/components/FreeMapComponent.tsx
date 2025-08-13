@@ -34,6 +34,10 @@ const FreeMapComponent: React.FC<FreeMapComponentProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [map, setMap] = useState<any>(null);
+  const [pickupSearch, setPickupSearch] = useState('');
+  const [destinationSearch, setDestinationSearch] = useState('');
+  const [searchResults, setSearchResults] = useState<Location[]>([]);
+  const [activeSearch, setActiveSearch] = useState<'pickup' | 'destination' | null>(null);
 
   // Load Leaflet CSS and JS
   useEffect(() => {
