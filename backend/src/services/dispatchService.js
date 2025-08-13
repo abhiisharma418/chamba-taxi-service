@@ -212,9 +212,11 @@ async function handleNoDriversAvailable(rideId) {
     // Notify customer
     const ride = await Ride.findById(rideId);
     if (ride) {
-      await notifyCustomer(ride.customerId, 'no_drivers_available', {
-        rideId: rideId.toString(),
-        message: 'No drivers available at the moment. Please try again later.'
+      await notificationService.sendNotification(ride.customerId, {
+        type: 'no_drivers_available',
+        title: '❌ No Drivers Available',
+        message: 'No drivers available at the moment. Please try again later.',
+        rideId: rideId.toString()
       });
     }
     
