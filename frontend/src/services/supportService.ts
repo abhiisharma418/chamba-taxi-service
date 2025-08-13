@@ -247,10 +247,13 @@ class SupportService {
 
   async updateTicketStatus(ticketId: string, status: string, resolution?: string, assignedTo?: string): Promise<{ success: boolean; message?: string }> {
     try {
-      const response = await api.put(`/support/admin/ticket/${ticketId}/status`, {
-        status,
-        resolution,
-        assignedTo
+      const response = await apiFetch(`/support/admin/ticket/${ticketId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          status,
+          resolution,
+          assignedTo
+        })
       });
       return response.data;
     } catch (error: any) {
