@@ -27,6 +27,7 @@ import driverProfileRoutes from './routes/driverProfileRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
 import vehicleRoutes from './routes/vehicleRoutes.js';
 import vehicleManagementRoutes from './routes/vehicleRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
