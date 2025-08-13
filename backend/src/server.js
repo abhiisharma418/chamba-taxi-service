@@ -33,6 +33,7 @@ import chatRoutes from './routes/chatRoutes.js';
 import supportTicketRoutes from './routes/supportTicketRoutes.js';
 import financialReportRoutes from './routes/financialReportRoutes.js';
 import promoCodeRoutes from './routes/promoCodeRoutes.js';
+import emergencyRoutes from './routes/emergencyRoutes.js';
 
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
