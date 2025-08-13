@@ -137,26 +137,51 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
-            Why Choose RideWithUs?
-          </h2>
-          <p className="text-lg text-slate-600 text-center mb-16 max-w-2xl mx-auto">
-            Experience the difference of honest, reliable transportation
-          </p>
+      {/* Luxury Features Section */}
+      <section className="relative py-32 bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/20 overflow-hidden">
+        {/* Premium Background Elements */}
+        <div className={"absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23000000\" fill-opacity=\"0.02\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"}></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          {/* Premium Section Header */}
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/70 backdrop-blur-xl border border-white/40 rounded-full shadow-xl mb-8">
+              <Star className="h-4 w-4 text-amber-500" />
+              <span className="text-sm font-bold text-slate-700 tracking-wide uppercase">Premium Features</span>
+            </div>
+
+            <h2 className="text-5xl sm:text-6xl font-black text-slate-900 mb-6 leading-none">
+              Why Choose{' '}
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                RideWithUs?
+              </span>
+            </h2>
+
+            <p className="text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-medium">
+              Experience the difference of{' '}
+              <span className="font-bold text-slate-800">luxury, reliability,</span>
+              {' '}and{' '}
+              <span className="font-bold text-emerald-600">honest transportation</span>
+            </p>
+          </div>
+
+          {/* Premium Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="group text-center p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-100 hover:border-blue-200 transform hover:-translate-y-2">
-              <div className="bg-gradient-to-br from-blue-100 to-blue-200 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <MapPin className="h-8 w-8 text-blue-600" />
+            <div className="group relative text-center p-10 rounded-3xl hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-xl border border-white/40 hover:border-blue-300/50 transform hover:-translate-y-4 hover:scale-105 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-xl"></div>
+
+              <div className="relative z-10">
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                  <MapPin className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">
+                  Elite Tracking
+                </h3>
+                <p className="text-slate-600 leading-relaxed font-medium">
+                  Real-time precision tracking with AI-powered ETA predictions and luxury route optimization.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-3">
-                Live Tracking
-              </h3>
-              <p className="text-slate-600 leading-relaxed">
-                Track your driver in real-time with precise location updates and accurate arrival times.
-              </p>
             </div>
 
             <div className="group text-center p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-100 hover:border-emerald-200 transform hover:-translate-y-2">
