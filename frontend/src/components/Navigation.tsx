@@ -16,7 +16,8 @@ import {
   FileText,
   Settings,
   HelpCircle,
-  Shield
+  Shield,
+  Calendar
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -39,6 +40,7 @@ const Navigation: React.FC = () => {
         return [
           { path: '/customer/dashboard', label: 'Dashboard', icon: User },
           { path: '/customer/book-ride', label: 'Book Ride', icon: Car },
+          { path: '/customer/scheduled-rides', label: 'Scheduled', icon: Calendar },
           { path: '/customer/history', label: 'History', icon: Clock },
           { path: '/customer/emergency', label: 'Emergency', icon: Shield }
         ];
