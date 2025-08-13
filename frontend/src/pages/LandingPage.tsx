@@ -86,7 +86,7 @@ const LandingPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Link
               to="/signup?type=customer"
-              className="group relative bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-purple-600 hover:to-indigo-600 text-white px-12 py-6 rounded-3xl text-xl font-black transition-all duration-500 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 overflow-hidden"
+              className="group relative bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white px-12 py-6 rounded-3xl text-xl font-black transition-all duration-500 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-3">
                 <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
