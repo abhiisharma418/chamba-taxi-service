@@ -28,6 +28,8 @@ const BookRide: React.FC = () => {
 
   const [pickupLocation, setPickupLocation] = useState<Location>({ address: '', coordinates: [0, 0] });
   const [destinationLocation, setDestinationLocation] = useState<Location>({ address: '', coordinates: [0, 0] });
+  const [mapRef, setMapRef] = useState<any>(null);
+  const [isMapReady, setIsMapReady] = useState(false);
   const [vehicleType, setVehicleType] = useState<'car' | 'bike'>('car');
   const [isBooking, setIsBooking] = useState(false);
   const [fareEstimate, setFareEstimate] = useState<number | null>(null);
