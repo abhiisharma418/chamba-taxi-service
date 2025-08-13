@@ -62,12 +62,17 @@ const Navigation: React.FC = () => {
   const navItems = getNavItems();
 
   return (
-    <nav className="bg-white/95 dark:bg-dark-card/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100 dark:border-dark-border">
-      <div className={patterns.navigation.inner}>
+    <nav className="relative bg-white/80 dark:bg-dark-card/80 backdrop-blur-2xl shadow-2xl sticky top-0 z-50 border-b border-white/30 dark:border-dark-border/30 overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-blue-50/20 dark:from-dark-card/10"></div>
+
+      <div className={`${patterns.navigation.inner} relative z-10`}>
         <div className={patterns.navigation.content}>
           <div className="flex items-center">
-            <Link to={getHomePath()} className="flex items-center hover:scale-105 transition-transform duration-300">
-              <Logo size="md" />
+            <Link to={getHomePath()} className="group flex items-center transition-transform duration-300 hover:scale-105">
+              <div className="p-2 bg-white/50 dark:bg-dark-card/50 backdrop-blur-xl rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 border border-white/40">
+                <Logo size="md" />
+              </div>
             </Link>
           </div>
 
