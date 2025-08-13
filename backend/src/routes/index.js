@@ -13,3 +13,4 @@ export { default as supportTicketRoutes } from './supportTicketRoutes.js';
 export { default as financialReportRoutes } from './financialReportRoutes.js';
 export { default as promoCodeRoutes } from './promoCodeRoutes.js';
 export { default as emergencyRoutes } from './emergencyRoutes.js';
+export { default as scheduledRideRoutes } from './scheduledRideRoutes.js';

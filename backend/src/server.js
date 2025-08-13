@@ -34,6 +34,7 @@ import supportTicketRoutes from './routes/supportTicketRoutes.js';
 import financialReportRoutes from './routes/financialReportRoutes.js';
 import promoCodeRoutes from './routes/promoCodeRoutes.js';
 import emergencyRoutes from './routes/emergencyRoutes.js';
+import scheduledRideRoutes from './routes/scheduledRideRoutes.js';
 
 import { auditLogger } from './middleware/audit.js';
 import { i18n } from './middleware/i18n.js';
@@ -199,6 +200,7 @@ app.use('/api/support', authenticate, requireActive, supportTicketRoutes);
 app.use('/api/financial', authenticate, requireActive, financialReportRoutes);
 app.use('/api/promo-codes', authenticate, requireActive, promoCodeRoutes);
 app.use('/api/emergency', authenticate, requireActive, emergencyRoutes);
+app.use('/api/scheduled-rides', authenticate, requireActive, scheduledRideRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server and connect to MongoDB
