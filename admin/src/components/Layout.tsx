@@ -160,8 +160,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             <div className="flex items-center gap-6">
               {/* Premium Notifications */}
-              <button className="relative group p-4 bg-white/70 backdrop-blur-xl hover:bg-white/90 rounded-2xl transition-all duration-300 border border-white/40 hover:shadow-xl hover:scale-105">
-                <Bell className="h-6 w-6 text-slate-600 group-hover:text-blue-600 transition-colors duration-300" />
+              <button className="relative group p-4 bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl hover:bg-white/90 dark:hover:bg-dark-card/90 rounded-2xl transition-all duration-300 border border-white/40 dark:border-dark-border hover:shadow-xl dark:hover:shadow-dark-xl hover:scale-105">
+                <Bell className="h-6 w-6 text-slate-600 dark:text-dark-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300" />
                 <div className="absolute -top-1 -right-1 flex items-center justify-center">
                   <div className="w-4 h-4 bg-gradient-to-r from-red-500 to-rose-600 rounded-full animate-pulse"></div>
                   <div className="absolute w-2 h-2 bg-white rounded-full"></div>
@@ -169,17 +169,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </button>
 
               {/* Premium Admin Badge */}
-              <div className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 rounded-2xl shadow-lg border border-orange-200/50 backdrop-blur-sm">
-                <div className="p-1 bg-white/20 rounded-lg backdrop-blur-sm">
+              <ThemeToggle />
+              <div className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 dark:from-amber-500 dark:via-orange-600 dark:to-red-600 rounded-2xl shadow-lg dark:shadow-dark-lg border border-orange-200/50 dark:border-orange-300/30 backdrop-blur-sm">
+                <div className="p-1 bg-white/20 dark:bg-white/30 rounded-lg backdrop-blur-sm">
                   <Shield className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-sm font-black text-white tracking-wide uppercase">Administrator</span>
               </div>
 
               {/* Premium Status Indicator */}
-              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl border border-emerald-200">
-                <CheckCircle className="h-4 w-4 text-emerald-600" />
-                <span className="text-xs font-bold text-emerald-700">ONLINE</span>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl border border-emerald-200 dark:border-emerald-700/50">
+                <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">ONLINE</span>
               </div>
             </div>
           </div>
