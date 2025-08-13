@@ -426,14 +426,10 @@ const BookRide: React.FC = () => {
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6">
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Live Route</h2>
-              <GoogleMapComponent
+              <FreeMapComponent
                 pickup={pickupLocation.address ? pickupLocation : undefined}
                 destination={destinationLocation.address ? destinationLocation : undefined}
-                onPickupChange={setPickupLocation}
-                onDestinationChange={setDestinationLocation}
-                height="400px"
-                showRoute={!!(pickupLocation.address && destinationLocation.address)}
-                interactive={true}
+                className="h-96 w-full"
               />
             </div>
 
