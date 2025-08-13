@@ -175,35 +175,64 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  const StatCard = ({ 
-    title, 
-    value, 
-    icon: Icon, 
-    color, 
-    bgColor, 
-    change 
-  }: { 
-    title: string; 
-    value: string | number; 
-    icon: any; 
-    color: string; 
+  const StatCard = ({
+    title,
+    value,
+    icon: Icon,
+    color,
+    bgColor,
+    change
+  }: {
+    title: string;
+    value: string | number;
+    icon: any;
+    color: string;
     bgColor: string;
     change?: string;
   }) => (
-    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-slate-600 text-sm font-medium">{title}</p>
-          <p className="text-3xl font-bold text-slate-900 mt-2">{value}</p>
-          {change && (
-            <p className="text-green-600 text-sm mt-1 flex items-center gap-1">
-              <TrendingUp className="h-4 w-4" />
-              {change}
-            </p>
-          )}
+    <div className="group relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20 hover:bg-white/90 transition-all duration-500 hover:scale-105 hover:shadow-3xl overflow-hidden">
+      {/* Premium Background Pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-gray-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+      {/* Floating Elements */}
+      <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+      <div className="absolute -bottom-2 -left-2 w-16 h-16 bg-gradient-to-br from-amber-400/10 to-orange-400/10 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500 delay-200"></div>
+
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse"></div>
+              <p className="text-slate-500 text-sm font-semibold tracking-wide uppercase">{title}</p>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-4xl font-black text-slate-900 tracking-tight leading-none bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text">
+                {value}
+              </p>
+
+              {change && (
+                <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-emerald-50 to-green-50 rounded-full w-fit">
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3 text-emerald-600" />
+                    <span className="text-xs font-bold text-emerald-700">{change}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className={`${bgColor} p-4 rounded-2xl shadow-lg backdrop-blur-sm border border-white/30 group-hover:scale-110 transition-transform duration-300`}>
+              <Icon className={`h-7 w-7 ${color} drop-shadow-sm`} />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </div>
         </div>
-        <div className={`${bgColor} p-3 rounded-xl`}>
-          <Icon className={`h-8 w-8 ${color}`} />
+
+        {/* Progress Bar */}
+        <div className="h-1 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 group-hover:translate-x-0 -translate-x-full"></div>
         </div>
       </div>
     </div>
