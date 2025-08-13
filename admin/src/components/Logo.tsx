@@ -45,7 +45,7 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = false, size = 'm
           {/* Combined Admin RWU Text Design - Bound as One Word */}
           <div className={`relative z-10 ${rwuTextSize[size]} rwu-premium-text`}>
             <span
-              className="relative font-black tracking-tighter drop-shadow-lg transform group-hover:scale-110 transition-all duration-500 rwu-admin-glow inline-block"
+              className={`relative font-black tracking-tighter drop-shadow-lg transform ${enableRotation ? 'group-hover:scale-110 rwu-admin-glow' : ''} transition-all duration-500 inline-block`}
               style={{
                 fontFamily: 'Inter, system-ui, sans-serif',
                 letterSpacing: '-0.05em',
@@ -55,16 +55,20 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = false, size = 'm
                 backgroundClip: 'text'
               }}
             >
-              <span className="rwu-letter inline-block transform group-hover:rotate-[8deg] transition-transform duration-300">R</span>
-              <span className="rwu-letter inline-block transform group-hover:rotate-[-5deg] transition-transform duration-300 delay-75">W</span>
-              <span className="rwu-letter inline-block transform group-hover:rotate-[8deg] transition-transform duration-300 delay-150">U</span>
+              <span className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[8deg]' : ''} transition-transform duration-300`}>R</span>
+              <span className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[-5deg]' : ''} transition-transform duration-300 delay-75`}>W</span>
+              <span className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[8deg]' : ''} transition-transform duration-300 delay-150`}>U</span>
             </span>
 
             {/* Admin connecting line effect with crown colors */}
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-yellow-300/60 via-white/60 to-blue-200/60 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out"></div>
+            {enableRotation && (
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-yellow-300/60 via-white/60 to-blue-200/60 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out"></div>
+            )}
 
             {/* Admin binding glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-white/30 to-blue-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+            {enableRotation && (
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-white/30 to-blue-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+            )}
           </div>
 
           {/* Enhanced shimmer effect */}
