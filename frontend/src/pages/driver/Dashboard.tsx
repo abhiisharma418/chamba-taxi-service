@@ -12,6 +12,7 @@ const DriverDashboard: React.FC = () => {
   const { bookings, updateBookingStatus, getBookingHistory } = useBooking();
   const [isOnline, setIsOnline] = useState(true);
   const [offer, setOffer] = useState<{ rideId: string; pickup: any; destination: any } | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
