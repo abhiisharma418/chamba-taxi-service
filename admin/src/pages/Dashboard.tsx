@@ -239,11 +239,50 @@ const Dashboard: React.FC = () => {
   );
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 text-white">
-        <h1 className="text-3xl font-bold mb-2">Dashboard Overview</h1>
-        <p className="text-blue-100 text-lg">Monitor your RideWithUs operations in real-time</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 space-y-10">
+      {/* Premium Header with Glassmorphism */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 via-purple-600/90 to-indigo-600/90 backdrop-blur-xl"></div>
+        <div className={"absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"}></div>
+
+        <div className="relative z-10 rounded-3xl p-10 text-white">
+          <div className="flex items-center justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                <span className="text-white/80 text-sm font-semibold tracking-wider uppercase">Live Dashboard</span>
+              </div>
+
+              <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight">
+                Dashboard Overview
+              </h1>
+
+              <p className="text-xl text-white/90 font-medium max-w-2xl leading-relaxed">
+                Monitor your RideWithUs operations with real-time analytics and premium insights
+              </p>
+
+              <div className="flex items-center gap-6 pt-2">
+                <div className="flex items-center gap-2 text-white/80">
+                  <Clock className="h-4 w-4" />
+                  <span className="text-sm">Last updated: {new Date().toLocaleTimeString()}</span>
+                </div>
+                <div className="flex items-center gap-2 text-emerald-300">
+                  <CheckCircle className="h-4 w-4" />
+                  <span className="text-sm font-semibold">All Systems Operational</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="hidden lg:block">
+              <div className="relative">
+                <div className="w-32 h-32 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 flex items-center justify-center">
+                  <BarChart3 className="h-16 w-16 text-white/90" />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
