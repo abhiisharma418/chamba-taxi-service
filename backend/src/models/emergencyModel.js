@@ -341,7 +341,4 @@ emergencyIncidentSchema.index({ 'location.latitude': 1, 'location.longitude': 1 
 const EmergencyIncident = mongoose.model('EmergencyIncident', emergencyIncidentSchema);
 const EmergencySettings = mongoose.model('EmergencySettings', emergencySettingsSchema);
 
-module.exports = {
-  EmergencyIncident,
-  EmergencySettings
-};
+export { EmergencyIncident, EmergencySettings };
