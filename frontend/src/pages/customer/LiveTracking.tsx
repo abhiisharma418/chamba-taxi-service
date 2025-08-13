@@ -383,11 +383,11 @@ const LiveTracking: React.FC = () => {
                     <span>Call</span>
                   </button>
                   <button
-                    onClick={() => window.open(`https://wa.me/${rideData.driver!.phone.replace(/\D/g, '')}`)}
-                    className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
+                    onClick={() => setIsChatOpen(true)}
+                    className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    <span>Message</span>
+                    <span>Chat</span>
                   </button>
                 </div>
               </div>
