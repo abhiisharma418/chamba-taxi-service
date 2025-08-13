@@ -1,8 +1,8 @@
-const { Ride } = require('../models/rideModel');
-const { User } = require('../models/userModel');
-const Payment = require('../models/paymentModel');
-const { UserActivity } = require('../models/adminUserModel');
-const TrackingData = require('../models/trackingModel');
+import { Ride } from '../models/rideModel.js';
+import { User } from '../models/userModel.js';
+import Payment from '../models/paymentModel.js';
+import { UserActivity } from '../models/adminUserModel.js';
+import TrackingData from '../models/trackingModel.js';
 
 // Get comprehensive analytics dashboard
 const getAnalyticsDashboard = async (req, res) => {
