@@ -1,0 +1,144 @@
+/* Premium RWU Logo Animations */
+
+@keyframes rwu-glow {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5),
+                 0 0 10px rgba(59, 130, 246, 0.3),
+                 0 0 15px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                 0 0 20px rgba(59, 130, 246, 0.5),
+                 0 0 30px rgba(59, 130, 246, 0.3);
+  }
+}
+
+@keyframes rwu-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-3px) scale(1.05);
+  }
+  60% {
+    transform: translateY(-1px) scale(1.02);
+  }
+}
+
+@keyframes rwu-rotate-smooth {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.05);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  75% {
+    transform: rotate(270deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes rwu-pulse-border {
+  0%, 100% {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes rwu-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Logo specific hover classes */
+.rwu-logo-container {
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.rwu-logo-container:hover .rwu-letter {
+  animation: rwu-bounce 0.6s ease-in-out;
+}
+
+.rwu-logo-container:hover .rwu-letter:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.rwu-logo-container:hover .rwu-letter:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.rwu-logo-container:hover .rwu-letter:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.rwu-glow-effect {
+  animation: rwu-glow 2s ease-in-out infinite;
+}
+
+.rwu-rotate-effect:hover {
+  animation: rwu-rotate-smooth 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rwu-pulse-border-effect {
+  animation: rwu-pulse-border 2s ease-in-out infinite;
+}
+
+.rwu-shimmer-effect {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: rwu-shimmer 2s ease-in-out infinite;
+}
+
+/* Dark mode adjustments */
+.dark .rwu-glow-effect {
+  animation: rwu-glow 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rwu-logo-container:hover .rwu-letter,
+  .rwu-glow-effect,
+  .rwu-rotate-effect:hover,
+  .rwu-pulse-border-effect,
+  .rwu-shimmer-effect {
+    animation: none;
+  }
+}
+
+/* Enhanced 3D effect for premium look */
+.rwu-3d-effect {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.rwu-3d-effect:hover {
+  transform: rotateY(15deg) rotateX(10deg);
+}
+
+/* Typography enhancement */
+.rwu-premium-text {
+  font-feature-settings: "kern" 1, "liga" 1;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
