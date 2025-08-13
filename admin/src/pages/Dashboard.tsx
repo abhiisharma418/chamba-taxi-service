@@ -16,6 +16,22 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart as RechartsPieChart,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 interface Stats {
   totalRides: number;
