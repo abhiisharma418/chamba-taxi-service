@@ -75,7 +75,7 @@ const LandingPage: React.FC = () => {
             Experience{' '}
             <span className="relative">
               <span className="font-bold text-slate-800">premium transportation</span>
-              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500"></div>
+              <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 block"></span>
             </span>
             {' '}with RideWithUs.
             <br className="hidden sm:block" />
