@@ -765,6 +765,18 @@ const UserManagement: React.FC = () => {
           onSuspend={(reason) => handleSuspendUser(selectedUser._id, reason)}
         />
       )}
+
+      {/* Driver Document Verification Modal */}
+      {showDocumentVerification && selectedDriverId && (
+        <DriverDocumentVerification
+          driverId={selectedDriverId}
+          onClose={() => {
+            setShowDocumentVerification(false);
+            setSelectedDriverId(null);
+          }}
+          onVerificationComplete={handleVerificationComplete}
+        />
+      )}
     </div>
   );
 };
