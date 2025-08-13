@@ -22,6 +22,7 @@ const CustomerDashboard = React.lazy(() => import('./pages/customer/Dashboard'))
 const CustomerBookRide = React.lazy(() => import('./pages/customer/BookRide'));
 const CustomerHistory = React.lazy(() => import('./pages/customer/History'));
 const CustomerLiveTracking = React.lazy(() => import('./pages/customer/LiveTracking'));
+const CustomerEmergencyCenter = React.lazy(() => import('./pages/customer/EmergencyCenter'));
 
 // Driver pages
 const DriverDashboard = React.lazy(() => import('./pages/driver/Dashboard'));
