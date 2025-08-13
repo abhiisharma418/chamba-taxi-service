@@ -36,6 +36,7 @@ function App() {
         <Route path="/users" element={<UserManagement />} />
         <Route path="/rides" element={<LiveRideMonitoring />} />
         <Route path="/support" element={<SupportManagement />} />
+        <Route path="/financial-reports" element={<FinancialReporting />} />
         <Route path="/financial" element={<FinancialManagement />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
