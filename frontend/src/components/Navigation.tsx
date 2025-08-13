@@ -66,9 +66,9 @@ const Navigation: React.FC = () => {
       <div className={patterns.navigation.inner}>
         <div className={patterns.navigation.content}>
           <div className="flex items-center">
-            {/* <Link to="/" className="flex items-center"> */}
+            <Link to={getHomePath()} className="flex items-center hover:scale-105 transition-transform duration-300">
               <Logo size="md" />
-            {/* </Link> */}
+            </Link>
           </div>
 
           {user && (
