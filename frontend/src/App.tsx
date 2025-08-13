@@ -78,6 +78,14 @@ const AppRoutes: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/customer/emergency"
+              element={
+                <ProtectedRoute userType="customer">
+                  <CustomerEmergencyCenter />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Driver Routes */}
             <Route
