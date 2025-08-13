@@ -497,8 +497,9 @@ const BookRide: React.FC = () => {
               <FreeMapComponent
                 pickup={pickupLocation.address ? pickupLocation : undefined}
                 destination={destinationLocation.address ? destinationLocation : undefined}
-                onPickupChange={setPickupLocation}
-                onDestinationChange={setDestinationLocation}
+                onPickupChange={handlePickupLocationChange}
+                onDestinationChange={handleDestinationLocationChange}
+                onMapReady={handleMapReady}
                 showSearch={true}
                 interactive={true}
                 className="h-96 w-full"
