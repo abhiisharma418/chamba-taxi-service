@@ -7,6 +7,7 @@ import { LiveAPI, RidesAPI } from '../../lib/api';
 import { io } from 'socket.io-client';
 import ChatInterface from '../../components/ChatInterface';
 import SupportInterface from '../../components/SupportInterface';
+import FinancialWidget from '../../components/FinancialWidget';
 
 const DriverDashboard: React.FC = () => {
   const { user } = useAuth();
