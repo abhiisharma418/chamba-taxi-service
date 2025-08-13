@@ -483,12 +483,28 @@ const BookRide: React.FC = () => {
                   </div>
                 )}
 
-                <button
-                  onClick={handleProceedToDashboard}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Go to Dashboard
-                </button>
+                <div className="space-y-4">
+                  {/* Chat with Driver Button */}
+                  {bookingData?.driverId && (
+                    <button
+                      onClick={() => {
+                        setActiveChatRide(bookingData);
+                        setIsChatOpen(true);
+                      }}
+                      className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle className="h-5 w-5" />
+                      Chat with Driver
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleProceedToDashboard}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    Go to Dashboard
+                  </button>
+                </div>
               </div>
             )}
           </div>
