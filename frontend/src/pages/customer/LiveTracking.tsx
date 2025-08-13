@@ -440,6 +440,21 @@ const LiveTracking: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Chat Interface */}
+      {rideData.driver && (
+        <ChatInterface
+          rideId={rideId!}
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          otherParty={{
+            id: rideData.driver._id,
+            name: rideData.driver.name,
+            type: 'driver',
+            avatar: rideData.driver.photo
+          }}
+        />
+      )}
     </div>
   );
 };
