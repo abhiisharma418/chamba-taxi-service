@@ -242,23 +242,42 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
             </div>
           )}
 
-          {!isLoading && suggestions.map((location, index) => (
-            <button
-              key={index}
-              onClick={() => handleSuggestionClick(location)}
-              className="w-full text-left px-4 py-3 hover:bg-slate-50 flex items-center space-x-3 border-b border-slate-100 last:border-b-0"
-            >
-              <div className="p-2 bg-slate-100 rounded-lg">
-                <MapPin className="h-4 w-4 text-slate-600" />
-              </div>
-              <div className="flex-1">
-                <div className="font-medium text-slate-900">{location.address}</div>
-                <div className="text-sm text-slate-500">
-                  {location.coordinates[1].toFixed(4)}, {location.coordinates[0].toFixed(4)}
+          {!isLoading && suggestions.map((location, index) => {
+            // Highlight matching text
+            const highlightText = (text: string, query: string) => {
+              if (!query) return text;
+              const parts = text.split(new RegExp(`(${query})`, 'gi'));
+              return parts.map((part, i) =>
+                part.toLowerCase() === query.toLowerCase() ?
+                  <span key={i} className="bg-yellow-200 text-yellow-900 font-semibold">{part}</span> :
+                  part
+              );
+            };
+
+            return (
+              <button
+                key={index}
+                onClick={() => handleSuggestionClick(location)}
+                className="w-full text-left px-4 py-3 hover:bg-blue-50 flex items-center space-x-3 border-b border-slate-100 last:border-b-0 transition-colors group"
+              >
+                <div className={`p-2 rounded-lg transition-colors ${
+                  type === 'pickup' ? 'bg-green-100 group-hover:bg-green-200' : 'bg-red-100 group-hover:bg-red-200'
+                }`}>
+                  <MapPin className={`h-4 w-4 ${
+                    type === 'pickup' ? 'text-green-600' : 'text-red-600'
+                  }`} />
                 </div>
-              </div>
-            </button>
-          ))}
+                <div className="flex-1">
+                  <div className="font-medium text-slate-900">
+                    {highlightText(location.address, searchQuery)}
+                  </div>
+                  <div className="text-sm text-slate-500">
+                    📍 {location.coordinates[1].toFixed(4)}, {location.coordinates[0].toFixed(4)}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
           
           {!isLoading && searchQuery.length <= 2 && (
             <div className="px-4 py-8 text-center">
