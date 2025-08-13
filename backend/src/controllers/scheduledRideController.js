@@ -1,8 +1,8 @@
-const ScheduledRide = require('../models/scheduledRideModel');
-const User = require('../models/userModel');
-const Booking = require('../models/bookingModel');
-const { validationResult } = require('express-validator');
-const notificationService = require('../services/notificationService');
+import ScheduledRide from '../models/scheduledRideModel.js';
+import User from '../models/userModel.js';
+import Booking from '../models/bookingModel.js';
+import { validationResult } from 'express-validator';
+import notificationService from '../services/notificationService.js';
 
 class ScheduledRideController {
   async createScheduledRide(req, res) {
@@ -660,4 +660,4 @@ class ScheduledRideController {
   }
 }
 
-module.exports = new ScheduledRideController();
+export default new ScheduledRideController();
