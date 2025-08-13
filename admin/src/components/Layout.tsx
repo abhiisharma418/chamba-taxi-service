@@ -14,7 +14,8 @@ import {
   DollarSign,
   BarChart3,
   CheckCircle,
-  HelpCircle
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 
 interface LayoutProps {
