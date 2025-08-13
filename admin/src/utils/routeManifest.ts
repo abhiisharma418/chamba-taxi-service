@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Route manifest for admin portal lazy loading optimization
 export interface RouteManifest {
   path: string;
