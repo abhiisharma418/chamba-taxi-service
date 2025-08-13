@@ -153,7 +153,7 @@ class SupportService {
         if (value) queryParams.append(key, value.toString());
       });
 
-      const response = await api.get(`/support/my-tickets?${queryParams}`);
+      const response = await apiFetch(`/support/my-tickets?${queryParams}`);
       return response.data;
     } catch (error: any) {
       console.error('Error fetching user tickets:', error);
