@@ -132,25 +132,44 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Main Content */}
       <div className="ml-72">
-        {/* Top Bar */}
-        <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Admin Portal</h1>
-              <p className="text-slate-600">Manage your RideWithUs operations</p>
+        {/* Premium Top Bar */}
+        <header className="relative bg-white/80 backdrop-blur-2xl shadow-xl border-b border-white/30 px-10 py-6 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-blue-50/30"></div>
+          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
+
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <h1 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                  Admin Portal
+                </h1>
+              </div>
+              <p className="text-slate-600 font-semibold tracking-wide">Manage your RideWithUs operations with premium control</p>
             </div>
-            
-            <div className="flex items-center gap-4">
-              {/* Notifications */}
-              <button className="relative p-2 bg-slate-100 hover:bg-blue-100 rounded-xl transition-colors duration-300">
-                <Bell className="h-5 w-5 text-slate-600" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+
+            <div className="flex items-center gap-6">
+              {/* Premium Notifications */}
+              <button className="relative group p-4 bg-white/70 backdrop-blur-xl hover:bg-white/90 rounded-2xl transition-all duration-300 border border-white/40 hover:shadow-xl hover:scale-105">
+                <Bell className="h-6 w-6 text-slate-600 group-hover:text-blue-600 transition-colors duration-300" />
+                <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                  <div className="w-4 h-4 bg-gradient-to-r from-red-500 to-rose-600 rounded-full animate-pulse"></div>
+                  <div className="absolute w-2 h-2 bg-white rounded-full"></div>
+                </div>
               </button>
-              
-              {/* Admin Badge */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl border border-amber-200">
-                <Shield className="h-4 w-4 text-amber-600" />
-                <span className="text-sm font-semibold text-amber-700">Admin</span>
+
+              {/* Premium Admin Badge */}
+              <div className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 rounded-2xl shadow-lg border border-orange-200/50 backdrop-blur-sm">
+                <div className="p-1 bg-white/20 rounded-lg backdrop-blur-sm">
+                  <Shield className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-sm font-black text-white tracking-wide uppercase">Administrator</span>
+              </div>
+
+              {/* Premium Status Indicator */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl border border-emerald-200">
+                <CheckCircle className="h-4 w-4 text-emerald-600" />
+                <span className="text-xs font-bold text-emerald-700">ONLINE</span>
               </div>
             </div>
           </div>
