@@ -102,6 +102,9 @@ const io = new SocketIOServer(server, {
 });
 setIO(io);
 
+// Make io globally available for emergency alerts
+global.io = io;
+
 // Initialize notification service
 notificationService.initialize(server);
 
