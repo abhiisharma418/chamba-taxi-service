@@ -40,6 +40,9 @@ const BookRide: React.FC = () => {
   const [bookingData, setBookingData] = useState<any>(null);
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
   const [whatsappPhone, setWhatsappPhone] = useState(user?.phone || '');
+  const [selectedPromo, setSelectedPromo] = useState<PromoCode | null>(null);
+  const [showPromoCodeInterface, setShowPromoCodeInterface] = useState(false);
+  const [originalFare, setOriginalFare] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user) return;
