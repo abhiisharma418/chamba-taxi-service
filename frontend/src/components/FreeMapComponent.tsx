@@ -92,11 +92,53 @@ const FreeMapComponent: React.FC<FreeMapComponentProps> = ({
       }
 
       setMap(leafletMap);
+
+      // Expose map methods to parent
+      if (onMapReady) {
+        const mapInstance = {
+          updatePickupLocation: (location: Location) => {
+            if (pickupMarker) {
+              leafletMap.removeLayer(pickupMarker);
+            }
+
+            const marker = window.L.marker(location.coordinates)
+              .addTo(leafletMap)
+              .bindPopup(`📍 Pickup: ${location.address}`)
+              .openPopup();
+
+            setPickupMarker(marker);
+            leafletMap.setView(location.coordinates, 14);
+          },
+
+          updateDestinationLocation: (location: Location) => {
+            if (destinationMarker) {
+              leafletMap.removeLayer(destinationMarker);
+            }
+
+            const marker = window.L.marker(location.coordinates)
+              .addTo(leafletMap)
+              .bindPopup(`🎯 Destination: ${location.address}`)
+              .openPopup();
+
+            setDestinationMarker(marker);
+
+            // If both pickup and destination exist, fit bounds
+            if (pickupMarker) {
+              const group = window.L.featureGroup([pickupMarker, marker]);
+              leafletMap.fitBounds(group.getBounds().pad(0.1));
+            } else {
+              leafletMap.setView(location.coordinates, 14);
+            }
+          }
+        };
+
+        onMapReady(mapInstance);
+      }
     } catch (err) {
       console.error('Error initializing map:', err);
       setError('Error loading map');
     }
-  }, [isLoaded, map]);
+  }, [isLoaded, map, pickupMarker, destinationMarker]);
 
   // Search location function using Nominatim (OpenStreetMap's geocoding service)
   const searchLocation = async (query: string) => {
