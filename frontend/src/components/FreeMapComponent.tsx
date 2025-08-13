@@ -266,6 +266,53 @@ const FreeMapComponent: React.FC<FreeMapComponentProps> = ({
 
   return (
     <div className={`relative ${className}`}>
+      {/* Search Interface */}
+      {showSearch && (
+        <div className="absolute top-4 left-4 right-4 z-10 space-y-2">
+          {/* Pickup Search */}
+          <div className="relative">
+            <input
+              type="text"
+              value={pickupSearch}
+              onChange={(e) => handleSearchChange(e.target.value, 'pickup')}
+              placeholder="Enter pickup location..."
+              className="w-full px-4 py-3 bg-white rounded-lg shadow-lg border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+            <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-500" />
+          </div>
+
+          {/* Destination Search */}
+          <div className="relative">
+            <input
+              type="text"
+              value={destinationSearch}
+              onChange={(e) => handleSearchChange(e.target.value, 'destination')}
+              placeholder="Enter destination..."
+              className="w-full px-4 py-3 bg-white rounded-lg shadow-lg border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            />
+            <Navigation className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-red-500" />
+          </div>
+
+          {/* Search Results */}
+          {searchResults.length > 0 && activeSearch && (
+            <div className="bg-white rounded-lg shadow-lg border border-gray-200 max-h-48 overflow-y-auto">
+              {searchResults.map((result, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleLocationSelect(result, activeSearch)}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                >
+                  <div className="flex items-center space-x-2">
+                    <MapPin className={`h-4 w-4 ${activeSearch === 'pickup' ? 'text-green-500' : 'text-red-500'}`} />
+                    <span className="text-sm text-gray-900 truncate">{result.address}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <div ref={mapRef} className="w-full h-full rounded-lg" />
       
       {/* Map attribution */}
