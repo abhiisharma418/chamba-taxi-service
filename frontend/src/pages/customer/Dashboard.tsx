@@ -236,6 +236,12 @@ const CustomerDashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Support Interface */}
+      <SupportInterface
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+      />
     </div>
   );
 };
