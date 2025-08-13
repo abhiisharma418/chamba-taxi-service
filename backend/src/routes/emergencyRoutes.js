@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { body, param, query } = require('express-validator');
-const auth = require('../middleware/auth');
-const rateLimit = require('../middleware/rateLimit');
-const emergencyController = require('../controllers/emergencyController');
-const adminEmergencyController = require('../controllers/adminEmergencyController');
+import { body, param, query } from 'express-validator';
+import auth from '../middleware/auth.js';
+import rateLimit from '../middleware/rateLimit.js';
+import emergencyController from '../controllers/emergencyController.js';
+import adminEmergencyController from '../controllers/adminEmergencyController.js';
 
 const sosRateLimit = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
