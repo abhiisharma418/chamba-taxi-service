@@ -195,6 +195,7 @@ app.use('/api/chat', authenticate, requireActive, chatRoutes);
 app.use('/api/support', authenticate, requireActive, supportTicketRoutes);
 app.use('/api/financial', authenticate, requireActive, financialReportRoutes);
 app.use('/api/promo-codes', authenticate, requireActive, promoCodeRoutes);
+app.use('/api/emergency', authenticate, requireActive, emergencyRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server and connect to MongoDB
