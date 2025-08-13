@@ -44,34 +44,95 @@ const LandingPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-8 leading-tight">
-            Your Trusted{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Ride Partner
+      {/* Luxury Hero Section */}
+      <section className="relative py-32 px-6 sm:px-8 lg:px-12 overflow-hidden">
+        {/* Premium Background Elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto text-center">
+          {/* Premium Badge */}
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/70 backdrop-blur-xl border border-white/40 rounded-full shadow-xl mb-8">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-bold text-slate-700 tracking-wide uppercase">Premium Mobility Experience</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-slate-900 mb-8 leading-none tracking-tight">
+            Your{' '}
+            <span className="relative inline-block">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                Luxury
+              </span>
+              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-full"></div>
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Mobility Partner
             </span>
           </h1>
-          <p className="text-xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Experience premium transportation with RideWithUs. Safe, reliable, and always
-            <span className="font-semibold text-slate-700">honest pricing</span> for every journey.
+
+          <p className="text-2xl text-slate-600 mb-16 max-w-4xl mx-auto leading-relaxed font-medium">
+            Experience{' '}
+            <span className="relative">
+              <span className="font-bold text-slate-800">premium transportation</span>
+              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500"></div>
+            </span>
+            {' '}with RideWithUs.
+            <br className="hidden sm:block" />
+            Safe, reliable, and always with{' '}
+            <span className="font-black text-emerald-600">honest pricing</span> for every journey.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Link
               to="/signup?type=customer"
-              className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center gap-2"
+              className="group relative bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-purple-600 hover:to-indigo-600 text-white px-12 py-6 rounded-3xl text-xl font-black transition-all duration-500 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 overflow-hidden"
             >
-              Book Your Ride
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+              <span className="relative z-10 flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <MapPin className="h-6 w-6" />
+                </div>
+                Book Your Elite Ride
+                <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-emerald-400 rounded-full animate-bounce"></div>
             </Link>
+
             <Link
               to="/signup?type=driver"
-              className="group bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center gap-2"
+              className="group relative bg-gradient-to-r from-slate-800 via-slate-900 to-black hover:from-slate-900 hover:via-black hover:to-slate-800 text-white px-12 py-6 rounded-3xl text-xl font-black transition-all duration-500 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 overflow-hidden border border-slate-700/50"
             >
-              Drive & Earn
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+              <span className="relative z-10 flex items-center gap-3">
+                <div className="p-2 bg-amber-500/20 rounded-xl backdrop-blur-sm">
+                  <Shield className="h-6 w-6 text-amber-400" />
+                </div>
+                Drive & Earn Premium
+                <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-amber-400 rounded-full animate-bounce delay-200"></div>
             </Link>
+          </div>
+
+          {/* Premium Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="text-4xl font-black text-blue-600 mb-2">10K+</div>
+              <div className="text-slate-600 font-semibold">Happy Customers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-black text-purple-600 mb-2">500+</div>
+              <div className="text-slate-600 font-semibold">Elite Drivers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-black text-emerald-600 mb-2">4.9★</div>
+              <div className="text-slate-600 font-semibold">Average Rating</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-black text-amber-600 mb-2">24/7</div>
+              <div className="text-slate-600 font-semibold">Premium Support</div>
+            </div>
           </div>
         </div>
       </section>
