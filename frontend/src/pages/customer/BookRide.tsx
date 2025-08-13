@@ -10,6 +10,7 @@ import LocationSearch from '../../components/LocationSearch';
 import PaymentMethod from '../../components/PaymentMethod';
 import WhatsAppNotification from '../../components/WhatsAppNotification';
 import PromoCodeInterface from '../../components/PromoCodeInterface';
+import SOSButton from '../../components/SOSButton';
 import { Car, Clock, CreditCard, Bike, Users, Zap, ArrowLeft, CheckCircle, Loader2, AlertCircle, Gift } from 'lucide-react';
 import { PromoCode } from '../../services/promoCodeService';
 import { RidesAPI, PaymentAPI } from '../../lib/api';
