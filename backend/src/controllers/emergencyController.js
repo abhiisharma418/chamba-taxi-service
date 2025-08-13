@@ -538,4 +538,4 @@ class EmergencyController {
   }
 }
 
-module.exports = new EmergencyController();
+export default new EmergencyController();
