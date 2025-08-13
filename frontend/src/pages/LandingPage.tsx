@@ -5,24 +5,39 @@ import Logo from '../components/Logo';
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Logo size="md" />
-            <div className="flex items-center space-x-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50 relative overflow-hidden">
+      {/* Premium Background Pattern */}
+      <div className={"absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"100\" height=\"100\" viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.03\"%3E%3Cpath d=\"M50 10 L60 25 L50 40 L40 25 Z\"/%3E%3Cpath d=\"M20 30 L30 45 L20 60 L10 45 Z\"/%3E%3Cpath d=\"M80 30 L90 45 L80 60 L70 45 Z\"/%3E%3C/g%3E%3C/svg%3E')] opacity-40"}></div>
+
+      {/* Luxury Header */}
+      <header className="relative bg-white/80 backdrop-blur-2xl shadow-2xl border-b border-white/30 sticky top-0 z-50">
+        <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-blue-50/20"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex justify-between items-center h-20">
+            <div className="hover:scale-105 transition-transform duration-300">
+              <Logo size="lg" />
+            </div>
+
+            <div className="flex items-center space-x-6">
               <Link
                 to="/login"
-                className="text-slate-700 hover:text-blue-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-blue-50"
+                className="group relative px-6 py-3 text-slate-700 hover:text-blue-600 font-semibold text-base transition-all duration-300 rounded-2xl hover:bg-white/60 backdrop-blur-sm border border-transparent hover:border-blue-200/50 hover:shadow-lg"
               >
-                Login
+                <span className="relative z-10">Login</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 to-blue-50/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
+
               <Link
                 to="/signup"
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="group relative bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-purple-600 hover:to-indigo-600 text-white px-8 py-3 rounded-2xl font-bold text-base transition-all duration-500 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 hover:scale-105 overflow-hidden"
               >
-                Sign Up
+                <span className="relative z-10 flex items-center gap-2">
+                  Get Started
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
             </div>
           </div>
