@@ -164,6 +164,9 @@ const CustomerDashboard: React.FC = () => {
           </button>
         </div>
 
+        {/* Financial Overview */}
+        <FinancialWidget userType="customer" />
+
         {/* Recent Rides */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100">
           <div className="p-8 border-b border-gray-100">
