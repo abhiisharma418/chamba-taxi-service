@@ -84,33 +84,47 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             })}
           </nav>
 
-          {/* Bottom Section */}
-          <div className="p-4 border-t border-gray-100">
-            <div className="mb-4">
-              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 transition-all duration-300">
-                <Settings className="h-5 w-5" />
-                <span className="font-medium">Settings</span>
+          {/* Premium Bottom Section */}
+          <div className="p-6 border-t border-white/20">
+            <div className="mb-6">
+              <button className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-slate-700 hover:bg-white/60 hover:text-blue-600 transition-all duration-300 font-semibold backdrop-blur-sm border border-transparent hover:border-blue-200/50 hover:shadow-lg">
+                <div className="p-2 rounded-xl bg-slate-100 group-hover:bg-blue-100 transition-all duration-300">
+                  <Settings className="h-5 w-5" />
+                </div>
+                <span className="font-semibold tracking-wide">Settings</span>
               </button>
             </div>
-            
-            {/* User Info */}
-            <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center">
-                  <User className="h-5 w-5 text-white" />
+
+            {/* Premium User Info */}
+            <div className="relative bg-gradient-to-br from-white/70 via-white/50 to-slate-50/70 backdrop-blur-xl rounded-2xl p-6 border border-white/40 shadow-xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20"></div>
+
+              <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="relative">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <User className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-slate-900 truncate text-lg">{user?.name}</p>
+                    <p className="text-sm text-slate-600 truncate font-medium">{user?.email}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-emerald-600 font-semibold">Administrator</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-slate-900 truncate">{user?.name}</p>
-                  <p className="text-sm text-slate-600 truncate">{user?.email}</p>
-                </div>
+
+                <button
+                  onClick={logout}
+                  className="w-full flex items-center justify-center gap-3 px-5 py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl font-semibold tracking-wide hover:scale-105"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
               </div>
-              <button
-                onClick={logout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 rounded-lg transition-all duration-300 border border-slate-200"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="font-medium">Logout</span>
-              </button>
             </div>
           </div>
         </div>
