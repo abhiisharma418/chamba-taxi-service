@@ -36,8 +36,8 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = false, size = 'm
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent dark:from-white/5"></div>
 
           {/* Admin Crown Effect - Enhanced with Animation */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-2 bg-gradient-to-b from-yellow-300 to-transparent rounded-b-sm opacity-70 group-hover:opacity-100 transition-opacity duration-300 rwu-admin-crown-effect"></div>
-          <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 w-2 h-1 bg-gradient-to-b from-yellow-200 to-transparent rounded-b-sm opacity-80 rwu-admin-crown-effect"></div>
+          <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-2 bg-gradient-to-b from-yellow-300 to-transparent rounded-b-sm opacity-70 group-hover:opacity-100 transition-opacity duration-300 ${enableRotation ? 'rwu-admin-crown-effect' : ''}`}></div>
+          <div className={`absolute top-0.5 left-1/2 transform -translate-x-1/2 w-2 h-1 bg-gradient-to-b from-yellow-200 to-transparent rounded-b-sm opacity-80 ${enableRotation ? 'rwu-admin-crown-effect' : ''}`}></div>
 
           <div className="absolute top-1 left-1 w-2 h-2 bg-white/40 rounded-full animate-pulse"></div>
           <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-blue-300/60 rounded-full animate-pulse delay-1000"></div>
