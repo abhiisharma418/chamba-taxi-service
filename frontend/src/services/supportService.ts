@@ -267,7 +267,7 @@ class SupportService {
 
   async getSupportStats(period: string = '30d'): Promise<{ success: boolean; data?: SupportStats; message?: string }> {
     try {
-      const response = await api.get(`/support/admin/stats?period=${period}`);
+      const response = await apiFetch(`/support/admin/stats?period=${period}`);
       return response.data;
     } catch (error: any) {
       console.error('Error fetching support stats:', error);
