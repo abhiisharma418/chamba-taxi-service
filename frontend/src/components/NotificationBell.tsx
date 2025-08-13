@@ -23,17 +23,25 @@ const NotificationBell: React.FC = () => {
 
   return (
     <div className="relative">
-      {/* Notification Bell */}
+      {/* Premium Notification Bell */}
       <button
         onClick={handleBellClick}
-        className="relative p-2 bg-white hover:bg-gray-50 rounded-full shadow-md border border-gray-200 transition-all duration-200 hover:scale-105"
+        className="group relative p-3 bg-white/70 backdrop-blur-xl hover:bg-white/90 rounded-2xl shadow-xl border border-white/40 transition-all duration-300 hover:scale-110 hover:shadow-2xl overflow-hidden"
       >
-        <Bell className="h-5 w-5 text-gray-600" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <Bell className="relative z-10 h-6 w-6 text-blue-600 group-hover:text-blue-700 transition-colors duration-300" />
+
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
+          <div className="absolute -top-2 -right-2 flex items-center justify-center">
+            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse border-2 border-white">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </div>
+            <div className="absolute inset-0 bg-red-400 rounded-full animate-ping opacity-30"></div>
+          </div>
         )}
+
+        {/* Premium shine effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 skew-x-12"></div>
       </button>
 
       {/* Dropdown */}
