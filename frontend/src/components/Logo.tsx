@@ -56,10 +56,14 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = false, size = 'm
             </span>
 
             {/* Connecting line effect to bind letters */}
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-white/40 via-blue-200/60 to-white/40 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out"></div>
+            {enableRotation && (
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-white/40 via-blue-200/60 to-white/40 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out"></div>
+            )}
 
             {/* Binding glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-white/30 to-blue-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+            {enableRotation && (
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-white/30 to-blue-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+            )}
           </div>
 
           {/* Enhanced shimmer effect */}
