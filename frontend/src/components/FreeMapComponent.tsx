@@ -84,6 +84,11 @@ const FreeMapComponent: React.FC<FreeMapComponentProps> = ({
         maxZoom: 19
       }).addTo(leafletMap);
 
+      // Add click event listener for interactive mode
+      if (interactive) {
+        leafletMap.on('click', handleMapClick);
+      }
+
       setMap(leafletMap);
     } catch (err) {
       console.error('Error initializing map:', err);
