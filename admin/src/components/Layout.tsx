@@ -131,7 +131,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div className="ml-64">
+      <div className="ml-72">
         {/* Top Bar */}
         <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 px-8 py-4">
           <div className="flex items-center justify-between">
