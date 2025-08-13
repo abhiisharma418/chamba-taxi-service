@@ -181,9 +181,12 @@ class SupportService {
   // Add message to ticket
   async addMessage(ticketId: string, message: string, attachments: any[] = []): Promise<{ success: boolean; message?: string }> {
     try {
-      const response = await api.post(`/support/ticket/${ticketId}/message`, {
-        message,
-        attachments
+      const response = await apiFetch(`/support/ticket/${ticketId}/message`, {
+        method: 'POST',
+        body: JSON.stringify({
+          message,
+          attachments
+        })
       });
       return response.data;
     } catch (error: any) {
