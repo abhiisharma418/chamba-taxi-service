@@ -167,7 +167,7 @@ class SupportService {
   // Get single ticket by ID
   async getTicketById(ticketId: string): Promise<TicketResponse> {
     try {
-      const response = await api.get(`/support/ticket/${ticketId}`);
+      const response = await apiFetch(`/support/ticket/${ticketId}`);
       return response.data;
     } catch (error: any) {
       console.error('Error fetching ticket:', error);
