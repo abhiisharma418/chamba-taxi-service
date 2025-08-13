@@ -194,17 +194,20 @@ const DriverDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <button
+            onClick={() => setIsSupportOpen(true)}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all group text-left w-full"
+          >
             <div className="flex items-center">
-              <div className="bg-amber-100 p-3 rounded-full">
-                <Clock className="h-6 w-6 text-amber-600" />
+              <div className="bg-orange-100 p-3 rounded-full group-hover:scale-110 transition-transform">
+                <HelpCircle className="h-6 w-6 text-orange-600" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-gray-900">8.2</div>
-                <div className="text-gray-600">Hours Online</div>
+                <div className="text-lg font-bold text-gray-900">Get Support</div>
+                <div className="text-gray-600">Need help?</div>
               </div>
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Pending Requests */}
