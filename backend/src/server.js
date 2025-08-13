@@ -187,6 +187,7 @@ app.use('/api/vehicle-management', authenticate, requireActive, vehicleManagemen
 app.use('/api/support', authenticate, requireActive, supportRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/driver-documents', driverDocumentRoutes);
+app.use('/api/chat', authenticate, requireActive, chatRoutes);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server and connect to MongoDB
