@@ -31,21 +31,48 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Sample locations for demo - in real app, this would come from Google Places API
+  // Enhanced sample locations for demo - in real app, this would come from Google Places API
   const sampleLocations: Location[] = [
+    // Shimla & Himachal Pradesh
     { address: 'Shimla Railway Station, Shimla, HP', coordinates: [77.1734, 31.1048] },
     { address: 'Mall Road, Shimla, HP', coordinates: [77.1727, 31.1033] },
-    { address: 'Kalka Railway Station, Kalka, HR', coordinates: [76.9366, 30.8406] },
+    { address: 'Christ Church, Shimla, HP', coordinates: [77.1719, 31.1033] },
+    { address: 'Jakhu Temple, Shimla, HP', coordinates: [77.1828, 31.1125] },
+    { address: 'The Ridge, Shimla, HP', coordinates: [77.1719, 31.1040] },
+    { address: 'Kufri, Shimla, HP', coordinates: [77.2648, 31.0976] },
+    { address: 'Narkanda, Shimla, HP', coordinates: [77.3167, 31.2167] },
+    { address: 'Chail Palace, Chail, HP', coordinates: [77.1833, 30.8944] },
+    { address: 'Kasauli, Himachal Pradesh', coordinates: [76.9609, 30.8978] },
+
+    // Chandigarh & Punjab
     { address: 'Chandigarh Airport, Chandigarh', coordinates: [76.7884, 30.6735] },
     { address: 'Sector 17, Chandigarh', coordinates: [76.7794, 30.7411] },
     { address: 'PGI Hospital, Chandigarh', coordinates: [76.7689, 30.7614] },
     { address: 'Rock Garden, Chandigarh', coordinates: [76.8131, 30.7526] },
     { address: 'Sukhna Lake, Chandigarh', coordinates: [76.8131, 30.7420] },
-    { address: 'Christ Church, Shimla, HP', coordinates: [77.1719, 31.1033] },
-    { address: 'Jakhu Temple, Shimla, HP', coordinates: [77.1828, 31.1125] },
-    { address: 'The Ridge, Shimla, HP', coordinates: [77.1719, 31.1040] },
-    { address: 'Kufri, Shimla, HP', coordinates: [77.2648, 31.0976] },
-    { address: 'Narkanda, Shimla, HP', coordinates: [77.3167, 31.2167] }
+    { address: 'Kalka Railway Station, Kalka, HR', coordinates: [76.9366, 30.8406] },
+    { address: 'Panchkula, Haryana', coordinates: [76.8512, 30.6942] },
+    { address: 'Mohali Stadium, Mohali, Punjab', coordinates: [76.7323, 30.6908] },
+
+    // Delhi NCR
+    { address: 'Delhi Airport, Terminal 3, Delhi', coordinates: [77.1025, 28.5562] },
+    { address: 'Connaught Place, New Delhi', coordinates: [77.2167, 28.6289] },
+    { address: 'India Gate, Delhi', coordinates: [77.2295, 28.6129] },
+    { address: 'Red Fort, Delhi', coordinates: [77.2410, 28.6562] },
+    { address: 'Gurgaon Cyber City, Haryana', coordinates: [77.0892, 28.4089] },
+    { address: 'Noida Sector 18, UP', coordinates: [77.3178, 28.5706] },
+
+    // Popular tourist destinations
+    { address: 'Manali, Himachal Pradesh', coordinates: [77.1892, 32.2432] },
+    { address: 'Dharamshala, Himachal Pradesh', coordinates: [76.3234, 32.2190] },
+    { address: 'Rishikesh, Uttarakhand', coordinates: [78.2676, 30.0869] },
+    { address: 'Haridwar, Uttarakhand', coordinates: [78.1642, 29.9457] },
+
+    // Local areas
+    { address: 'Bus Stand, Shimla', coordinates: [77.1820, 31.1033] },
+    { address: 'IGMC Hospital, Shimla', coordinates: [77.1695, 31.1089] },
+    { address: 'Himachal University, Shimla', coordinates: [77.1145, 31.0775] },
+    { address: 'Summer Hill, Shimla', coordinates: [77.1500, 31.0833] }
   ];
 
   useEffect(() => {
