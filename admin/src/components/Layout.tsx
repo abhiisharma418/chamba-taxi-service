@@ -37,19 +37,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="fixed inset-y-0 left-0 w-72 bg-white/90 backdrop-blur-2xl shadow-2xl border-r border-white/30 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-slate-50/20"></div>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-6 border-b border-gray-100">
+        <div className="relative z-10 flex flex-col h-full">
+          {/* Premium Logo Section */}
+          <div className="p-8 border-b border-white/20">
             <button
               onClick={() => navigate('/dashboard')}
-              className="w-full hover:scale-105 transition-transform duration-300"
+              className="w-full hover:scale-105 transition-all duration-300 group"
             >
-              <Logo size="md" />
+              <div className="p-3 bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-xl rounded-2xl border border-white/40 group-hover:shadow-xl transition-all duration-300">
+                <Logo size="md" />
+              </div>
             </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          {/* Premium Navigation */}
+          <nav className="flex-1 p-6 space-y-3">
             {menuItems.map((item) => {
               const IconComponent = item.icon;
               const isActive = location.pathname === item.path;
@@ -57,14 +59,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
+                  className={`group w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-left transition-all duration-300 font-semibold ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                      : 'text-slate-700 hover:bg-blue-50 hover:text-blue-600'
+                      ? 'bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white shadow-xl scale-105 border border-blue-300/50'
+                      : 'text-slate-700 hover:bg-white/60 hover:text-blue-600 hover:scale-102 hover:shadow-lg backdrop-blur-sm border border-transparent hover:border-blue-200/50'
                   }`}
                 >
-                  <IconComponent className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <div className={`p-2 rounded-xl transition-all duration-300 ${
+                    isActive
+                      ? 'bg-white/20 backdrop-blur-sm'
+                      : 'bg-slate-100 group-hover:bg-blue-100'
+                  }`}>
+                    <IconComponent className="h-5 w-5" />
+                  </div>
+                  <span className="font-semibold tracking-wide">{item.label}</span>
+
+                  {isActive && (
+                    <div className="ml-auto">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    </div>
+                  )}
                 </button>
               );
             })}
