@@ -1,7 +1,7 @@
 import { getRedis } from '../utils/redis.js';
 import { assignDriverToRide } from './driverMatchingService.js';
 import { Ride } from '../models/rideModel.js';
-import { notifyDriver, notifyCustomer } from './notificationService.js';
+import notificationService from './notificationService.js';
 
 // Start dispatch process for a ride
 export async function startDispatch(rideId, pickup, nearbyDrivers) {
