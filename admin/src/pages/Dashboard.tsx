@@ -349,18 +349,37 @@ const Dashboard: React.FC = () => {
               <Car className="h-5 w-5 text-green-600" />
               Rides Trend
             </h3>
-            <div className="h-48 flex items-end justify-between space-x-1">
-              {analytics?.ridesChart.slice(-7).map((data, index) => (
-                <div key={index} className="flex flex-col items-center flex-1">
-                  <div
-                    className="bg-green-600 rounded-t w-full transition-all duration-300 hover:bg-green-700"
-                    style={{ height: `${(data.rides / 70) * 100}%`, minHeight: '20px' }}
-                  ></div>
-                  <span className="text-xs text-slate-600 mt-2 transform -rotate-45">
-                    {new Date(data.date).getDate()}
-                  </span>
-                </div>
-              ))}
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics?.ridesChart || []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis
+                    dataKey="date"
+                    stroke="#64748b"
+                    fontSize={12}
+                    tickFormatter={(value) => new Date(value).getDate().toString()}
+                  />
+                  <YAxis
+                    stroke="#64748b"
+                    fontSize={12}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                    }}
+                    formatter={(value: any) => [value, 'Rides']}
+                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                  />
+                  <Bar
+                    dataKey="rides"
+                    fill="#16a34a"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
             <div className="text-center mt-4">
               <p className="text-2xl font-bold text-slate-900">
