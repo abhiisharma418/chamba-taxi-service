@@ -13,7 +13,8 @@ import {
   Users,
   DollarSign,
   BarChart3,
-  CheckCircle
+  CheckCircle,
+  HelpCircle
 } from 'lucide-react';
 
 interface LayoutProps {
