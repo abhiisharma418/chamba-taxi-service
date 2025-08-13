@@ -95,6 +95,9 @@ const io = new SocketIOServer(server, {
 });
 setIO(io);
 
+// Initialize notification service
+notificationService.initialize(server);
+
 io.on('connection', (socket) => {
   const userId = socket.handshake.auth?.userId;
   if (userId) socket.join(`user:${userId}`);
