@@ -67,13 +67,19 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = false, size = 'm
           </div>
 
           {/* Enhanced shimmer effect */}
-          <div className="absolute inset-0 rwu-shimmer-effect opacity-0 group-hover:opacity-100 transition-opacity duration-500 skew-x-12"></div>
+          {enableRotation && (
+            <div className="absolute inset-0 rwu-shimmer-effect opacity-0 group-hover:opacity-100 transition-opacity duration-500 skew-x-12"></div>
+          )}
 
           {/* Rotating border effect */}
-          <div className="absolute inset-0 rounded-2xl border-2 border-gradient-to-r from-blue-400/50 via-white/30 to-blue-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          {enableRotation && (
+            <div className="absolute inset-0 rounded-2xl border-2 border-gradient-to-r from-blue-400/50 via-white/30 to-blue-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          )}
 
-          {/* Pulsing glow effect */}
-          <div className="absolute -inset-1 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-2xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+          {/* Pulsing glow effect - No background shadow during rotation */}
+          {enableRotation && (
+            <div className="absolute -inset-1 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-2xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+          )}
         </div>
       </div>
 
