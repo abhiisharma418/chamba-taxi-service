@@ -8,7 +8,7 @@ interface LogoProps {
   enableRotation?: boolean;
 }
 
-const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md' }) => {
+const Logo: React.FC<LogoProps> = ({ className = '', showText = false, size = 'md', enableRotation = false }) => {
   const sizeClasses = {
     sm: 'h-6 w-6',
     md: 'h-8 w-8',
