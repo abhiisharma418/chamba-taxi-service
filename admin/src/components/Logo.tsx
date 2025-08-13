@@ -41,17 +41,29 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md
           <div className="absolute top-1 left-1 w-2 h-2 bg-white/40 rounded-full animate-pulse"></div>
           <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-blue-300/60 rounded-full animate-pulse delay-1000"></div>
 
-          {/* Combined Admin RWU Text Design with Enhanced Effects */}
-          <div className={`relative z-10 flex items-center space-x-0.5 ${rwuTextSize[size]} rwu-premium-text`}>
-            <span className="rwu-letter text-white font-black tracking-tight drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 rwu-admin-glow" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-              R
+          {/* Combined Admin RWU Text Design - Bound as One Word */}
+          <div className={`relative z-10 ${rwuTextSize[size]} rwu-premium-text`}>
+            <span
+              className="relative font-black tracking-tighter drop-shadow-lg transform group-hover:scale-110 transition-all duration-500 rwu-admin-glow inline-block"
+              style={{
+                fontFamily: 'Inter, system-ui, sans-serif',
+                letterSpacing: '-0.05em',
+                background: 'linear-gradient(135deg, #ffffff 0%, #fde047 30%, #93c5fd 70%, #dbeafe 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+            >
+              <span className="rwu-letter inline-block transform group-hover:rotate-[8deg] transition-transform duration-300">R</span>
+              <span className="rwu-letter inline-block transform group-hover:rotate-[-5deg] transition-transform duration-300 delay-75">W</span>
+              <span className="rwu-letter inline-block transform group-hover:rotate-[8deg] transition-transform duration-300 delay-150">U</span>
             </span>
-            <span className="rwu-letter text-yellow-200 font-black tracking-tight drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-75" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-              W
-            </span>
-            <span className="rwu-letter text-blue-100 font-black tracking-tight drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 delay-150" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-              U
-            </span>
+
+            {/* Admin connecting line effect with crown colors */}
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-yellow-300/60 via-white/60 to-blue-200/60 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out"></div>
+
+            {/* Admin binding glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-white/30 to-blue-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
           </div>
 
           {/* Enhanced shimmer effect */}
