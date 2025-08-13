@@ -587,6 +587,17 @@ const BookRide: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Promo Code Interface */}
+      <PromoCodeInterface
+        isOpen={showPromoCodeInterface}
+        onClose={() => setShowPromoCodeInterface(false)}
+        orderAmount={fareEstimate || 0}
+        vehicleType={vehicleType}
+        city={pickupLocation.address.split(',').pop()?.trim()}
+        onPromoSelected={handlePromoSelected}
+        selectedPromo={selectedPromo}
+      />
     </div>
   );
 };
