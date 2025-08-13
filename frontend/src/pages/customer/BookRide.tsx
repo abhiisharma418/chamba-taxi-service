@@ -429,6 +429,10 @@ const BookRide: React.FC = () => {
               <FreeMapComponent
                 pickup={pickupLocation.address ? pickupLocation : undefined}
                 destination={destinationLocation.address ? destinationLocation : undefined}
+                onPickupChange={setPickupLocation}
+                onDestinationChange={setDestinationLocation}
+                showSearch={true}
+                interactive={true}
                 className="h-96 w-full"
               />
             </div>
