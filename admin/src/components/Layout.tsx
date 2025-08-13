@@ -16,7 +16,8 @@ import {
   CheckCircle,
   HelpCircle,
   FileText,
-  Gift
+  Gift,
+  ShieldAlert
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -32,6 +33,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Car, label: 'Live Rides', path: '/rides' },
     { icon: Users, label: 'User Management', path: '/users' },
+    { icon: ShieldAlert, label: 'Emergency', path: '/emergency' },
     { icon: HelpCircle, label: 'Support', path: '/support' },
     { icon: Gift, label: 'Promo Codes', path: '/promo-codes' },
     { icon: FileText, label: 'Financial Reports', path: '/financial-reports' },
