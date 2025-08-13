@@ -257,9 +257,11 @@ export async function cancelDispatch(rideId) {
     
     if (pendingDriverId) {
       // Notify driver that ride was cancelled
-      await notifyDriver(pendingDriverId, 'ride_cancelled', {
-        rideId: rideId.toString(),
-        message: 'Ride was cancelled by customer'
+      await notificationService.sendNotification(pendingDriverId, {
+        type: 'ride_cancelled',
+        title: '🚫 Ride Cancelled',
+        message: 'Ride was cancelled by customer',
+        rideId: rideId.toString()
       });
     }
     
