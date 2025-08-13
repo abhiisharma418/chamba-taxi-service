@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, Search, Filter, Plus, Edit, Trash2, 
-  Shield, AlertCircle, CheckCircle, Clock, 
-  Eye, MoreHorizontal, Download, Ban, UserCheck
+import {
+  Users, Search, Filter, Plus, Edit, Trash2,
+  Shield, AlertCircle, CheckCircle, Clock,
+  Eye, MoreHorizontal, Download, Ban, UserCheck, FileText
 } from 'lucide-react';
+import DriverDocumentVerification from '../components/DriverDocumentVerification';
 
 interface User {
   _id: string;
