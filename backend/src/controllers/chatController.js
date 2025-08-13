@@ -2,7 +2,7 @@ import { ChatMessage } from '../models/chatModel.js';
 import { Ride } from '../models/rideModel.js';
 import { User } from '../models/userModel.js';
 import { DriverProfile } from '../models/driverProfileModel.js';
-import { NotificationService } from '../services/notificationService.js';
+import notificationService from '../services/notificationService.js';
 
 export class ChatController {
   // Send a message
