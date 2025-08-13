@@ -38,7 +38,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-gray-100">
-            <Logo size="md" />
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full hover:scale-105 transition-transform duration-300"
+            >
+              <Logo size="md" />
+            </button>
           </div>
 
           {/* Navigation */}
