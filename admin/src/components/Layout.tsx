@@ -12,7 +12,8 @@ import {
   Car,
   Users,
   DollarSign,
-  BarChart3
+  BarChart3,
+  CheckCircle
 } from 'lucide-react';
 
 interface LayoutProps {
