@@ -373,34 +373,62 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Driver Status */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-            <MapPin className="h-6 w-6 text-green-600" />
-            Driver Status
-          </h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-slate-700">Online Drivers</span>
+        <div className="group relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30 hover:bg-white/95 transition-all duration-500 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 via-transparent to-blue-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="absolute -top-6 -left-6 w-24 h-24 bg-gradient-to-br from-green-400/10 to-blue-400/10 rounded-full blur-2xl"></div>
+
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg">
+                <MapPin className="h-6 w-6 text-white" />
               </div>
-              <span className="font-semibold text-green-600">{stats?.onlineDrivers || 0}</span>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                Driver Status
+              </h2>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                <span className="text-slate-700">Offline Drivers</span>
+
+            <div className="space-y-6">
+              <div className="relative p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="relative flex items-center justify-center">
+                      <div className="w-5 h-5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
+                      <div className="absolute inset-0 w-5 h-5 bg-green-400 rounded-full animate-ping opacity-40"></div>
+                    </div>
+                    <span className="text-slate-700 font-semibold">Online Drivers</span>
+                  </div>
+                  <span className="text-3xl font-black text-green-600">{stats?.onlineDrivers || 0}</span>
+                </div>
               </div>
-              <span className="font-semibold text-slate-900">
-                {(stats?.activeDrivers || 0) - (stats?.onlineDrivers || 0)}
-              </span>
-            </div>
-            <div className="pt-4 border-t">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-700">Online Rate</span>
-                <span className="font-semibold text-blue-600">
-                  {stats?.activeDrivers ? Math.round(((stats?.onlineDrivers || 0) / stats.activeDrivers) * 100) : 0}%
+
+              <div className="flex items-center justify-between p-6 bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl border border-slate-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-5 h-5 bg-gradient-to-r from-slate-400 to-gray-400 rounded-full"></div>
+                  <span className="text-slate-700 font-semibold">Offline Drivers</span>
+                </div>
+                <span className="text-3xl font-black text-slate-600">
+                  {(stats?.activeDrivers || 0) - (stats?.onlineDrivers || 0)}
                 </span>
+              </div>
+
+              <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-slate-700 font-semibold">Online Rate</span>
+                  <span className="text-3xl font-black text-blue-600">
+                    {stats?.activeDrivers ? Math.round(((stats?.onlineDrivers || 0) / stats.activeDrivers) * 100) : 0}%
+                  </span>
+                </div>
+
+                {/* Premium Progress Bar */}
+                <div className="relative h-3 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                    style={{
+                      width: `${stats?.activeDrivers ? Math.round(((stats?.onlineDrivers || 0) / stats.activeDrivers) * 100) : 0}%`
+                    }}
+                  ></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full"></div>
+                </div>
               </div>
             </div>
           </div>
