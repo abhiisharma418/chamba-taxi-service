@@ -321,35 +321,53 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      {/* Performance Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Premium Performance Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Ride Statistics */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-            <Activity className="h-6 w-6 text-blue-600" />
-            Ride Statistics
-          </h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-slate-700">Completed Rides</span>
+        <div className="group relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30 hover:bg-white/95 transition-all duration-500 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-green-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-green-400/10 rounded-full blur-2xl"></div>
+
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg">
+                <Activity className="h-6 w-6 text-white" />
               </div>
-              <span className="font-semibold text-slate-900">{stats?.completedRides || 0}</span>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                Ride Statistics
+              </h2>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-slate-700">Cancelled Rides</span>
+
+            <div className="space-y-6">
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
+                    <div className="absolute inset-0 w-4 h-4 bg-green-400 rounded-full animate-ping opacity-30"></div>
+                  </div>
+                  <span className="text-slate-700 font-semibold">Completed Rides</span>
+                </div>
+                <span className="text-2xl font-black text-green-600">{stats?.completedRides || 0}</span>
               </div>
-              <span className="font-semibold text-slate-900">{stats?.cancelledRides || 0}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Star className="h-4 w-4 text-amber-500" />
-                <span className="text-slate-700">Average Rating</span>
+
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl border border-red-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-4 h-4 bg-gradient-to-r from-red-500 to-rose-500 rounded-full"></div>
+                  <span className="text-slate-700 font-semibold">Cancelled Rides</span>
+                </div>
+                <span className="text-2xl font-black text-red-600">{stats?.cancelledRides || 0}</span>
               </div>
-              <span className="font-semibold text-slate-900">{stats?.averageRating || 0}/5</span>
+
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border border-amber-100">
+                <div className="flex items-center gap-4">
+                  <Star className="h-5 w-5 text-amber-500 drop-shadow-sm" />
+                  <span className="text-slate-700 font-semibold">Average Rating</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-black text-amber-600">{stats?.averageRating || 0}</span>
+                  <span className="text-amber-500 font-medium">/5</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
