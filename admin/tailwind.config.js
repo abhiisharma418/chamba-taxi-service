@@ -61,6 +61,7 @@ export default {
         'slideInRight': 'slideInRight 0.5s ease-out',
         'scaleIn': 'scaleIn 0.3s ease-out',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'shimmer': 'shimmer 2s ease-in-out infinite',
       },
       keyframes: {
         fadeInUp: {
