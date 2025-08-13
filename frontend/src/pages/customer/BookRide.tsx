@@ -47,6 +47,8 @@ const BookRide: React.FC = () => {
   const [selectedPromo, setSelectedPromo] = useState<PromoCode | null>(null);
   const [showPromoCodeInterface, setShowPromoCodeInterface] = useState(false);
   const [originalFare, setOriginalFare] = useState<number | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeChatRide, setActiveChatRide] = useState<any>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -638,7 +640,7 @@ const BookRide: React.FC = () => {
                 <div>
                   <h3 className="text-xl font-bold mb-1">Live Tracking</h3>
                   <p className="text-blue-100">Track your driver in real-time after booking</p>
-                  <p className="text-blue-200 text-sm mt-2">• Driver details • Live location • ETA updates</p>
+                  <p className="text-blue-200 text-sm mt-2">��� Driver details • Live location • ETA updates</p>
                 </div>
               </div>
             </div>
