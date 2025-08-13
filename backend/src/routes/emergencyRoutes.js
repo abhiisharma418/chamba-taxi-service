@@ -4,6 +4,7 @@ const { body, param, query } = require('express-validator');
 const auth = require('../middleware/auth');
 const rateLimit = require('../middleware/rateLimit');
 const emergencyController = require('../controllers/emergencyController');
+const adminEmergencyController = require('../controllers/adminEmergencyController');
 
 const sosRateLimit = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
@@ -128,10 +129,71 @@ router.post('/fake-call',
   emergencyController.triggerFakeCall
 );
 
-router.get('/stats', 
+router.get('/stats',
   auth,
   query('timeframe').optional().isIn(['7d', '30d', '90d']).withMessage('Invalid timeframe'),
   emergencyController.getEmergencyStats
+);
+
+// Admin routes
+router.get('/admin/incidents',
+  auth,
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+  query('status').optional().isIn(['active', 'resolved', 'false_alarm', 'escalated', 'all']).withMessage('Invalid status'),
+  query('severity').optional().isIn(['low', 'medium', 'high', 'critical', 'all']).withMessage('Invalid severity'),
+  query('userType').optional().isIn(['customer', 'driver', 'all']).withMessage('Invalid user type'),
+  query('timeframe').optional().isIn(['7d', '30d', '90d', '365d']).withMessage('Invalid timeframe'),
+  adminEmergencyController.getAllIncidents
+);
+
+router.get('/admin/incident/:incidentId',
+  auth,
+  param('incidentId').isAlphanumeric().withMessage('Invalid incident ID'),
+  adminEmergencyController.getIncidentDetails
+);
+
+router.patch('/admin/incident/:incidentId/assign',
+  auth,
+  param('incidentId').isAlphanumeric().withMessage('Invalid incident ID'),
+  body('operatorId').isMongoId().withMessage('Invalid operator ID'),
+  body('notes').optional().isString().trim().isLength({ max: 2000 }).withMessage('Notes must be less than 2000 characters'),
+  adminEmergencyController.assignOperator
+);
+
+router.patch('/admin/incident/:incidentId',
+  auth,
+  param('incidentId').isAlphanumeric().withMessage('Invalid incident ID'),
+  body('status').optional().isIn(['active', 'resolved', 'false_alarm', 'escalated']).withMessage('Invalid status'),
+  body('severity').optional().isIn(['low', 'medium', 'high', 'critical']).withMessage('Invalid severity'),
+  body('resolution').optional().isString().trim().isLength({ max: 2000 }).withMessage('Resolution must be less than 2000 characters'),
+  body('notes').optional().isString().trim().isLength({ max: 2000 }).withMessage('Notes must be less than 2000 characters'),
+  adminEmergencyController.updateIncident
+);
+
+router.get('/admin/statistics',
+  auth,
+  query('timeframe').optional().isIn(['7d', '30d', '90d', '365d']).withMessage('Invalid timeframe'),
+  adminEmergencyController.getEmergencyStatistics
+);
+
+router.get('/admin/user/:userId/settings',
+  auth,
+  param('userId').isMongoId().withMessage('Invalid user ID'),
+  adminEmergencyController.getUserEmergencySettings
+);
+
+router.get('/admin/recent-alerts',
+  auth,
+  query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
+  adminEmergencyController.getRecentAlerts
+);
+
+router.get('/admin/export',
+  auth,
+  query('format').optional().isIn(['csv', 'json']).withMessage('Invalid export format'),
+  query('timeframe').optional().isIn(['7d', '30d', '90d']).withMessage('Invalid timeframe'),
+  adminEmergencyController.exportIncidents
 );
 
 module.exports = router;
