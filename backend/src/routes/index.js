@@ -11,3 +11,4 @@ export { default as whatsappRoutes } from './whatsappRoutes.js';
 export { default as chatRoutes } from './chatRoutes.js';
 export { default as supportTicketRoutes } from './supportTicketRoutes.js';
 export { default as financialReportRoutes } from './financialReportRoutes.js';
+export { default as promoCodeRoutes } from './promoCodeRoutes.js';
