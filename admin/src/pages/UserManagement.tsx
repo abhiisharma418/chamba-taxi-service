@@ -36,6 +36,8 @@ const UserManagement: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [showDocumentVerification, setShowDocumentVerification] = useState(false);
+  const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
   
   const [filters, setFilters] = useState<UserFilters>({
     role: 'all',
