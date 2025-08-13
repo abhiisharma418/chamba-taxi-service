@@ -122,15 +122,15 @@ const LandingPage: React.FC = () => {
               <div className="text-slate-600 font-semibold">Happy Customers</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-black text-purple-600 mb-2">500+</div>
+              <div className="text-4xl font-black text-blue-700 mb-2">500+</div>
               <div className="text-slate-600 font-semibold">Elite Drivers</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-black text-emerald-600 mb-2">4.9★</div>
+              <div className="text-4xl font-black text-blue-800 mb-2">4.9★</div>
               <div className="text-slate-600 font-semibold">Average Rating</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-black text-amber-600 mb-2">24/7</div>
+              <div className="text-4xl font-black text-blue-900 mb-2">24/7</div>
               <div className="text-slate-600 font-semibold">Premium Support</div>
             </div>
           </div>
