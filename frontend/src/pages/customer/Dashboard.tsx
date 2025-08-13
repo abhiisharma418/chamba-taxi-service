@@ -17,6 +17,8 @@ const CustomerDashboard: React.FC = () => {
   const { currentBooking, bookings } = useBooking();
   const [isLoading, setIsLoading] = useState(true);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeChatRide, setActiveChatRide] = useState<any>(null);
 
   const userBookings = bookings.filter(booking => booking.customerId === user?.id);
   const recentBookings = userBookings.slice(0, 3);
