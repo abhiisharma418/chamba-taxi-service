@@ -250,11 +250,11 @@ const BookRide: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-10">
-          <div className={`bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-gray-100 ${animations.fadeInDown} ${animations.hoverLift}`}>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-2">
+          <div className={`bg-white/80 dark:bg-dark-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg dark:shadow-dark-lg border border-gray-100 dark:border-dark-border ${animations.fadeInDown} ${animations.hoverLift}`}>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-dark-800 dark:to-dark-600 bg-clip-text text-transparent mb-2">
               Book Your Ride
             </h1>
-            <p className="text-slate-600 text-lg">Where would you like to go today?</p>
+            <p className="text-slate-600 dark:text-dark-500 text-lg">Where would you like to go today?</p>
           </div>
         </div>
 
@@ -262,8 +262,8 @@ const BookRide: React.FC = () => {
           {/* Booking Form */}
           <div className="lg:col-span-3 space-y-8">
             {/* Location Inputs */}
-            <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8 ${cardVariants.interactive}`} {...getStaggerDelay(0)}>
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Trip Details</h2>
+            <div className={`bg-white/80 dark:bg-dark-card/80 backdrop-blur-sm rounded-2xl shadow-xl dark:shadow-dark-xl border border-gray-100 dark:border-dark-border p-8 ${cardVariants.interactive}`} {...getStaggerDelay(0)}>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-800 mb-6">Trip Details</h2>
 
               <div className="space-y-6">
                 <LocationSearch
