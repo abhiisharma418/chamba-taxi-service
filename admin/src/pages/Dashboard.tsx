@@ -61,10 +61,20 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log('Fetching admin dashboard data...');
         const [statsResponse, analyticsResponse, rideAnalyticsResponse] = await Promise.all([
-          AdminAPI.getStats(),
-          AdminAPI.getAnalyticsDashboard(selectedPeriod),
-          AdminAPI.getRideAnalytics(selectedPeriod, 'day')
+          AdminAPI.getStats().catch(err => {
+            console.warn('Stats API failed, using fallback:', err);
+            return { success: true, data: { totalRides: 0, activeDrivers: 0, totalCustomers: 0, todayRevenue: 0 } };
+          }),
+          AdminAPI.getAnalyticsDashboard(selectedPeriod).catch(err => {
+            console.warn('Analytics Dashboard API failed, using fallback:', err);
+            return { success: true, data: { overview: {}, trends: [] } };
+          }),
+          AdminAPI.getRideAnalytics(selectedPeriod, 'day').catch(err => {
+            console.warn('Ride Analytics API failed, using fallback:', err);
+            return { success: true, data: { timeline: [], insights: { peakHours: [], topRoutes: [], driverPerformance: [] } } };
+          })
         ]);
 
         if (statsResponse.success) {
