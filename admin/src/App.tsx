@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import { AdminPageSkeleton } from './components/LoadingSkeletons';
 import { AdminRouter } from './components/AdminRouter';
 import { useCodeSplitting, usePerformanceMonitoring } from './hooks/useCodeSplitting';
+import { useRoutePreloading } from './utils/routeManifest';
 
 // Lazy load login page
 const Login = React.lazy(() => import('./pages/Login'));
