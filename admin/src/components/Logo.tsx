@@ -19,12 +19,18 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md
     lg: 'text-3xl'
   };
 
+  const rwuTextSize = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-lg'
+  };
+
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
       {/* Simple RWU Logo with Admin indicator */}
       <div className={`${sizeClasses[size]} relative`}>
         <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center shadow-md border border-blue-400/30">
-          <div className="text-white font-bold text-sm">
+          <div className={`text-white font-bold ${rwuTextSize[size]}`}>
             RWU
           </div>
           {/* Small admin crown indicator */}

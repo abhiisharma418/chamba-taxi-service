@@ -292,7 +292,7 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
-              <Logo className="text-white" size="md" />
+              <Logo className="text-white" size="lg" />
             </div>
             <div className="text-slate-400 font-medium">
               © 2025 RideWithUs. All rights reserved. Built with trust.
