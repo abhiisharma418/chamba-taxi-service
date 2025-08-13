@@ -75,7 +75,7 @@ const Navigation: React.FC = () => {
           <div className="flex items-center">
             <Link to={getHomePath()} className="group flex items-center transition-transform duration-300 hover:scale-105">
               <div className="p-2 bg-white/50 dark:bg-dark-card/50 backdrop-blur-xl rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 border border-white/40">
-                <Logo size="md" />
+                <Logo size="md" enableRotation={true} />
               </div>
             </Link>
           </div>
