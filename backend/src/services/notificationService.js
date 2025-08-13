@@ -51,6 +51,25 @@ class NotificationService {
       socket.on('notification_received', (notificationId) => {
         console.log(`Notification ${notificationId} acknowledged by user ${socket.userId}`);
       });
+
+      // Handle chat events
+      socket.on('join_chat', (rideId) => {
+        socket.join(`chat_${rideId}`);
+        console.log(`User ${socket.userId} joined chat for ride ${rideId}`);
+      });
+
+      socket.on('leave_chat', (rideId) => {
+        socket.leave(`chat_${rideId}`);
+        console.log(`User ${socket.userId} left chat for ride ${rideId}`);
+      });
+
+      socket.on('typing', (data) => {
+        socket.to(`chat_${data.rideId}`).emit('user_typing', {
+          userId: socket.userId,
+          userType: socket.userType,
+          isTyping: data.isTyping
+        });
+      });
     });
   }
 
