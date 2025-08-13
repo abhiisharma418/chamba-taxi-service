@@ -34,6 +34,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<UserManagement />} />
         <Route path="/rides" element={<LiveRideMonitoring />} />
+        <Route path="/support" element={<SupportManagement />} />
         <Route path="/financial" element={<FinancialManagement />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
