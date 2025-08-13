@@ -146,24 +146,21 @@ const CustomerDashboard: React.FC = () => {
             </div>
           </Link>
 
-          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100">
+          <button
+            onClick={() => setIsSupportOpen(true)}
+            className="group bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-left w-full"
+          >
             <div className="flex items-center justify-between">
               <div>
-                <div className="bg-gradient-to-br from-purple-600 to-purple-700 p-4 rounded-2xl mb-4">
-                  <Star className="h-8 w-8 text-white" />
+                <div className="bg-gradient-to-br from-orange-600 to-orange-700 p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300 mb-4">
+                  <HelpCircle className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Your Rating</h3>
-                <div className="flex items-center space-x-2">
-                  <span className="text-3xl font-bold text-purple-600">4.8</span>
-                  <div className="flex space-x-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className={`h-5 w-5 ${star <= 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
-                    ))}
-                  </div>
-                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Get Support</h3>
+                <p className="text-slate-600">Need help? Contact us</p>
               </div>
+              <ArrowRight className="h-6 w-6 text-orange-600 group-hover:translate-x-1 transition-transform duration-300" />
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Recent Rides */}
