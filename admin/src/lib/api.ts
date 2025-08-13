@@ -112,4 +112,11 @@ export const AdminAPI = {
   // Pricing management
   getPricing: () => apiFetch('/api/admin/pricing'),
   updatePricing: (pricing: any) => apiFetch('/api/admin/pricing', { method: 'PUT', body: JSON.stringify(pricing) }),
+
+  // Analytics
+  getAnalyticsDashboard: (period = '30d') => apiFetch(`/api/admin/analytics/dashboard?period=${period}`),
+  getRideAnalytics: (period = '30d', groupBy = 'day') => apiFetch(`/api/admin/analytics/rides?period=${period}&groupBy=${groupBy}`),
+  getUserAnalytics: (period = '30d') => apiFetch(`/api/admin/analytics/users?period=${period}`),
+  getFinancialAnalytics: (period = '30d') => apiFetch(`/api/admin/analytics/financial?period=${period}`),
+  getOperationalAnalytics: (period = '30d') => apiFetch(`/api/admin/analytics/operational?period=${period}`),
 };
