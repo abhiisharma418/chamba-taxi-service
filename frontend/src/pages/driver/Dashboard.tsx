@@ -211,6 +211,9 @@ const DriverDashboard: React.FC = () => {
           </button>
         </div>
 
+        {/* Financial Overview */}
+        <FinancialWidget userType="driver" className="mb-8" />
+
         {/* Pending Requests */}
         {isOnline && pendingRequests.length > 0 && !activeRide && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
