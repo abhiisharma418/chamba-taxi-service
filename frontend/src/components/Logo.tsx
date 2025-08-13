@@ -28,10 +28,10 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = false, size = 'm
   };
 
   return (
-    <div className={`flex items-center space-x-3 ${className} rwu-logo-container`}>
-      {/* Premium Combined RWU Logo with Enhanced Rotation */}
-      <div className={`${sizeClasses[size]} relative group cursor-pointer rwu-3d-effect`}>
-        <div className="w-full h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-2xl flex items-center justify-center shadow-2xl border-2 border-blue-400/30 group-hover:scale-110 group-hover:rotate-[360deg] transition-all duration-700 ease-in-out overflow-hidden transform-gpu rwu-pulse-border-effect">
+    <div className={`flex items-center space-x-3 ${className} ${enableRotation ? 'rwu-logo-container' : ''}`}>
+      {/* Premium Combined RWU Logo */}
+      <div className={`${sizeClasses[size]} relative group cursor-pointer ${enableRotation ? 'rwu-3d-effect' : ''}`}>
+        <div className={`w-full h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-2xl flex items-center justify-center ${enableRotation ? 'shadow-2xl group-hover:shadow-none' : 'shadow-lg'} border-2 border-blue-400/30 ${enableRotation ? 'group-hover:scale-110 group-hover:rotate-[360deg]' : ''} transition-all duration-700 ease-in-out overflow-hidden transform-gpu ${enableRotation ? 'rwu-pulse-border-effect' : ''}`}>
           {/* Premium Background Pattern */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
           <div className="absolute top-1 left-1 w-2 h-2 bg-white/40 rounded-full animate-pulse"></div>
