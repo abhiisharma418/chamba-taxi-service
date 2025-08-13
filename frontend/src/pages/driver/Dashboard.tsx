@@ -321,6 +321,12 @@ const DriverDashboard: React.FC = () => {
           }}
         />
       )}
+
+      {/* Support Interface */}
+      <SupportInterface
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+      />
     </div>
   );
 };
