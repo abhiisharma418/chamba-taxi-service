@@ -134,6 +134,13 @@ const DriverDashboard: React.FC = () => {
                 {activeRide.status === 'on-trip' && (
                   <button onClick={() => handleStatusUpdate(activeRide.id, 'completed')} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">Complete Trip</button>
                 )}
+                <button
+                  onClick={() => setIsChatOpen(true)}
+                  className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span>Chat</span>
+                </button>
                 <button className="px-4 py-2 border border-blue-300 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors duration-200">Navigate</button>
               </div>
             </div>
