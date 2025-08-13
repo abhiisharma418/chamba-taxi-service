@@ -184,40 +184,55 @@ const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="group text-center p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-100 hover:border-emerald-200 transform hover:-translate-y-2">
-              <div className="bg-gradient-to-br from-emerald-100 to-emerald-200 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Shield className="h-8 w-8 text-emerald-600" />
+            <div className="group relative text-center p-10 rounded-3xl hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-xl border border-white/40 hover:border-emerald-300/50 transform hover:-translate-y-4 hover:scale-105 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-transparent to-green-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute -top-6 -left-6 w-24 h-24 bg-gradient-to-br from-emerald-400/10 to-green-400/10 rounded-full blur-xl"></div>
+
+              <div className="relative z-10">
+                <div className="bg-gradient-to-br from-emerald-500 to-green-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                  <Shield className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-emerald-600 transition-colors duration-300">
+                  Premium Safety
+                </h3>
+                <p className="text-slate-600 leading-relaxed font-medium">
+                  Military-grade verification with biometric screening and continuous monitoring for ultimate security.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-3">
-                Trusted & Safe
-              </h3>
-              <p className="text-slate-600 leading-relaxed">
-                Every driver is thoroughly verified with background checks for your complete peace of mind.
-              </p>
             </div>
 
-            <div className="group text-center p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-100 hover:border-amber-200 transform hover:-translate-y-2">
-              <div className="bg-gradient-to-br from-amber-100 to-amber-200 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Clock className="h-8 w-8 text-amber-600" />
+            <div className="group relative text-center p-10 rounded-3xl hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-xl border border-white/40 hover:border-amber-300/50 transform hover:-translate-y-4 hover:scale-105 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-orange-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br from-amber-400/10 to-orange-400/10 rounded-full blur-xl"></div>
+
+              <div className="relative z-10">
+                <div className="bg-gradient-to-br from-amber-500 to-orange-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                  <Clock className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-amber-600 transition-colors duration-300">
+                  Lightning Fast
+                </h3>
+                <p className="text-slate-600 leading-relaxed font-medium">
+                  Instant booking with AI-powered driver matching and predictive arrival algorithms.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-3">
-                Instant Booking
-              </h3>
-              <p className="text-slate-600 leading-relaxed">
-                Book your ride in seconds with our intuitive, streamlined booking experience.
-              </p>
             </div>
 
-            <div className="group text-center p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-100 hover:border-purple-200 transform hover:-translate-y-2">
-              <div className="bg-gradient-to-br from-purple-100 to-purple-200 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Star className="h-8 w-8 text-purple-600" />
+            <div className="group relative text-center p-10 rounded-3xl hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-xl border border-white/40 hover:border-purple-300/50 transform hover:-translate-y-4 hover:scale-105 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-transparent to-pink-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute -top-6 -left-6 w-24 h-24 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-xl"></div>
+
+              <div className="relative z-10">
+                <div className="bg-gradient-to-br from-purple-500 to-pink-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                  <Star className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-purple-600 transition-colors duration-300">
+                  Five-Star Elite
+                </h3>
+                <p className="text-slate-600 leading-relaxed font-medium">
+                  Join our exclusive community of premium customers with personalized concierge service.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-3">
-                Highly Rated
-              </h3>
-              <p className="text-slate-600 leading-relaxed">
-                Join thousands of satisfied customers who choose us for reliable transportation.
-              </p>
             </div>
           </div>
         </div>
