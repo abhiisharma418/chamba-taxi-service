@@ -316,7 +316,7 @@ const BookRide: React.FC = () => {
                   label="Pickup Location"
                   placeholder="Where are you?"
                   value={pickupLocation.address}
-                  onChange={setPickupLocation}
+                  onChange={handlePickupLocationChange}
                   onCurrentLocation={handleCurrentLocation}
                   type="pickup"
                 />
@@ -325,7 +325,7 @@ const BookRide: React.FC = () => {
                   label="Destination"
                   placeholder="Where to?"
                   value={destinationLocation.address}
-                  onChange={setDestinationLocation}
+                  onChange={handleDestinationLocationChange}
                   type="destination"
                 />
               </div>
