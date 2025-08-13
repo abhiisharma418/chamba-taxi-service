@@ -100,7 +100,7 @@ const EmergencyCenter: React.FC = () => {
 
       <div className="p-6">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl p-8 text-white">
+          <div className="bg-white/10 dark:bg-dark-glass backdrop-blur-lg rounded-3xl p-8 text-white shadow-dark-2xl border border-white/20 dark:border-dark-border">
             <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
               Emergency Safety Center
             </h1>
