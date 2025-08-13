@@ -632,6 +632,19 @@ const UserManagement: React.FC = () => {
                             <Eye className="h-4 w-4" />
                           </button>
                           
+                          {user.role === 'driver' && (
+                            <button
+                              onClick={() => {
+                                setSelectedDriverId(user._id);
+                                setShowDocumentVerification(true);
+                              }}
+                              className="text-purple-600 hover:text-purple-900"
+                              title="Verify Documents"
+                            >
+                              <FileText className="h-4 w-4" />
+                            </button>
+                          )}
+
                           {!user.verified && (
                             <button
                               onClick={() => handleVerifyUser(user._id)}
