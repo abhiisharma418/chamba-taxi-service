@@ -201,9 +201,12 @@ class SupportService {
   // Submit feedback for resolved ticket
   async submitFeedback(ticketId: string, rating: number, comment?: string): Promise<{ success: boolean; message?: string }> {
     try {
-      const response = await api.post(`/support/ticket/${ticketId}/feedback`, {
-        rating,
-        comment
+      const response = await apiFetch(`/support/ticket/${ticketId}/feedback`, {
+        method: 'POST',
+        body: JSON.stringify({
+          rating,
+          comment
+        })
       });
       return response.data;
     } catch (error: any) {
