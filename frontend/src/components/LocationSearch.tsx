@@ -69,15 +69,37 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     setIsOpen(true);
 
     if (query.length > 2) {
+      const currentTime = Date.now();
+      setLastSearchTime(currentTime);
       setIsLoading(true);
-      // Simulate API call delay
+
+      // Debounced search with better filtering
       setTimeout(() => {
-        const filtered = sampleLocations.filter(location =>
-          location.address.toLowerCase().includes(query.toLowerCase())
-        );
-        setSuggestions(filtered);
-        setIsLoading(false);
-      }, 300);
+        // Only proceed if this is the latest search
+        if (currentTime === lastSearchTime) {
+          const filtered = sampleLocations.filter(location => {
+            const lowercaseQuery = query.toLowerCase();
+            const lowercaseAddress = location.address.toLowerCase();
+
+            // Prioritize matches that start with the query
+            const startsWithQuery = lowercaseAddress.startsWith(lowercaseQuery);
+            const containsQuery = lowercaseAddress.includes(lowercaseQuery);
+
+            return startsWithQuery || containsQuery;
+          }).sort((a, b) => {
+            // Sort by relevance - starting matches first
+            const aStarts = a.address.toLowerCase().startsWith(query.toLowerCase());
+            const bStarts = b.address.toLowerCase().startsWith(query.toLowerCase());
+
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+            return 0;
+          }).slice(0, 8); // Limit to 8 results for better UX
+
+          setSuggestions(filtered);
+          setIsLoading(false);
+        }
+      }, 200); // Reduced delay for snappier feel
     } else {
       setSuggestions([]);
       setIsLoading(false);
