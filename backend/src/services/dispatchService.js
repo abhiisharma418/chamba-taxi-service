@@ -96,7 +96,12 @@ export async function offerToNextDriver(rideId) {
     };
     
     // Send real-time notification to driver
-    await notifyDriver(driverId, 'ride_offer', offerData);
+    await notificationService.sendNotification(driverId, {
+      type: 'ride_offer',
+      title: '🚖 New Ride Request',
+      message: `New ride from ${pickup.address}`,
+      data: offerData
+    });
     
     // Set timeout to auto-decline if no response
     setTimeout(async () => {
