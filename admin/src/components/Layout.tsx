@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from './Logo';
+import ThemeToggle from './ThemeToggle';
 import {
   LogOut,
   User,
@@ -41,14 +42,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-surface dark:via-dark-100 dark:to-dark-200 transition-colors duration-300">
       {/* Premium Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-72 bg-white/90 backdrop-blur-2xl shadow-2xl border-r border-white/30 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-slate-50/20"></div>
+      <div className="fixed inset-y-0 left-0 w-72 bg-white/90 dark:bg-dark-card/90 backdrop-blur-2xl shadow-2xl dark:shadow-dark-2xl border-r border-white/30 dark:border-dark-border overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-slate-50/20 dark:from-dark-100/10 dark:to-dark-200/20"></div>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
         <div className="relative z-10 flex flex-col h-full">
           {/* Premium Logo Section */}
-          <div className="p-8 border-b border-white/20">
+          <div className="p-8 border-b border-white/20 dark:border-dark-border">
             <button
               onClick={() => navigate('/dashboard')}
               className="w-full hover:scale-105 transition-all duration-300 group"
