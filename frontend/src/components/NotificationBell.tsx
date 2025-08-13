@@ -44,17 +44,27 @@ const NotificationBell: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 skew-x-12"></div>
       </button>
 
-      {/* Dropdown */}
+      {/* Premium Dropdown */}
       {showDropdown && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
-          <div className="p-4 border-b border-gray-200">
+        <div className="absolute right-0 mt-4 w-96 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/30 z-50 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20"></div>
+
+          <div className="relative z-10 p-6 border-b border-white/20">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-xl">
+                  <Bell className="h-5 w-5 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                  Notifications
+                </h3>
+              </div>
               <button
                 onClick={() => setShowSettings(true)}
-                className="p-1 hover:bg-gray-100 rounded-md transition-colors"
+                className="group p-2 hover:bg-white/60 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-200/50"
               >
-                <Settings className="h-4 w-4 text-gray-500" />
+                <Settings className="h-5 w-5 text-slate-600 group-hover:text-blue-600 transition-colors duration-300" />
               </button>
             </div>
           </div>
