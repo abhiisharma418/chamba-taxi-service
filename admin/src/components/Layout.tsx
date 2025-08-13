@@ -54,7 +54,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => navigate('/dashboard')}
               className="w-full hover:scale-105 transition-all duration-300 group"
             >
-              <div className="p-3 bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-xl rounded-2xl border border-white/40 group-hover:shadow-xl transition-all duration-300">
+              <div className="p-3 bg-gradient-to-br from-white/50 to-white/30 dark:from-dark-card/50 dark:to-dark-card/30 backdrop-blur-xl rounded-2xl border border-white/40 dark:border-dark-border group-hover:shadow-xl dark:group-hover:shadow-dark-xl transition-all duration-300">
                 <Logo size="md" />
               </div>
             </button>
@@ -71,14 +71,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   onClick={() => navigate(item.path)}
                   className={`group w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-left transition-all duration-300 font-semibold ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white shadow-xl scale-105 border border-blue-300/50'
-                      : 'text-slate-700 hover:bg-white/60 hover:text-blue-600 hover:scale-102 hover:shadow-lg backdrop-blur-sm border border-transparent hover:border-blue-200/50'
+                      ? 'bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white shadow-xl dark:shadow-dark-xl scale-105 border border-blue-300/50 dark:border-blue-400/50'
+                      : 'text-slate-700 dark:text-dark-600 hover:bg-white/60 dark:hover:bg-dark-100/60 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-102 hover:shadow-lg dark:hover:shadow-dark-lg backdrop-blur-sm border border-transparent hover:border-blue-200/50 dark:hover:border-blue-400/30'
                   }`}
                 >
                   <div className={`p-2 rounded-xl transition-all duration-300 ${
                     isActive
-                      ? 'bg-white/20 backdrop-blur-sm'
-                      : 'bg-slate-100 group-hover:bg-blue-100'
+                      ? 'bg-white/20 dark:bg-dark-accent-blue/20 backdrop-blur-sm'
+                      : 'bg-slate-100 dark:bg-dark-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30'
                   }`}>
                     <IconComponent className="h-5 w-5" />
                   </div>
