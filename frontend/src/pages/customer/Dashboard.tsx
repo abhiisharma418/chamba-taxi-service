@@ -215,13 +215,28 @@ const CustomerDashboard: React.FC = () => {
                           <span className="text-sm font-medium text-slate-600">{booking.rating}</span>
                         </div>
                       )}
-                      {booking.paymentId && (
-                        <a href={`${API_URL}/api/payments/receipt/${booking.paymentId}.pdf`} target="_blank"
-                           className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
-                          <Receipt className="h-4 w-4" />
-                          Receipt
-                        </a>
-                      )}
+                      <div className="space-y-2">
+                        {booking.paymentId && (
+                          <a href={`${API_URL}/api/payments/receipt/${booking.paymentId}.pdf`} target="_blank"
+                             className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                            <Receipt className="h-4 w-4" />
+                            Receipt
+                          </a>
+                        )}
+                        {/* Chat Button for Active/Completed Rides */}
+                        {(booking.status === 'in-progress' || booking.status === 'completed') && booking.driverId && (
+                          <button
+                            onClick={() => {
+                              setActiveChatRide(booking);
+                              setIsChatOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 text-sm font-medium transition-colors bg-green-50 hover:bg-green-100 px-3 py-1 rounded-full"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                            Chat Driver
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
