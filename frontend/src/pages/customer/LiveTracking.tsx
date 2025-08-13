@@ -5,6 +5,7 @@ import Navigation from '../../components/Navigation';
 import LiveTrackingMap from '../../components/LiveTrackingMap';
 import { RidesAPI, TrackingAPI } from '../../lib/api';
 import { ArrowLeft, Clock, MapPin, Star, Phone, MessageCircle, AlertCircle, CheckCircle, Navigation as NavIcon } from 'lucide-react';
+import ChatInterface from '../../components/ChatInterface';
 
 interface RideData {
   _id: string;
