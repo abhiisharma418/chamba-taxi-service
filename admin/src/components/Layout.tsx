@@ -57,7 +57,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               className="w-full hover:scale-105 transition-all duration-300 group"
             >
               <div className="p-3 bg-gradient-to-br from-white/50 to-white/30 dark:from-dark-card/50 dark:to-dark-card/30 backdrop-blur-xl rounded-2xl border border-white/40 dark:border-dark-border group-hover:shadow-xl dark:group-hover:shadow-dark-xl transition-all duration-300">
-                <Logo size="md" />
+                <Logo size="md" enableRotation={true} />
               </div>
             </button>
           </div>
