@@ -1,8 +1,8 @@
-const { EmergencyIncident, EmergencySettings } = require('../models/emergencyModel');
-const User = require('../models/userModel');
-const Booking = require('../models/bookingModel');
-const notificationService = require('../services/notificationService');
-const { validationResult } = require('express-validator');
+import { EmergencyIncident, EmergencySettings } from '../models/emergencyModel.js';
+import User from '../models/userModel.js';
+import Booking from '../models/bookingModel.js';
+import notificationService from '../services/notificationService.js';
+import { validationResult } from 'express-validator';
 
 class EmergencyController {
   async triggerSOS(req, res) {
