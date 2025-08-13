@@ -35,6 +35,7 @@ import path from 'path';
 import fs from 'fs';
 import { setDriverLocation } from './utils/liveStore.js';
 import { setIO } from './services/notifyService.js';
+import notificationService from './services/notificationService.js';
 import cookieParser from 'cookie-parser';
 import { authenticate, requireActive } from './middleware/auth.js';
 
