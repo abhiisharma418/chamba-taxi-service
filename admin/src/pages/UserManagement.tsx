@@ -204,10 +204,32 @@ const UserManagement: React.FC = () => {
     try {
       // Mock API call
       console.log('Deleting user:', userId);
-      
+
       setUsers(prev => prev.filter(user => user._id !== userId));
     } catch (error) {
       console.error('Failed to delete user:', error);
+    }
+  };
+
+  const handleVerificationComplete = (driverId: string, status: string) => {
+    try {
+      console.log('Driver verification completed:', driverId, status);
+
+      setUsers(prev => prev.map(user =>
+        user._id === driverId
+          ? {
+              ...user,
+              verified: status === 'approved',
+              verificationStatus: status === 'approved' ? 'verified' : 'pending',
+              status: status === 'approved' ? 'active' : 'inactive'
+            }
+          : user
+      ));
+
+      setShowDocumentVerification(false);
+      setSelectedDriverId(null);
+    } catch (error) {
+      console.error('Failed to update driver verification:', error);
     }
   };
 
