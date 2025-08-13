@@ -27,6 +27,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   const [searchQuery, setSearchQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastSearchTime, setLastSearchTime] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
