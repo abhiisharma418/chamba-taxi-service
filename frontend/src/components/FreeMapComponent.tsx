@@ -91,6 +91,74 @@ const FreeMapComponent: React.FC<FreeMapComponentProps> = ({
     }
   }, [isLoaded, map]);
 
+  // Search location function using Nominatim (OpenStreetMap's geocoding service)
+  const searchLocation = async (query: string) => {
+    if (!query || query.length < 3) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
+      );
+      const data = await response.json();
+
+      const results: Location[] = data.map((item: any) => ({
+        coordinates: [parseFloat(item.lon), parseFloat(item.lat)],
+        address: item.display_name
+      }));
+
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    }
+  };
+
+  // Handle search input changes
+  const handleSearchChange = (value: string, type: 'pickup' | 'destination') => {
+    if (type === 'pickup') {
+      setPickupSearch(value);
+    } else {
+      setDestinationSearch(value);
+    }
+    setActiveSearch(type);
+    searchLocation(value);
+  };
+
+  // Handle location selection from search results
+  const handleLocationSelect = (location: Location, type: 'pickup' | 'destination') => {
+    if (type === 'pickup') {
+      setPickupSearch(location.address);
+      onPickupChange?.(location);
+    } else {
+      setDestinationSearch(location.address);
+      onDestinationChange?.(location);
+    }
+    setSearchResults([]);
+    setActiveSearch(null);
+  };
+
+  // Handle map click to set location
+  const handleMapClick = (e: any) => {
+    if (!interactive || !map) return;
+
+    const { lat, lng } = e.latlng;
+    const location: Location = {
+      coordinates: [lng, lat],
+      address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+    };
+
+    if (activeSearch === 'pickup') {
+      onPickupChange?.(location);
+      setPickupSearch(location.address);
+    } else if (activeSearch === 'destination') {
+      onDestinationChange?.(location);
+      setDestinationSearch(location.address);
+    }
+  };
+
   // Add markers and route
   useEffect(() => {
     if (!map || !window.L) return;
