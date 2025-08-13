@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/logo-animations.css';
 
 interface LogoProps {
   className?: string;
