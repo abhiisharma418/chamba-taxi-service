@@ -23,6 +23,7 @@ const CustomerBookRide = React.lazy(() => import('./pages/customer/BookRide'));
 const CustomerHistory = React.lazy(() => import('./pages/customer/History'));
 const CustomerLiveTracking = React.lazy(() => import('./pages/customer/LiveTracking'));
 const CustomerEmergencyCenter = React.lazy(() => import('./pages/customer/EmergencyCenter'));
+const CustomerScheduledRides = React.lazy(() => import('./pages/customer/ScheduledRides'));
 
 // Driver pages
 const DriverDashboard = React.lazy(() => import('./pages/driver/Dashboard'));
@@ -83,6 +84,14 @@ const AppRoutes: React.FC = () => {
               element={
                 <ProtectedRoute userType="customer">
                   <CustomerEmergencyCenter />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customer/scheduled-rides"
+              element={
+                <ProtectedRoute userType="customer">
+                  <CustomerScheduledRides />
                 </ProtectedRoute>
               }
             />
