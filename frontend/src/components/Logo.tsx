@@ -37,23 +37,76 @@ const Logo: React.FC<LogoProps> = ({ className = '', showText = true, size = 'md
           <div className="absolute top-1 left-1 w-2 h-2 bg-white/40 rounded-full animate-pulse"></div>
           <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-blue-300/60 rounded-full animate-pulse delay-1000"></div>
 
-          {/* Combined RWU Text Design - Bound as One Word */}
+          {/* Enhanced RWU Design - Clearly Represents RideWithUs */}
           <div className={`relative z-10 ${rwuTextSize[size]} rwu-premium-text`}>
-            <span
+            {/* Main RWU Text */}
+            <div
               className={`relative font-black tracking-tighter drop-shadow-lg transform ${enableRotation ? 'group-hover:scale-110 rwu-glow-effect' : ''} transition-all duration-500 inline-block`}
               style={{
                 fontFamily: 'Inter, system-ui, sans-serif',
-                letterSpacing: '-0.05em',
-                background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #dbeafe 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
+                letterSpacing: '-0.08em'
               }}
             >
-              <span className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[8deg]' : ''} transition-transform duration-300`}>R</span>
-              <span className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[-5deg]' : ''} transition-transform duration-300 delay-75`}>W</span>
-              <span className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[8deg]' : ''} transition-transform duration-300 delay-150`}>U</span>
-            </span>
+              {/* R - Ride */}
+              <span
+                className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[8deg]' : ''} transition-transform duration-300 relative`}
+                style={{
+                  background: 'linear-gradient(135deg, #ffffff 0%, #fbbf24 50%, #f59e0b 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+                title="Ride"
+              >
+                R
+                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[6px] font-normal text-white/60 whitespace-nowrap">
+                  ide
+                </span>
+              </span>
+
+              {/* W - With */}
+              <span
+                className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[-5deg]' : ''} transition-transform duration-300 delay-75 relative mx-0.5`}
+                style={{
+                  background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #60a5fa 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+                title="With"
+              >
+                W
+                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[6px] font-normal text-white/60 whitespace-nowrap">
+                  ith
+                </span>
+              </span>
+
+              {/* U - Us */}
+              <span
+                className={`inline-block transform ${enableRotation ? 'rwu-letter group-hover:rotate-[8deg]' : ''} transition-transform duration-300 delay-150 relative`}
+                style={{
+                  background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #8b5cf6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+                title="Us"
+              >
+                U
+                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[6px] font-normal text-white/60 whitespace-nowrap">
+                  s
+                </span>
+              </span>
+            </div>
+
+            {/* Descriptive Arc */}
+            <div className="absolute -bottom-2 left-0 right-0 flex justify-center">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">
+                <span className="text-[6px] font-medium text-white/80 tracking-wider">
+                  RIDE•WITH•US
+                </span>
+              </div>
+            </div>
 
             {/* Connecting line effect to bind letters */}
             {enableRotation && (
