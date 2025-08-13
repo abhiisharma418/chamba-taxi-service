@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import Navigation from '../../components/Navigation';
 import { animations, cardVariants, buttonVariants, getStaggerDelay } from '../../utils/animations';
-import GoogleMapComponent from '../../components/GoogleMapComponent';
+import FreeMapComponent from '../../components/FreeMapComponent';
 import { getEstimateForTrip, formatFareBreakdown, FareBreakdown } from '../../utils/fareCalculation';
 import LocationSearch from '../../components/LocationSearch';
 import PaymentMethod from '../../components/PaymentMethod';
