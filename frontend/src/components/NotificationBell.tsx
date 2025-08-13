@@ -146,12 +146,12 @@ const NotificationBell: React.FC = () => {
           </div>
 
           {hasPermission && (
-            <div className="p-3 border-t border-gray-200">
+            <div className="relative z-10 p-4 border-t border-white/20">
               <button
                 onClick={markAsRead}
-                className="w-full text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                Mark all as read
+                Mark All as Read
               </button>
             </div>
           )}
