@@ -54,6 +54,11 @@ const Navigation: React.FC = () => {
     }
   };
 
+  const getHomePath = () => {
+    if (!user) return '/';
+    return user.type === 'customer' ? '/customer/dashboard' : '/driver/dashboard';
+  };
+
   const navItems = getNavItems();
 
   return (
