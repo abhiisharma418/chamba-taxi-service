@@ -78,34 +78,49 @@ const Navigation: React.FC = () => {
 
           {user && (
             <>
-              {/* Desktop Navigation */}
-              <div className="hidden md:flex items-center space-x-8">
+              {/* Luxury Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-6">
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="flex items-center space-x-1 text-slate-700 hover:text-blue-600 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-blue-50"
+                    className="group flex items-center space-x-2 text-slate-700 hover:text-blue-600 transition-all duration-300 px-4 py-3 rounded-2xl hover:bg-white/60 dark:hover:bg-dark-card/60 backdrop-blur-sm border border-transparent hover:border-blue-200/50 hover:shadow-lg font-semibold"
                   >
-                    <item.icon className="h-4 w-4" />
+                    <div className="p-1 rounded-lg bg-slate-100 group-hover:bg-blue-100 transition-colors duration-300">
+                      <item.icon className="h-4 w-4" />
+                    </div>
                     <span>{item.label}</span>
                   </Link>
                 ))}
+
+                <div className="h-6 w-0.5 bg-gradient-to-b from-slate-200 to-slate-300 mx-2"></div>
+
                 <NotificationBell />
                 <ThemeToggle />
+
                 <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="h-8 w-8 rounded-full"
-                    />
-                    <span className="text-sm text-gray-700">{user.name}</span>
+                  <div className="flex items-center space-x-3 px-4 py-2 bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl rounded-2xl border border-white/40 shadow-lg">
+                    <div className="relative">
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="h-10 w-10 rounded-2xl border-2 border-white shadow-lg"
+                      />
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">{user.name}</span>
+                      <span className="text-xs text-slate-600 dark:text-slate-400 capitalize">{user.type}</span>
+                    </div>
                   </div>
+
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-1 text-slate-700 hover:text-red-600 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-red-50"
+                    className="group flex items-center space-x-2 text-slate-700 hover:text-red-600 transition-all duration-300 px-4 py-3 rounded-2xl hover:bg-red-50 dark:hover:bg-red-900/20 border border-transparent hover:border-red-200/50 hover:shadow-lg font-semibold"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <div className="p-1 rounded-lg bg-slate-100 group-hover:bg-red-100 transition-colors duration-300">
+                      <LogOut className="h-4 w-4" />
+                    </div>
                     <span>Logout</span>
                   </button>
                 </div>
