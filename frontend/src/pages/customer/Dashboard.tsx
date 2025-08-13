@@ -264,6 +264,24 @@ const CustomerDashboard: React.FC = () => {
         isOpen={isSupportOpen}
         onClose={() => setIsSupportOpen(false)}
       />
+
+      {/* Chat Interface */}
+      {activeChatRide && (
+        <ChatInterface
+          rideId={activeChatRide.id}
+          isOpen={isChatOpen}
+          onClose={() => {
+            setIsChatOpen(false);
+            setActiveChatRide(null);
+          }}
+          otherParty={{
+            id: activeChatRide.driverId,
+            name: activeChatRide.driverName || 'Driver',
+            type: 'driver',
+            avatar: activeChatRide.driverAvatar
+          }}
+        />
+      )}
     </div>
   );
 };
