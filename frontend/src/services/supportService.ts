@@ -126,7 +126,10 @@ class SupportService {
   // Create a new support ticket
   async createTicket(ticketData: CreateTicketData): Promise<TicketResponse> {
     try {
-      const response = await api.post('/support/create', ticketData);
+      const response = await apiFetch('/support/create', {
+        method: 'POST',
+        body: JSON.stringify(ticketData)
+      });
       return response.data;
     } catch (error: any) {
       console.error('Error creating ticket:', error);
