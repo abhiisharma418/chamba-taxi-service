@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import UserManagement from './pages/UserManagement';
-import LiveRideMonitoring from './pages/LiveRideMonitoring';
-import FinancialManagement from './pages/FinancialManagement';
-import SupportManagement from './pages/SupportManagement';
-import FinancialReporting from './pages/FinancialReporting';
-import PromoCodeManagement from './pages/PromoCodeManagement';
-import EmergencyManagement from './pages/EmergencyManagement';
-import ScheduledRidesManagement from './pages/ScheduledRidesManagement';
+import { AdminPageSkeleton } from './components/LoadingSkeletons';
+import { useCodeSplitting, usePerformanceMonitoring } from './hooks/useCodeSplitting';
+
+// Lazy load pages for better performance
+const Login = React.lazy(() => import('./pages/Login'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const UserManagement = React.lazy(() => import('./pages/UserManagement'));
+const LiveRideMonitoring = React.lazy(() => import('./pages/LiveRideMonitoring'));
+const FinancialManagement = React.lazy(() => import('./pages/FinancialManagement'));
+const SupportManagement = React.lazy(() => import('./pages/SupportManagement'));
+const FinancialReporting = React.lazy(() => import('./pages/FinancialReporting'));
+const PromoCodeManagement = React.lazy(() => import('./pages/PromoCodeManagement'));
+const EmergencyManagement = React.lazy(() => import('./pages/EmergencyManagement'));
+const ScheduledRidesManagement = React.lazy(() => import('./pages/ScheduledRidesManagement'));
 
 function App() {
   const { user, isLoading } = useAuth();
