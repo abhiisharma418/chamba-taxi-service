@@ -95,10 +95,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </nav>
 
           {/* Premium Bottom Section */}
-          <div className="p-6 border-t border-white/20">
+          <div className="p-6 border-t border-white/20 dark:border-dark-border">
             <div className="mb-6">
-              <button className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-slate-700 hover:bg-white/60 hover:text-blue-600 transition-all duration-300 font-semibold backdrop-blur-sm border border-transparent hover:border-blue-200/50 hover:shadow-lg">
-                <div className="p-2 rounded-xl bg-slate-100 group-hover:bg-blue-100 transition-all duration-300">
+              <button className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-slate-700 dark:text-dark-600 hover:bg-white/60 dark:hover:bg-dark-100/60 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 font-semibold backdrop-blur-sm border border-transparent hover:border-blue-200/50 dark:hover:border-blue-400/30 hover:shadow-lg dark:hover:shadow-dark-lg">
+                <div className="p-2 rounded-xl bg-slate-100 dark:bg-dark-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-all duration-300">
                   <Settings className="h-5 w-5" />
                 </div>
                 <span className="font-semibold tracking-wide">Settings</span>
@@ -143,19 +143,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main Content */}
       <div className="ml-72">
         {/* Premium Top Bar */}
-        <header className="relative bg-white/80 backdrop-blur-2xl shadow-xl border-b border-white/30 px-10 py-6 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-blue-50/30"></div>
+        <header className="relative bg-white/80 dark:bg-dark-card/80 backdrop-blur-2xl shadow-xl dark:shadow-dark-xl border-b border-white/30 dark:border-dark-border px-10 py-6 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-blue-50/30 dark:from-dark-100/10 dark:to-dark-200/30"></div>
           <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
 
           <div className="relative z-10 flex items-center justify-between">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                <h1 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-dark-800 dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
                   Admin Portal
                 </h1>
               </div>
-              <p className="text-slate-600 font-semibold tracking-wide">Manage your RideWithUs operations with premium control</p>
+              <p className="text-slate-600 dark:text-dark-500 font-semibold tracking-wide">Manage your RideWithUs operations with premium control</p>
             </div>
 
             <div className="flex items-center gap-6">
