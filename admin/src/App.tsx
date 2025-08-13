@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import LiveRideMonitoring from './pages/LiveRideMonitoring';
 import FinancialManagement from './pages/FinancialManagement';
+import SupportManagement from './pages/SupportManagement';
 
 function App() {
   const { user, isLoading } = useAuth();
