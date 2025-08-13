@@ -69,53 +69,76 @@ const NotificationBell: React.FC = () => {
             </div>
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          <div className="relative z-10 max-h-96 overflow-y-auto">
             {!hasPermission ? (
-              <div className="p-4 text-center">
-                <Bell className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <h4 className="text-lg font-medium text-gray-900 mb-2">Enable Notifications</h4>
-                <p className="text-gray-600 text-sm mb-4">
-                  Get notified about ride updates, driver arrivals, and important alerts.
+              <div className="p-8 text-center">
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                    <Bell className="h-10 w-10 text-blue-600" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full animate-bounce"></div>
+                </div>
+                <h4 className="text-xl font-bold text-slate-900 mb-3">Enable Premium Notifications</h4>
+                <p className="text-slate-600 text-base mb-6 leading-relaxed">
+                  Get instant updates about ride status, driver arrivals, and important alerts with our premium notification system.
                 </p>
                 <button
                   onClick={handleEnableNotifications}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   Enable Notifications
                 </button>
               </div>
             ) : unreadCount === 0 ? (
-              <div className="p-6 text-center">
-                <Check className="h-12 w-12 text-green-500 mx-auto mb-3" />
-                <p className="text-gray-600">All caught up! No new notifications.</p>
+              <div className="p-8 text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-green-200 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                  <Check className="h-10 w-10 text-emerald-600" />
+                </div>
+                <h4 className="text-lg font-bold text-slate-900 mb-2">All Caught Up!</h4>
+                <p className="text-slate-600">You have no new notifications.</p>
               </div>
             ) : (
-              <div className="p-2">
-                {/* Mock notifications - in real app, these would come from state */}
+              <div className="p-4 space-y-3">
+                {/* Premium notification items */}
                 {Array.from({ length: Math.min(unreadCount, 5) }).map((_, index) => (
-                  <div key={index} className="p-3 hover:bg-gray-50 rounded-lg mb-2">
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">
-                          Ride Update
+                  <div key={index} className="group relative p-4 bg-white/60 backdrop-blur-sm hover:bg-white/90 rounded-2xl border border-white/40 hover:border-blue-200/50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+                    <div className="flex items-start gap-4">
+                      <div className="relative flex-shrink-0">
+                        <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full animate-pulse"></div>
+                        <div className="absolute inset-0 w-3 h-3 bg-blue-400 rounded-full animate-ping opacity-30"></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-bold text-slate-900">
+                            🚗 Ride Update
+                          </p>
+                          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                            Live
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-700 mb-2">
+                          Your driver is {2 + index} minutes away and approaching your location
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">
-                          Your driver is 2 minutes away
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {new Date().toLocaleTimeString()}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs text-slate-500">
+                            {new Date().toLocaleTimeString()}
+                          </p>
+                          <span className="w-1 h-1 bg-slate-400 rounded-full"></span>
+                          <p className="text-xs text-blue-600 font-semibold">
+                            Track Live
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
-                
+
                 {unreadCount > 5 && (
-                  <div className="p-3 text-center">
-                    <p className="text-sm text-gray-500">
+                  <div className="p-4 text-center bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
+                    <p className="text-sm font-semibold text-slate-700">
                       +{unreadCount - 5} more notifications
                     </p>
+                    <p className="text-xs text-slate-500 mt-1">View all in notification center</p>
                   </div>
                 )}
               </div>
