@@ -157,16 +157,21 @@ export async function handleDriverResponse(rideId, driverId, accepted) {
         await redis.del(`dispatch:info:${rideId}`);
         
         // Notify customer about driver assignment
-        await notifyCustomer(ride.customerId, 'driver_assigned', {
+        await notificationService.sendNotification(ride.customerId, {
+          type: 'driver_assigned',
+          title: '🚗 Driver Assigned',
+          message: 'Your driver is on the way!',
           rideId: rideId.toString(),
-          driver: {
-            name: 'Driver', // Would get from driver profile
-            phone: '+91XXXXXXXXXX', // Would get from driver profile
-            vehicleNumber: 'DL 01 AB 1234', // Would get from driver profile
-            vehicleModel: 'Swift Dzire', // Would get from driver profile
-            rating: 4.8
-          },
-          estimatedArrival: 5 // minutes
+          data: {
+            driver: {
+              name: 'Driver', // Would get from driver profile
+              phone: '+91XXXXXXXXXX', // Would get from driver profile
+              vehicleNumber: 'DL 01 AB 1234', // Would get from driver profile
+              vehicleModel: 'Swift Dzire', // Would get from driver profile
+              rating: 4.8
+            },
+            estimatedArrival: 5 // minutes
+          }
         });
         
         console.log(`Ride ${rideId} assigned to driver ${driverId}`);
