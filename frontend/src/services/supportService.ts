@@ -234,7 +234,7 @@ class SupportService {
         if (value) queryParams.append(key, value.toString());
       });
 
-      const response = await api.get(`/support/admin/all?${queryParams}`);
+      const response = await apiFetch(`/support/admin/all?${queryParams}`);
       return response.data;
     } catch (error: any) {
       console.error('Error fetching all tickets:', error);
