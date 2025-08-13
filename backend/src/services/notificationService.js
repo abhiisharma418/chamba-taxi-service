@@ -251,6 +251,51 @@ class NotificationService {
     }
   }
 
+  // Chat message notifications
+  sendChatMessage(userId, chatData) {
+    const socketId = this.connectedUsers.get(userId);
+    if (socketId && this.io) {
+      // Send to specific chat room
+      this.io.to(`chat_${chatData.rideId}`).emit('new_message', chatData.chatMessage);
+
+      // Send notification if user is not in chat room
+      this.sendNotification(userId, {
+        type: 'chat_message',
+        title: `New message from ${chatData.senderName}`,
+        message: chatData.chatMessage.message.text,
+        rideId: chatData.rideId,
+        data: {
+          senderType: chatData.senderType,
+          messageId: chatData.chatMessage._id
+        }
+      });
+
+      return true;
+    }
+    return false;
+  }
+
+  // Check if user is online
+  isUserOnline(userId) {
+    return this.connectedUsers.has(userId);
+  }
+
+  // Get all connected users
+  getConnectedUsers() {
+    return Array.from(this.connectedUsers.keys());
+  }
+
+  // Send typing indicator
+  sendTypingIndicator(rideId, userId, userType, isTyping) {
+    if (this.io) {
+      this.io.to(`chat_${rideId}`).emit('user_typing', {
+        userId,
+        userType,
+        isTyping
+      });
+    }
+  }
+
   // Promotional notifications
   async sendPromotionalNotification(userIds, promotion) {
     const notification = {
