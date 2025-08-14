@@ -255,8 +255,8 @@ const SidebarContent: React.FC<{
             >
               <div className={`p-2 rounded-lg transition-all duration-300 ${
                 isActive
-                  ? 'bg-white/20 dark:bg-dark-accent-blue/20 backdrop-blur-sm'
-                  : 'bg-slate-100 dark:bg-dark-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30'
+                  ? 'bg-white/20 dark:bg-dark-accent-blue/20'
+                  : 'bg-slate-100 dark:bg-dark-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900'
               }`}>
                 <IconComponent className="h-4 w-4" />
               </div>
