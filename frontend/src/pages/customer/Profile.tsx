@@ -43,41 +43,44 @@ const CustomerProfile: React.FC = () => {
   const [editForm, setEditForm] = useState<Partial<UserProfile>>({});
 
   // Fetch profile from API
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await ProfileAPI.getProfile();
-        if (response.success) {
-          setProfile(response.data);
-          setEditForm(response.data);
-        } else {
-          console.error('Failed to fetch profile');
-        }
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
-        // Fallback to user data
-        const fallbackProfile: UserProfile = {
-          id: user?.id || '1',
-          name: user?.name || 'Customer Name',
-          email: user?.email || 'customer@example.com',
-          phone: '+91 9876543210',
-          address: 'Shimla, Himachal Pradesh, India',
-          dateOfBirth: '1990-01-15',
-          emergencyContact: '+91 9876543211',
-          preferredLanguage: 'Hindi',
-          joinDate: '2024-01-15',
-          totalRides: 47,
-          rating: 4.8
+useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const response = await ProfileAPI.getProfile();
+      console.log('ProfileAPI.getProfile:', response);
+      if (response.success && response.data) {
+        // Map API data to UserProfile
+        const apiData = response.data;
+        const mappedProfile: UserProfile = {
+          id: apiData._id,
+          name: apiData.name,
+          email: apiData.email,
+          phone: apiData.phone,
+          address: apiData.address || '',
+          dateOfBirth: apiData.dateOfBirth || '',
+          emergencyContact: apiData.emergencyContact || '',
+          preferredLanguage: apiData.locale === 'en' ? 'English' : apiData.locale,
+          profileImage: apiData.profileImage || '',
+          joinDate: apiData.createdAt ? new Date(apiData.createdAt).toISOString() : '',
+          totalRides: apiData.totalRides || 0,
+          rating: apiData.rating || 0,
         };
-        setProfile(fallbackProfile);
-        setEditForm(fallbackProfile);
-      } finally {
-        setIsLoading(false);
+        setProfile(mappedProfile);
+        setEditForm(mappedProfile);
+      } else {
+        console.error('Failed to fetch profile');
+        setProfile(null);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+      setProfile(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchProfile();
-  }, [user]);
+  fetchProfile();
+}, [user]);
 
   const handleEdit = () => {
     setIsEditing(true);

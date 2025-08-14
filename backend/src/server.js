@@ -46,7 +46,7 @@ import { setIO } from './services/notifyService.js';
 import notificationService from './services/notificationService.js';
 import cookieParser from 'cookie-parser';
 import { authenticate, requireActive } from './middleware/auth.js';
-
+import customerRoutes from './routes/customerRoutes.js';
 const app = express();
 const server = http.createServer(app);
 
@@ -202,7 +202,7 @@ app.use('/api/promo-codes', authenticate, requireActive, promoCodeRoutes);
 app.use('/api/emergency', authenticate, requireActive, emergencyRoutes);
 app.use('/api/scheduled-rides', authenticate, requireActive, scheduledRideRoutes);
 app.use("/api/bookings", bookingRoutes);
-
+app.use('/api/customer', customerRoutes);
 // Start server and connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
