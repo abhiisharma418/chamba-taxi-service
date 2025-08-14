@@ -566,3 +566,42 @@ export const DriverAPI = {
   getTicketStats: () => apiFetch('/api/support/tickets/stats') as Promise<{ success: boolean; data: any }>,
   searchSupport: (query: string, type?: 'faq' | 'tickets') => apiFetch(`/api/support/search?query=${encodeURIComponent(query)}${type ? `&type=${type}` : ''}`) as Promise<{ success: boolean; data: any }>
 };
+
+export const ProfileAPI = {
+  // Customer profile endpoints
+  getProfile: () => apiFetch('/api/customer/profile') as Promise<{ success: boolean; data: any }>,
+  updateProfile: (payload: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    dateOfBirth?: string;
+    emergencyContact?: string;
+    preferredLanguage?: string;
+  }) => apiFetch('/api/customer/profile', { method: 'PUT', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  uploadProfileImage: (file: File) => {
+    const formData = new FormData();
+    formData.append('profileImage', file);
+    return apiFetch('/api/customer/profile/image', { method: 'POST', body: formData }) as Promise<{ success: boolean; data: any }>;
+  },
+  deleteProfileImage: () => apiFetch('/api/customer/profile/image', { method: 'DELETE' }) as Promise<{ success: boolean; data: any }>,
+
+  // Customer settings
+  getNotificationSettings: () => apiFetch('/api/customer/settings/notifications') as Promise<{ success: boolean; data: any }>,
+  updateNotificationSettings: (payload: any) => apiFetch('/api/customer/settings/notifications', { method: 'PUT', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  getPrivacySettings: () => apiFetch('/api/customer/settings/privacy') as Promise<{ success: boolean; data: any }>,
+  updatePrivacySettings: (payload: any) => apiFetch('/api/customer/settings/privacy', { method: 'PUT', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  // Payment methods
+  getPaymentMethods: () => apiFetch('/api/customer/payment-methods') as Promise<{ success: boolean; data: any[] }>,
+  addPaymentMethod: (payload: any) => apiFetch('/api/customer/payment-methods', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  updatePaymentMethod: (methodId: string, payload: any) => apiFetch(`/api/customer/payment-methods/${methodId}`, { method: 'PUT', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  deletePaymentMethod: (methodId: string) => apiFetch(`/api/customer/payment-methods/${methodId}`, { method: 'DELETE' }) as Promise<{ success: boolean; data: any }>,
+
+  // Account management
+  changePassword: (payload: { currentPassword: string; newPassword: string }) => apiFetch('/api/customer/change-password', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+  deleteAccount: (payload: { password: string; reason?: string }) => apiFetch('/api/customer/delete-account', { method: 'POST', body: JSON.stringify(payload) }) as Promise<{ success: boolean; data: any }>,
+
+  // Profile statistics
+  getProfileStats: () => apiFetch('/api/customer/profile/stats') as Promise<{ success: boolean; data: any }>
+};
