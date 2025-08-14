@@ -96,6 +96,14 @@ const AppRoutes: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/customer/profile"
+              element={
+                <ProtectedRoute userType="customer">
+                  <CustomerProfile />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Driver Routes */}
             <Route
