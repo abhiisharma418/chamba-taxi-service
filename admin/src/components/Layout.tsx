@@ -22,7 +22,8 @@ import {
   ShieldAlert,
   Calendar,
   Menu,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 
 interface LayoutProps {
