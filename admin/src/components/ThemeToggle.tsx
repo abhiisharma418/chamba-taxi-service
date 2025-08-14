@@ -44,7 +44,7 @@ const ThemeToggle: React.FC = () => {
         <ChevronDown className={`h-3 w-3 text-gray-500 dark:text-dark-500 transition-transform duration-200 hidden sm:block ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <>
           {/* Backdrop */}
           <div
