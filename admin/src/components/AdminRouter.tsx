@@ -4,7 +4,7 @@ import { createLazyComponent } from '../utils/codeSplitting';
 import { AdminRouteLoading } from './AdminLoading';
 
 // Create lazy components with error boundaries
-const LazyDashboard = React.lazy(() => import('../pages/Dashboard'));
+const LazyDashboard = React.lazy(() => import('../pages/DashboardTest'));
 const LazyUserManagement = React.lazy(() => import('../pages/UserManagement'));
 const LazyLiveRideMonitoring = React.lazy(() => import('../pages/LiveRideMonitoring'));
 const LazyFinancialManagement = React.lazy(() => import('../pages/FinancialManagement'));
