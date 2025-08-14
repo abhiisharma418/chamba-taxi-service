@@ -34,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [apiStatus, setApiStatus] = useState(getApiStatus());
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
