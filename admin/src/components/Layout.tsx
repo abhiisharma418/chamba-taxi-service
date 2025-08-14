@@ -186,9 +186,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
 
               {/* Status */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700/50">
-                <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">ONLINE</span>
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-300 ${
+                apiStatus.isOnline
+                  ? 'bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 border-emerald-200 dark:border-emerald-700/50'
+                  : 'bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 border-yellow-200 dark:border-yellow-700/50'
+              }`}>
+                {apiStatus.isOnline ? (
+                  <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                ) : (
+                  <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                )}
+                <span className={`text-xs font-bold ${
+                  apiStatus.isOnline
+                    ? 'text-emerald-700 dark:text-emerald-300'
+                    : 'text-yellow-700 dark:text-yellow-300'
+                }`}>
+                  {apiStatus.isOnline ? 'ONLINE' : 'MOCK DATA'}
+                </span>
               </div>
             </div>
           </div>
