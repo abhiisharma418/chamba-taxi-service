@@ -46,8 +46,16 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const getBookingHistory = async () => {
-    const res = await RidesAPI.history();
-    setBookings(res.data as any);
+    try {
+      const res = await RidesAPI.history();
+      if (res.success && res.data) {
+        setBookings(res.data as any);
+      }
+    } catch (error) {
+      console.error('Failed to fetch booking history:', error);
+      // Set empty array as fallback
+      setBookings([]);
+    }
   };
 
   useEffect(() => { getBookingHistory().catch(()=>{}); }, []);
