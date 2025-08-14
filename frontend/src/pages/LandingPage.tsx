@@ -54,33 +54,33 @@ const LandingPage: React.FC = () => {
           {/* Premium Badge */}
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/70 backdrop-blur-xl border border-white/40 rounded-full shadow-xl mb-8">
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-bold text-slate-700 tracking-wide uppercase">Premium Mobility Experience</span>
+            <span className="text-sm font-bold text-slate-700 tracking-wide uppercase">Your Trusted Ride Partner</span>
           </div>
 
           <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-slate-900 mb-8 leading-none tracking-tight">
             Your{' '}
             <span className="relative inline-block">
               <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
-                Premium
+                Reliable
               </span>
               <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-full"></div>
             </span>
             <br />
             <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent">
-              Mobility Partner
+              Travel Companion
             </span>
           </h1>
 
           <p className="text-2xl text-slate-600 mb-16 max-w-4xl mx-auto leading-relaxed font-medium">
-            Experience{' '}
+            Get{' '}
             <span className="relative">
-              <span className="font-bold text-slate-800">premium transportation</span>
+              <span className="font-bold text-slate-800">comfortable rides</span>
               <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 block"></span>
             </span>
-            {' '}with RideWithUs.
+            {' '}whenever you need them.
             <br className="hidden sm:block" />
-            Safe, reliable, and always with{' '}
-            <span className="font-black text-emerald-600">honest pricing</span> for every journey.
+            Fast, secure, and always with{' '}
+            <span className="font-black text-emerald-600">transparent rates</span> for every trip.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
