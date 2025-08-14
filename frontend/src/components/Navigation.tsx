@@ -150,7 +150,14 @@ const Navigation: React.FC = () => {
 
         {/* Mobile Menu */}
         {user && isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 z-[50] bg-white dark:bg-dark-card shadow-xl border-t border-gray-200 dark:border-dark-border animate-fadeInDown md:hidden">
+          <>
+            {/* Mobile Menu Overlay */}
+            <div
+              className="fixed inset-0 bg-black/20 z-[45] md:hidden"
+              onClick={() => setIsMenuOpen(false)}
+            />
+            {/* Mobile Menu Content */}
+            <div className="absolute top-full left-0 right-0 z-[50] bg-white dark:bg-dark-card shadow-xl border-t border-gray-200 dark:border-dark-border animate-fadeInDown md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-dark-card max-h-[calc(100vh-80px)] overflow-y-auto">
               {navItems.map((item, index) => (
                 <Link
@@ -189,7 +196,8 @@ const Navigation: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </nav>
