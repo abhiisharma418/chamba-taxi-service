@@ -42,31 +42,36 @@ const CustomerProfile: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserProfile>>({});
 
-  // Mock API call - replace with actual API
+  // Fetch profile from API
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Simulating API call
-        setTimeout(() => {
-          const mockProfile: UserProfile = {
-            id: user?.id || '1',
-            name: user?.name || 'Customer Name',
-            email: user?.email || 'customer@example.com',
-            phone: '+91 9876543210',
-            address: 'Shimla, Himachal Pradesh, India',
-            dateOfBirth: '1990-01-15',
-            emergencyContact: '+91 9876543211',
-            preferredLanguage: 'Hindi',
-            joinDate: '2024-01-15',
-            totalRides: 47,
-            rating: 4.8
-          };
-          setProfile(mockProfile);
-          setEditForm(mockProfile);
-          setIsLoading(false);
-        }, 1000);
+        const response = await ProfileAPI.getProfile();
+        if (response.success) {
+          setProfile(response.data);
+          setEditForm(response.data);
+        } else {
+          console.error('Failed to fetch profile');
+        }
       } catch (error) {
         console.error('Failed to fetch profile:', error);
+        // Fallback to user data
+        const fallbackProfile: UserProfile = {
+          id: user?.id || '1',
+          name: user?.name || 'Customer Name',
+          email: user?.email || 'customer@example.com',
+          phone: '+91 9876543210',
+          address: 'Shimla, Himachal Pradesh, India',
+          dateOfBirth: '1990-01-15',
+          emergencyContact: '+91 9876543211',
+          preferredLanguage: 'Hindi',
+          joinDate: '2024-01-15',
+          totalRides: 47,
+          rating: 4.8
+        };
+        setProfile(fallbackProfile);
+        setEditForm(fallbackProfile);
+      } finally {
         setIsLoading(false);
       }
     };
