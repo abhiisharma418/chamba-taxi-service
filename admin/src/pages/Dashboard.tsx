@@ -123,11 +123,11 @@ const Dashboard: React.FC = () => {
                 <span className="text-white/80 text-sm font-semibold tracking-wider uppercase">Live Dashboard</span>
               </div>
 
-              <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight">
+              <h1 className="text-3xl lg:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight">
                 Dashboard Overview
               </h1>
 
-              <p className="text-xl text-white/90 font-medium max-w-2xl leading-relaxed">
+              <p className="text-base lg:text-xl text-white/90 font-medium max-w-2xl leading-relaxed">
                 Monitor your RideWithUs operations with real-time analytics
               </p>
 
