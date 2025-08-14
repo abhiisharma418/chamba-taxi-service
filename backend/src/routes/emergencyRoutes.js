@@ -1,21 +1,20 @@
 import express from 'express';
 const router = express.Router();
 import { body, param, query } from 'express-validator';
-import auth from '../middleware/auth.js';
-import rateLimit from '../middleware/rateLimit.js';
+// import rateLimit from '../middleware/rateLimit.js';
 import emergencyController from '../controllers/emergencyController.js';
-import adminEmergencyController from '../controllers/adminEmergencyController.js';
+// import adminEmergencyController from '../controllers/adminEmergencyController.js';
 
-const sosRateLimit = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5, // Allow 5 SOS triggers per minute per user
-  message: {
-    success: false,
-    message: 'Too many SOS requests. Please wait before triggering again.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
+// const sosRateLimit = rateLimit({
+//   windowMs: 1 * 60 * 1000, // 1 minute
+//   max: 5, // Allow 5 SOS triggers per minute per user
+//   message: {
+//     success: false,
+//     message: 'Too many SOS requests. Please wait before triggering again.'
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false
+// });
 
 const emergencyValidation = [
   body('incidentType')
@@ -68,20 +67,20 @@ const contactValidation = [
 ];
 
 router.post('/sos', 
-  auth, 
-  sosRateLimit, 
+  // auth, 
+  // sosRateLimit, 
   emergencyValidation, 
   emergencyController.triggerSOS
 );
 
 router.get('/incident/:incidentId', 
-  auth,
+  // auth,
   param('incidentId').isAlphanumeric().withMessage('Invalid incident ID'),
   emergencyController.getIncident
 );
 
 router.get('/incidents', 
-  auth,
+  // auth,
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
   query('status').optional().isIn(['active', 'resolved', 'false_alarm', 'escalated', 'all']).withMessage('Invalid status'),
@@ -89,7 +88,7 @@ router.get('/incidents',
 );
 
 router.patch('/incident/:incidentId/status', 
-  auth,
+  // auth,
   param('incidentId').isAlphanumeric().withMessage('Invalid incident ID'),
   body('status').isIn(['active', 'resolved', 'false_alarm', 'escalated']).withMessage('Invalid status'),
   body('resolution').optional().isString().trim().isLength({ max: 2000 }).withMessage('Resolution must be less than 2000 characters'),
@@ -98,102 +97,102 @@ router.patch('/incident/:incidentId/status',
 );
 
 router.get('/settings', 
-  auth, 
+  // auth, /
   emergencyController.getEmergencySettings
 );
 
-router.put('/settings', 
-  auth,
-  rateLimit({ windowMs: 15 * 60 * 1000, max: 10 }),
-  emergencyController.updateEmergencySettings
-);
+// router.put('/settings', 
+//   // auth,
+//   rateLimit({ windowMs: 15 * 60 * 1000, max: 10 }),
+//   emergencyController.updateEmergencySettings
+// );
 
-router.post('/contacts', 
-  auth,
-  rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }),
-  contactValidation,
-  emergencyController.addEmergencyContact
-);
+// router.post('/contacts', 
+//   // auth,
+//   rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }),
+//   contactValidation,
+//   emergencyController.addEmergencyContact
+// );
 
 router.delete('/contacts/:contactId', 
-  auth,
+  // auth,
   param('contactId').isMongoId().withMessage('Invalid contact ID'),
   emergencyController.removeEmergencyContact
 );
 
-router.post('/fake-call', 
-  auth,
-  rateLimit({ windowMs: 5 * 60 * 1000, max: 3 }),
-  body('contactName').optional().isString().trim().isLength({ max: 50 }).withMessage('Contact name must be less than 50 characters'),
-  body('duration').optional().isInt({ min: 30, max: 300 }).withMessage('Duration must be between 30 and 300 seconds'),
-  emergencyController.triggerFakeCall
-);
+// router.post('/fake-call', 
+//   // auth,
+//   rateLimit({ windowMs: 5 * 60 * 1000, max: 3 }),
+//   body('contactName').optional().isString().trim().isLength({ max: 50 }).withMessage('Contact name must be less than 50 characters'),
+//   body('duration').optional().isInt({ min: 30, max: 300 }).withMessage('Duration must be between 30 and 300 seconds'),
+//   emergencyController.triggerFakeCall
+// );
 
 router.get('/stats',
-  auth,
+  // auth,
   query('timeframe').optional().isIn(['7d', '30d', '90d']).withMessage('Invalid timeframe'),
   emergencyController.getEmergencyStats
 );
 
 // Admin routes
 router.get('/admin/incidents',
-  auth,
+  // auth,
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('status').optional().isIn(['active', 'resolved', 'false_alarm', 'escalated', 'all']).withMessage('Invalid status'),
   query('severity').optional().isIn(['low', 'medium', 'high', 'critical', 'all']).withMessage('Invalid severity'),
   query('userType').optional().isIn(['customer', 'driver', 'all']).withMessage('Invalid user type'),
   query('timeframe').optional().isIn(['7d', '30d', '90d', '365d']).withMessage('Invalid timeframe'),
-  adminEmergencyController.getAllIncidents
+  // adminEmergencyController.getAllIncidents
 );
 
 router.get('/admin/incident/:incidentId',
-  auth,
+  // auth,
   param('incidentId').isAlphanumeric().withMessage('Invalid incident ID'),
-  adminEmergencyController.getIncidentDetails
+  // adminEmergencyController.getIncidentDetails
 );
 
 router.patch('/admin/incident/:incidentId/assign',
-  auth,
+  // auth,
   param('incidentId').isAlphanumeric().withMessage('Invalid incident ID'),
   body('operatorId').isMongoId().withMessage('Invalid operator ID'),
   body('notes').optional().isString().trim().isLength({ max: 2000 }).withMessage('Notes must be less than 2000 characters'),
-  adminEmergencyController.assignOperator
+  // adminEmergencyController.assignOperator
 );
 
 router.patch('/admin/incident/:incidentId',
-  auth,
+  // auth,
   param('incidentId').isAlphanumeric().withMessage('Invalid incident ID'),
   body('status').optional().isIn(['active', 'resolved', 'false_alarm', 'escalated']).withMessage('Invalid status'),
   body('severity').optional().isIn(['low', 'medium', 'high', 'critical']).withMessage('Invalid severity'),
   body('resolution').optional().isString().trim().isLength({ max: 2000 }).withMessage('Resolution must be less than 2000 characters'),
   body('notes').optional().isString().trim().isLength({ max: 2000 }).withMessage('Notes must be less than 2000 characters'),
-  adminEmergencyController.updateIncident
+  // adminEmergencyController.updateIncident
 );
 
 router.get('/admin/statistics',
-  auth,
+  // auth,
   query('timeframe').optional().isIn(['7d', '30d', '90d', '365d']).withMessage('Invalid timeframe'),
-  adminEmergencyController.getEmergencyStatistics
+  // adminEmergencyController.getEmergencyStatistics
 );
 
 router.get('/admin/user/:userId/settings',
-  auth,
+  // auth,
   param('userId').isMongoId().withMessage('Invalid user ID'),
-  adminEmergencyController.getUserEmergencySettings
+  // adminEmergencyController.getUserEmergencySettings
 );
 
 router.get('/admin/recent-alerts',
-  auth,
+  // auth,
   query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
-  adminEmergencyController.getRecentAlerts
+  // adminEmergencyController.getRecentAlerts
 );
 
 router.get('/admin/export',
-  auth,
+  // auth,
   query('format').optional().isIn(['csv', 'json']).withMessage('Invalid export format'),
   query('timeframe').optional().isIn(['7d', '30d', '90d']).withMessage('Invalid timeframe'),
-  adminEmergencyController.exportIncidents
+  // adminEmergencyController.exportIncidents
 );
 
 export default router;

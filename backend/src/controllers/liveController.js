@@ -2,7 +2,6 @@ import Joi from 'joi';
 import { updateDriverLocation, setDriverAvailability, findNearbyDrivers, isDriverAvailable } from '../services/driverMatchingService.js';
 import { startDispatch, handleDriverResponse, getDispatchStatus } from '../services/dispatchService.js';
 import { Ride } from '../models/rideModel.js';
-import { notifyDriver, notifyCustomer } from '../services/notificationService.js';
 
 export const driverHeartbeat = async (req, res) => {
   try {

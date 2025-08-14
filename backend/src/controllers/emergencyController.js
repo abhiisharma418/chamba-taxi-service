@@ -1,6 +1,5 @@
 import { EmergencyIncident, EmergencySettings } from '../models/emergencyModel.js';
-import User from '../models/userModel.js';
-import Booking from '../models/bookingModel.js';
+import {User} from '../models/userModel.js';
 import notificationService from '../services/notificationService.js';
 import { validationResult } from 'express-validator';
 

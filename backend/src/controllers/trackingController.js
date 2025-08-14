@@ -3,7 +3,7 @@ import { TrackingSession } from '../models/trackingModel.js';
 import { Ride } from '../models/rideModel.js';
 import { User } from '../models/userModel.js';
 import { updateDriverLocation } from '../services/driverMatchingService.js';
-import { broadcastLocationUpdate, notifyCustomer, notifyDriver } from '../services/notificationService.js';
+import broadcastLocationUpdate  from '../services/notificationService.js';
 import { getRedis } from '../utils/redis.js';
 
 const startTrackingSchema = Joi.object({

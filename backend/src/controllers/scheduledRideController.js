@@ -1,6 +1,6 @@
 import ScheduledRide from '../models/scheduledRideModel.js';
-import User from '../models/userModel.js';
-import Booking from '../models/bookingModel.js';
+// import User from '../models/userModel.js';
+// import Booking from '../models/bookingModel.js';
 import { validationResult } from 'express-validator';
 import notificationService from '../services/notificationService.js';
 

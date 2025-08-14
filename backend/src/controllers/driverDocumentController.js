@@ -1,5 +1,5 @@
 import { User } from '../models/userModel.js';
-import { DriverProfile } from '../models/driverProfileModel.js';
+import DriverProfile  from '../models/driverProfileModel.js';
 import notificationService from '../services/notificationService.js';
 
 // Get driver documents

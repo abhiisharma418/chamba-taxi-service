@@ -242,4 +242,5 @@ supportTicketSchema.methods.updateStatus = function(newStatus, userId, resolutio
   return this.save();
 };
 
-export const SupportTicket = mongoose.model('SupportTicket', supportTicketSchema);
+export const SupportTicket = mongoose.models.SupportTicket || mongoose.model('SupportTicket', supportTicketSchema);
+export default SupportTicket;

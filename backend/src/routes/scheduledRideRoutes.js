@@ -1,28 +1,28 @@
 import express from 'express';
 const router = express.Router();
 import { body, param, query } from 'express-validator';
-import auth from '../middleware/auth.js';
-import rateLimit from '../middleware/rateLimit.js';
+// import auth from '../middleware/auth.js';
+// import rateLimit from '../middleware/rateLimit.js';
 import scheduledRideController from '../controllers/scheduledRideController.js';
 
 // Rate limiting for scheduled ride operations
-const createScheduledRideLimit = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Allow 10 scheduled rides per 15 minutes
-  message: {
-    success: false,
-    message: 'Too many scheduled ride requests. Please try again later.'
-  }
-});
+// const createScheduledRideLimit = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 10, // Allow 10 scheduled rides per 15 minutes
+//   message: {
+//     success: false,
+//     message: 'Too many scheduled ride requests. Please try again later.'
+//   }
+// });
 
-const updateScheduledRideLimit = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // Allow 20 updates per 15 minutes
-  message: {
-    success: false,
-    message: 'Too many update requests. Please try again later.'
-  }
-});
+// const updateScheduledRideLimit = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 20, // Allow 20 updates per 15 minutes
+//   message: {
+//     success: false,
+//     message: 'Too many update requests. Please try again later.'
+//   }
+// });
 
 // Validation middleware
 const createScheduledRideValidation = [
@@ -129,15 +129,15 @@ const updateScheduledRideValidation = [
 
 // Create a new scheduled ride
 router.post('/',
-  auth,
-  createScheduledRideLimit,
+  // auth,
+  // createScheduledRideLimit,
   createScheduledRideValidation,
   scheduledRideController.createScheduledRide
 );
 
 // Get user's scheduled rides
 router.get('/',
-  auth,
+  // auth,
   query('status')
     .optional()
     .isIn(['scheduled', 'confirmed', 'driver_assigned', 'started', 'completed', 'cancelled', 'failed', 'all'])
@@ -159,7 +159,7 @@ router.get('/',
 
 // Get specific scheduled ride details
 router.get('/:rideId',
-  auth,
+  // auth,
   param('rideId')
     .isAlphanumeric()
     .withMessage('Invalid ride ID format'),
@@ -168,8 +168,8 @@ router.get('/:rideId',
 
 // Update a scheduled ride
 router.put('/:rideId',
-  auth,
-  updateScheduledRideLimit,
+  // auth,
+  // updateScheduledRideLimit,
   param('rideId')
     .isAlphanumeric()
     .withMessage('Invalid ride ID format'),
@@ -179,7 +179,7 @@ router.put('/:rideId',
 
 // Cancel a scheduled ride
 router.delete('/:rideId',
-  auth,
+  // auth,
   param('rideId')
     .isAlphanumeric()
     .withMessage('Invalid ride ID format'),
@@ -196,7 +196,7 @@ router.delete('/:rideId',
 
 // Assign driver to scheduled ride
 router.patch('/:rideId/assign',
-  auth,
+  // auth,
   param('rideId')
     .isAlphanumeric()
     .withMessage('Invalid ride ID format'),
@@ -208,7 +208,7 @@ router.patch('/:rideId/assign',
 
 // Execute a scheduled ride (convert to actual booking)
 router.post('/:rideId/execute',
-  auth,
+  // auth,
   param('rideId')
     .isAlphanumeric()
     .withMessage('Invalid ride ID format'),
@@ -217,7 +217,7 @@ router.post('/:rideId/execute',
 
 // Get driver's schedule
 router.get('/driver/schedule',
-  auth,
+  // auth,
   query('date')
     .optional()
     .isISO8601()
@@ -238,7 +238,7 @@ router.get('/driver/schedule',
 
 // Admin routes for managing scheduled rides
 router.get('/admin/pending',
-  auth,
+  // auth,
   query('page')
     .optional()
     .isInt({ min: 1 })
@@ -295,7 +295,7 @@ router.get('/admin/pending',
 
 // Admin route to get scheduled ride statistics
 router.get('/admin/stats',
-  auth,
+  // auth,
   query('timeframe')
     .optional()
     .isIn(['today', 'week', 'month', 'quarter'])
