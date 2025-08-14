@@ -53,6 +53,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Update API status periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setApiStatus(getApiStatus());
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
