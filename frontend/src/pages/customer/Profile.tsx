@@ -90,17 +90,30 @@ const CustomerProfile: React.FC = () => {
 
   const handleSave = async () => {
     if (!editForm) return;
-    
+
     setIsSaving(true);
     try {
-      // Simulate API call to update profile
-      setTimeout(() => {
+      const response = await ProfileAPI.updateProfile({
+        name: editForm.name,
+        email: editForm.email,
+        phone: editForm.phone,
+        address: editForm.address,
+        dateOfBirth: editForm.dateOfBirth,
+        emergencyContact: editForm.emergencyContact,
+        preferredLanguage: editForm.preferredLanguage
+      });
+
+      if (response.success) {
         setProfile({ ...profile!, ...editForm });
         setIsEditing(false);
-        setIsSaving(false);
-      }, 1500);
+        alert('Profile updated successfully!');
+      } else {
+        alert('Failed to update profile. Please try again.');
+      }
     } catch (error) {
       console.error('Failed to update profile:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
       setIsSaving(false);
     }
   };
