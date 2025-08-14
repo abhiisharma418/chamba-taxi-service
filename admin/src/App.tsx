@@ -40,9 +40,11 @@ function App() {
 
   if (!user) {
     return (
-      <Suspense fallback={<AdminPageSkeleton showSidebar={false} />}>
-        <Login />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<AdminPageSkeleton showSidebar={false} />}>
+          <Login />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
