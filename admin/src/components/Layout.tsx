@@ -2,6 +2,7 @@ import React, { ReactNode, useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from './Logo';
+import { getApiStatus } from '../lib/api';
 import ThemeToggle from './ThemeToggle';
 import {
   LogOut,
