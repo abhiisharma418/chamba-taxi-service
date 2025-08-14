@@ -42,6 +42,7 @@ const Navigation: React.FC = () => {
           { path: '/customer/book-ride', label: 'Book Ride', icon: Car },
           { path: '/customer/scheduled-rides', label: 'Scheduled', icon: Calendar },
           { path: '/customer/history', label: 'History', icon: Clock },
+          { path: '/customer/profile', label: 'Profile', icon: Settings },
           { path: '/customer/emergency', label: 'Emergency', icon: Shield }
         ];
       case 'driver':
