@@ -93,9 +93,11 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
       clearTimeout(timeoutId);
 
       if (!res.ok) {
+        updateApiStatus(false);
         throw new Error(`Request failed: ${res.status}`);
       }
 
+      updateApiStatus(true);
       const ct = res.headers.get('content-type') || '';
       if (ct.includes('application/json')) {
         const data = await res.json();
@@ -107,6 +109,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     })
     .catch((error) => {
       clearTimeout(timeoutId);
+      updateApiStatus(false);
       console.warn(`API call failed for ${path}, using mock data:`, error.message || error);
       resolve(getMockResponse(path));
     });
