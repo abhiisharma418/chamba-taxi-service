@@ -165,17 +165,21 @@ const Navigation: React.FC = () => {
                 </Link>
               ))}
               <div className="border-t pt-2">
-                <div className="flex items-center space-x-2 px-3 py-2">
+                <Link
+                  to="/customer/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                >
                   <img
-                    src={user.avatar}
+                    src="https://cdn.builder.io/api/v1/image/assets%2Fcf4880cbfa8e44669fa8a9aa80d0be2a%2F550f118337114807a09b6e102244467d?format=webp&width=800"
                     alt={user.name}
-                    className="h-8 w-8 rounded-full"
+                    className="h-8 w-8 rounded-full object-cover"
                   />
                   <div>
                     <div className="text-sm font-medium text-gray-900">{user.name}</div>
                     <div className="text-sm text-gray-500">{user.email}</div>
                   </div>
-                </div>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
