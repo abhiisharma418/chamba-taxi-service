@@ -56,7 +56,7 @@ const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
 
   // Initialize WebSocket connection for real-time updates
   useEffect(() => {
-    const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
+    const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://ride-with-us.onrender.com';
     
     socketRef.current = io(API_URL, {
       auth: {

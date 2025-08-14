@@ -42,7 +42,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
     // Initialize socket connection for real-time notifications
     const socketInstance = io(
-      (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com',
+      (import.meta as any).env?.VITE_API_URL || 'https://ride-with-us.onrender.com',
       {
         auth: { userId: user.id, role: user.role }
       }

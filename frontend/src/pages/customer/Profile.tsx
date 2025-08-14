@@ -24,14 +24,11 @@ interface UserProfile {
   name: string;
   email: string;
   phone: string;
-  address: string;
-  dateOfBirth: string;
-  emergencyContact: string;
-  preferredLanguage: string;
-  profileImage?: string;
-  joinDate: string;
-  totalRides: number;
-  rating: number;
+  role: string;
+  isActive: boolean;
+  locale: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const CustomerProfile: React.FC = () => {
@@ -48,29 +45,27 @@ useEffect(() => {
     try {
       const response = await ProfileAPI.getProfile();
       console.log('ProfileAPI.getProfile:', response);
-      if (response.success && response.data) {
-        // Map API data to UserProfile
-        const apiData = response.data;
-        const mappedProfile: UserProfile = {
-          id: apiData._id,
-          name: apiData.name,
-          email: apiData.email,
-          phone: apiData.phone,
-          address: apiData.address || '',
-          dateOfBirth: apiData.dateOfBirth || '',
-          emergencyContact: apiData.emergencyContact || '',
-          preferredLanguage: apiData.locale === 'en' ? 'English' : apiData.locale,
-          profileImage: apiData.profileImage || '',
-          joinDate: apiData.createdAt ? new Date(apiData.createdAt).toISOString() : '',
-          totalRides: apiData.totalRides || 0,
-          rating: apiData.rating || 0,
-        };
-        setProfile(mappedProfile);
-        setEditForm(mappedProfile);
-      } else {
-        console.error('Failed to fetch profile');
-        setProfile(null);
-      }
+
+      // Fix: response me direct user object aa raha hai
+      const apiData = response.data || response; // agar response.data nahi hai to response hi use karo
+
+  if (apiData && apiData._id) {
+  const mappedProfile: UserProfile = {
+    id: apiData._id,
+    name: apiData.name,
+    email: apiData.email,
+    phone: apiData.phone,
+    role: apiData.role,
+    isActive: apiData.isActive,
+    locale: apiData.locale,
+    createdAt: apiData.createdAt,
+    updatedAt: apiData.updatedAt,
+  };
+  setProfile(mappedProfile);
+  setEditForm(mappedProfile);
+} else {
+  setProfile(null);
+}
     } catch (error) {
       console.error('Failed to fetch profile:', error);
       setProfile(null);
@@ -91,35 +86,31 @@ useEffect(() => {
     setIsEditing(false);
   };
 
-  const handleSave = async () => {
-    if (!editForm) return;
+const handleSave = async () => {
+  if (!editForm) return;
 
-    setIsSaving(true);
-    try {
-      const response = await ProfileAPI.updateProfile({
-        name: editForm.name,
-        email: editForm.email,
-        phone: editForm.phone,
-        address: editForm.address,
-        dateOfBirth: editForm.dateOfBirth,
-        emergencyContact: editForm.emergencyContact,
-        preferredLanguage: editForm.preferredLanguage
-      });
+  setIsSaving(true);
+  try {
+    const response = await ProfileAPI.updateProfile({
+      name: editForm.name,
+      email: editForm.email,
+      phone: editForm.phone,
+    });
 
-      if (response.success) {
-        setProfile({ ...profile!, ...editForm });
-        setIsEditing(false);
-        alert('Profile updated successfully!');
-      } else {
-        alert('Failed to update profile. Please try again.');
-      }
-    } catch (error) {
-      console.error('Failed to update profile:', error);
+    if (response.success) {
+      setProfile({ ...profile!, ...editForm });
+      setIsEditing(false);
+      alert('Profile updated successfully!');
+    } else {
       alert('Failed to update profile. Please try again.');
-    } finally {
-      setIsSaving(false);
     }
-  };
+  } catch (error) {
+    console.error('Failed to update profile:', error);
+    alert('Failed to update profile. Please try again.');
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const handleInputChange = (field: keyof UserProfile, value: string) => {
     setEditForm(prev => ({ ...prev, [field]: value }));
@@ -236,13 +227,10 @@ useEffect(() => {
                   <p className="opacity-90">{profile.email}</p>
                   <div className="flex items-center gap-4 mt-2">
                     <div className="flex items-center gap-1">
-                      <span className="text-sm">Total Rides:</span>
-                      <span className="font-semibold">{profile.totalRides}</span>
+                      <span className="text-sm">Role:</span>
+                      <span className="font-semibold">{profile.role}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm">Rating:</span>
-                      <span className="font-semibold">{profile.rating}/5</span>
-                    </div>
+                 
                   </div>
                 </div>
               </div>
@@ -312,105 +300,11 @@ useEffect(() => {
                     )}
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Date of Birth
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="date"
-                        value={editForm.dateOfBirth || ''}
-                        onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <span className="text-gray-900 dark:text-white">
-                          {new Date(profile.dateOfBirth).toLocaleDateString()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                
                 </div>
 
                 {/* Contact & Preferences */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contact & Preferences</h3>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Address
-                    </label>
-                    {isEditing ? (
-                      <textarea
-                        value={editForm.address || ''}
-                        onChange={(e) => handleInputChange('address', e.target.value)}
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    ) : (
-                      <div className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
-                        <span className="text-gray-900 dark:text-white">{profile.address}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Emergency Contact
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="tel"
-                        value={editForm.emergencyContact || ''}
-                        onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <Shield className="h-4 w-4 text-gray-500" />
-                        <span className="text-gray-900 dark:text-white">{profile.emergencyContact}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Preferred Language
-                    </label>
-                    {isEditing ? (
-                      <select
-                        value={editForm.preferredLanguage || ''}
-                        onChange={(e) => handleInputChange('preferredLanguage', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                      >
-                        <option value="Hindi">Hindi</option>
-                        <option value="English">English</option>
-                        <option value="Punjabi">Punjabi</option>
-                        <option value="Pahari">Pahari</option>
-                      </select>
-                    ) : (
-                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <Settings className="h-4 w-4 text-gray-500" />
-                        <span className="text-gray-900 dark:text-white">{profile.preferredLanguage}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Member Since
-                    </label>
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <History className="h-4 w-4 text-gray-500" />
-                      <span className="text-gray-900 dark:text-white">
-                        {new Date(profile.joinDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+               
               </div>
             </div>
           </div>

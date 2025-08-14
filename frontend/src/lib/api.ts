@@ -1,4 +1,4 @@
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://ride-with-us.onrender.com';
 const USE_DEMO_MODE = false; // Disable demo mode to use real API
 
 export function getToken(): string | null {

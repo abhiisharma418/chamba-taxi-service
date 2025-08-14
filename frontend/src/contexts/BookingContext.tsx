@@ -62,7 +62,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
 
   useEffect(() => {
     if (!user) return;
-    const sock = io((import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com', { auth: { userId: user.id } });
+    const sock = io((import.meta as any).env?.VITE_API_URL || 'https://ride-with-us.onrender.com', { auth: { userId: user.id } });
     setSocket(sock);
     sock.on('ride:status', async (payload: any) => {
       try {

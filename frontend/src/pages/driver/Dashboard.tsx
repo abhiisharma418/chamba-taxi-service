@@ -37,7 +37,7 @@ const DriverDashboard: React.FC = () => {
   useEffect(() => {
     if (!user) return;
 
-    const sock = io((import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com', { auth: { driverId: user.id } });
+    const sock = io((import.meta as any).env?.VITE_API_URL || 'https://ride-with-us.onrender.com', { auth: { driverId: user.id } });
     sock.on('dispatch:offer', (payload: any) => { setOffer({ rideId: payload.rideId, pickup: payload.pickup, destination: payload.destination }); });
     return () => { sock.disconnect(); };
   }, [user]);

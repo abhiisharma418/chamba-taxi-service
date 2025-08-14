@@ -52,7 +52,7 @@ const BookRide: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    const sock = io((import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com', { auth: { userId: user.id } });
+    const sock = io((import.meta as any).env?.VITE_API_URL || 'https://ride-with-us.onrender.com', { auth: { userId: user.id } });
     return () => { sock.disconnect(); };
   }, [user]);
 

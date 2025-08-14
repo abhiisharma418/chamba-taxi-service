@@ -17,7 +17,7 @@ const Login: React.FC = () => {
   React.useEffect(() => {
     const type = searchParams.get('type') as 'customer' | 'driver' | 'admin' | null;
     if (type === 'admin') {
-      window.location.href = (import.meta as any).env?.VITE_ADMIN_URL || 'https://chamba-taxi-service-2.onrender.com';
+      window.location.href = (import.meta as any).env?.VITE_ADMIN_URL || 'https://ride-with-us.onrender.com';
       return;
     }
     if (type === 'customer' || type === 'driver') {

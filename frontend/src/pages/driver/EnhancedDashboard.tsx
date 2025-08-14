@@ -74,7 +74,7 @@ const EnhancedDriverDashboard: React.FC = () => {
   };
 
   const setupSocketConnection = () => {
-    const socket = io(import.meta.env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com', {
+    const socket = io(import.meta.env?.VITE_API_URL || 'https://ride-with-us.onrender.com', {
       auth: { driverId: user?.id }
     });
 

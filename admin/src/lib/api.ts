@@ -1,4 +1,4 @@
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://ride-with-us.onrender.com';
 
 // API status tracking
 let apiStatus = {

@@ -10,7 +10,7 @@ import SupportInterface from '../../components/SupportInterface';
 import FinancialWidget from '../../components/FinancialWidget';
 import ChatInterface from '../../components/ChatInterface';
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://ride-with-us.onrender.com';
 
 const CustomerDashboard: React.FC = () => {
   const { user } = useAuth();
