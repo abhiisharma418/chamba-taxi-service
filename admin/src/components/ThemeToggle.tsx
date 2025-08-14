@@ -17,6 +17,17 @@ const ThemeToggle: React.FC = () => {
   const currentTheme = themes.find(t => t.value === theme) || themes[0];
   const CurrentIcon = currentTheme.icon;
 
+  // Calculate dropdown position when opening
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        left: rect.right - 176 // 176px = w-44
+      });
+    }
+  }, [isOpen]);
+
   return (
     <div className="relative">
       <button
