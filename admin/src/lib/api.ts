@@ -1,4 +1,4 @@
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000';
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
 
 // API status tracking
 let apiStatus = {
@@ -61,11 +61,12 @@ export function setToken(token: string | null) {
 // Demo responses removed - using live backend only
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
-  // First check if we should skip real API calls (development mode or offline)
-  const skipAPI = import.meta.env?.DEV || !navigator.onLine || (!apiStatus.isOnline && apiStatus.consecutiveFailures >= 3);
+  // Only use mock data if explicitly offline or after multiple consecutive failures
+  const useApiFirst = true; // Always try API first
+  const skipAPI = !navigator.onLine || (apiStatus.consecutiveFailures >= 5); // Only skip after 5 failures
 
   if (skipAPI) {
-    console.log(`Admin API: Using mock data for ${path} (${import.meta.env?.DEV ? 'development mode' : !navigator.onLine ? 'offline' : 'API unavailable'})`);
+    console.log(`Admin API: Using mock data for ${path} (${!navigator.onLine ? 'offline' : 'API unavailable after multiple failures'})`);
     return getMockResponse(path);
   }
 
@@ -94,6 +95,11 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
 
       if (!res.ok) {
         updateApiStatus(false);
+        // For auth failures, return proper error instead of mock data
+        if (path === '/api/auth/login' && (res.status === 401 || res.status === 403)) {
+          const errorData = await res.json().catch(() => ({ message: 'Invalid credentials' }));
+          throw new Error(errorData.message || 'Invalid admin credentials');
+        }
         throw new Error(`Request failed: ${res.status}`);
       }
 
@@ -110,6 +116,12 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     .catch((error) => {
       clearTimeout(timeoutId);
       updateApiStatus(false);
+
+      // For login, throw the error instead of returning mock data
+      if (path === '/api/auth/login') {
+        throw error;
+      }
+
       console.warn(`API call failed for ${path}, using mock data:`, error.message || error);
       resolve(getMockResponse(path));
     });
