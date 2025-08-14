@@ -199,7 +199,7 @@ const Dashboard: React.FC = () => {
               <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg">
                 <Activity className="h-6 w-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+              <h2 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
                 Ride Statistics
               </h2>
             </div>
