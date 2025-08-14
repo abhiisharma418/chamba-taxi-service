@@ -32,6 +32,7 @@ const ThemeToggle: React.FC = () => {
   return (
     <div className="relative">
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 transition-all duration-200 hover:scale-105"
         aria-label="Toggle theme"
