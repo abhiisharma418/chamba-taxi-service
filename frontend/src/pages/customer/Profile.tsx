@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { ProfileAPI } from '../../lib/api';
 import Navigation from '../../components/Navigation';
 import { 
   User, 
