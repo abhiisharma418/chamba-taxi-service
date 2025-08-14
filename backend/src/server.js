@@ -204,10 +204,16 @@ app.use('/api/scheduled-rides', authenticate, requireActive, scheduledRideRoutes
 app.use("/api/bookings", bookingRoutes);
 app.use('/api/customer', customerRoutes);
 // Start server and connect to MongoDB
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
-    server.listen(process.env.PORT || 5000, () => console.log(`Server running on port ${process.env.PORT || 5000}`));
+    const PORT = process.env.PORT || 5000;
+    const HOST = '0.0.0.0'; // Bind to all network interfaces
+    server.listen(PORT, HOST, () => {
+      console.log(`Server running on http://${HOST}:${PORT}`);
+      console.log(`Network URL: http://172.20.10.2:${PORT}`);
+    });
   })
   .catch((err) => console.error(err));
 
