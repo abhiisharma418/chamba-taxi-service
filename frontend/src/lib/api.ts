@@ -263,6 +263,121 @@ function getDemoResponse(path: string, options: RequestInit) {
     };
   }
 
+  // Customer profile endpoints
+  if (path === '/api/customer/profile') {
+    if (options.method === 'PUT') {
+      // Update profile - return success
+      return {
+        success: true,
+        data: {
+          message: 'Profile updated successfully'
+        }
+      };
+    }
+    // Get profile
+    return {
+      success: true,
+      data: {
+        id: '1',
+        name: 'Demo Customer',
+        email: 'customer@test.com',
+        phone: '+91 9876543210',
+        address: 'Shimla, Himachal Pradesh, India',
+        dateOfBirth: '1990-01-15',
+        emergencyContact: '+91 9876543211',
+        preferredLanguage: 'Hindi',
+        profileImage: null,
+        joinDate: '2024-01-15',
+        totalRides: 47,
+        rating: 4.8,
+        isVerified: true,
+        lastLoginAt: new Date().toISOString()
+      }
+    };
+  }
+
+  if (path === '/api/customer/profile/stats') {
+    return {
+      success: true,
+      data: {
+        totalRides: 47,
+        completedRides: 45,
+        cancelledRides: 2,
+        averageRating: 4.8,
+        totalSpent: 12500,
+        favoriteRoutes: [
+          { from: 'Mall Road', to: 'The Ridge', count: 8 },
+          { from: 'Bus Stand', to: 'Jakhu Temple', count: 6 }
+        ],
+        monthlyRides: Array.from({ length: 12 }, (_, i) => ({
+          month: new Date(2024, i, 1).toLocaleDateString('en-US', { month: 'short' }),
+          rides: Math.floor(Math.random() * 10) + 2
+        }))
+      }
+    };
+  }
+
+  if (path === '/api/customer/payment-methods') {
+    return {
+      success: true,
+      data: [
+        {
+          id: '1',
+          type: 'card',
+          provider: 'visa',
+          last4: '4242',
+          expiryMonth: 12,
+          expiryYear: 2025,
+          isDefault: true,
+          isVerified: true
+        },
+        {
+          id: '2',
+          type: 'upi',
+          provider: 'upi',
+          upiId: 'customer@paytm',
+          isDefault: false,
+          isVerified: true
+        }
+      ]
+    };
+  }
+
+  if (path === '/api/customer/settings/notifications') {
+    return {
+      success: true,
+      data: {
+        email: {
+          rideUpdates: true,
+          promotions: false,
+          newsletters: true
+        },
+        sms: {
+          rideUpdates: true,
+          emergencyAlerts: true,
+          promotions: false
+        },
+        push: {
+          rideUpdates: true,
+          driverMessages: true,
+          promotions: false
+        }
+      }
+    };
+  }
+
+  if (path === '/api/customer/settings/privacy') {
+    return {
+      success: true,
+      data: {
+        shareLocationHistory: false,
+        allowDataCollection: true,
+        shareRideData: false,
+        enableLocationTracking: true
+      }
+    };
+  }
+
   // Default demo response
   return { success: true, data: {} };
 }
