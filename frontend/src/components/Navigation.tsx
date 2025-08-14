@@ -67,7 +67,7 @@ const Navigation: React.FC = () => {
   const navItems = getNavItems();
 
   return (
-    <nav className="relative bg-white/80 dark:bg-dark-card/80 backdrop-blur-2xl shadow-2xl sticky top-0 z-50 border-b border-white/30 dark:border-dark-border/30 overflow-hidden">
+    <nav className="relative bg-white/80 dark:bg-dark-card/80 backdrop-blur-2xl shadow-2xl sticky top-0 z-[40] border-b border-white/30 dark:border-dark-border/30">
       <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
       <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-blue-50/20 dark:from-dark-card/10"></div>
 
@@ -150,8 +150,8 @@ const Navigation: React.FC = () => {
 
         {/* Mobile Menu */}
         {user && isMenuOpen && (
-          <div className={`${responsive.nav.mobileMenu} animate-fadeInDown`}>
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
+          <div className="absolute top-full left-0 right-0 z-[50] bg-white dark:bg-dark-card shadow-xl border-t border-gray-200 dark:border-dark-border animate-fadeInDown md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-dark-card max-h-[calc(100vh-80px)] overflow-y-auto">
               {navItems.map((item, index) => (
                 <Link
                   key={item.path}
