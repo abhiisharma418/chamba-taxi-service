@@ -4,15 +4,15 @@ import { createLazyComponent } from '../utils/codeSplitting';
 import { AdminRouteLoading } from './AdminLoading';
 
 // Create lazy components with error boundaries
-const LazyDashboard = createLazyComponent(() => import('../pages/Dashboard'));
-const LazyUserManagement = createLazyComponent(() => import('../pages/UserManagement'));
-const LazyLiveRideMonitoring = createLazyComponent(() => import('../pages/LiveRideMonitoring'));
-const LazyFinancialManagement = createLazyComponent(() => import('../pages/FinancialManagement'));
-const LazySupportManagement = createLazyComponent(() => import('../pages/SupportManagement'));
-const LazyFinancialReporting = createLazyComponent(() => import('../pages/FinancialReporting'));
-const LazyPromoCodeManagement = createLazyComponent(() => import('../pages/PromoCodeManagement'));
-const LazyEmergencyManagement = createLazyComponent(() => import('../pages/EmergencyManagement'));
-const LazyScheduledRidesManagement = createLazyComponent(() => import('../pages/ScheduledRidesManagement'));
+const LazyDashboard = React.lazy(() => import('../pages/Dashboard'));
+const LazyUserManagement = React.lazy(() => import('../pages/UserManagement'));
+const LazyLiveRideMonitoring = React.lazy(() => import('../pages/LiveRideMonitoring'));
+const LazyFinancialManagement = React.lazy(() => import('../pages/FinancialManagement'));
+const LazySupportManagement = React.lazy(() => import('../pages/SupportManagement'));
+const LazyFinancialReporting = React.lazy(() => import('../pages/FinancialReporting'));
+const LazyPromoCodeManagement = React.lazy(() => import('../pages/PromoCodeManagement'));
+const LazyEmergencyManagement = React.lazy(() => import('../pages/EmergencyManagement'));
+const LazyScheduledRidesManagement = React.lazy(() => import('../pages/ScheduledRidesManagement'));
 
 // Route configuration for better organization
 const adminRoutes = [
@@ -93,7 +93,7 @@ const RouteWrapper: React.FC<{
 };
 
 // Main admin router component
-export const AdminRouter: React.FC = () => {
+const AdminRouter: React.FC = () => {
   return (
     <Suspense fallback={<AdminRouteLoading />}>
       <Routes>
@@ -121,7 +121,7 @@ export const AdminRouter: React.FC = () => {
 };
 
 // Route preloader for hover effects
-export const preloadRoute = (routePath: string) => {
+const preloadRoute = (routePath: string) => {
   const route = adminRoutes.find(r => r.path === routePath);
   if (route) {
     // Trigger component preload
@@ -129,4 +129,5 @@ export const preloadRoute = (routePath: string) => {
   }
 };
 
+export { AdminRouter, preloadRoute };
 export default AdminRouter;

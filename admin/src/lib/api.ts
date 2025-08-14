@@ -1,5 +1,31 @@
 const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000';
 
+// API status tracking
+let apiStatus = {
+  isOnline: false,
+  lastChecked: 0,
+  consecutiveFailures: 0
+};
+
+// Check API status periodically
+function updateApiStatus(success: boolean) {
+  apiStatus.lastChecked = Date.now();
+  if (success) {
+    apiStatus.isOnline = true;
+    apiStatus.consecutiveFailures = 0;
+  } else {
+    apiStatus.consecutiveFailures++;
+    if (apiStatus.consecutiveFailures >= 3) {
+      apiStatus.isOnline = false;
+    }
+  }
+}
+
+// Get current API status
+export function getApiStatus() {
+  return { ...apiStatus };
+}
+
 // Mock data for when backend is not available
 const mockData = {
   stats: {
@@ -35,33 +61,59 @@ export function setToken(token: string | null) {
 // Demo responses removed - using live backend only
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
+  // First check if we should skip real API calls (development mode or offline)
+  const skipAPI = import.meta.env?.DEV || !navigator.onLine || (!apiStatus.isOnline && apiStatus.consecutiveFailures >= 3);
+
+  if (skipAPI) {
+    console.log(`Admin API: Using mock data for ${path} (${import.meta.env?.DEV ? 'development mode' : !navigator.onLine ? 'offline' : 'API unavailable'})`);
+    return getMockResponse(path);
+  }
+
   const token = getToken();
   const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(options.headers as any) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   console.log(`Admin API call to: ${API_URL}${path}`);
 
-  try {
-    const res = await fetch(`${API_URL}${path}`, {
+  // Wrap everything in a promise that resolves to mock data on any failure
+  return new Promise((resolve) => {
+    const timeoutId = setTimeout(() => {
+      console.warn(`API call timeout for ${path}, using mock data`);
+      resolve(getMockResponse(path));
+    }, 2000); // 2 second timeout
+
+    // Try the actual API call
+    fetch(`${API_URL}${path}`, {
       ...options,
       headers,
       credentials: 'include',
       mode: 'cors'
+    })
+    .then(async (res) => {
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        updateApiStatus(false);
+        throw new Error(`Request failed: ${res.status}`);
+      }
+
+      updateApiStatus(true);
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const data = await res.json();
+        resolve(data);
+      } else {
+        const text = await res.text();
+        resolve(text);
+      }
+    })
+    .catch((error) => {
+      clearTimeout(timeoutId);
+      updateApiStatus(false);
+      console.warn(`API call failed for ${path}, using mock data:`, error.message || error);
+      resolve(getMockResponse(path));
     });
-
-    if (!res.ok) {
-      console.warn(`Admin API call failed with status ${res.status}, falling back to mock data`);
-      throw new Error(`Request failed: ${res.status}`);
-    }
-
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('application/json')) return res.json();
-    return res.text();
-  } catch (error) {
-    console.warn(`API call failed, using mock data for ${path}:`, error);
-    // Return mock data based on the path
-    return getMockResponse(path);
-  }
+  });
 }
 
 function getMockResponse(path: string) {

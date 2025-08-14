@@ -5,6 +5,7 @@ import { AdminPageSkeleton } from './components/LoadingSkeletons';
 import { AdminRouter } from './components/AdminRouter';
 import { useCodeSplitting, usePerformanceMonitoring } from './hooks/useCodeSplitting';
 import { useRoutePreloading } from './utils/routeManifest';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy load login page
 const Login = React.lazy(() => import('./pages/Login'));
@@ -16,7 +17,9 @@ const AppRoutes: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-dark-25 dark:via-dark-50/30 dark:to-dark-100/50 transition-colors duration-200">
-      <AdminRouter />
+      <ErrorBoundary>
+        <AdminRouter />
+      </ErrorBoundary>
     </div>
   );
 };
@@ -37,9 +40,11 @@ function App() {
 
   if (!user) {
     return (
-      <Suspense fallback={<AdminPageSkeleton showSidebar={false} />}>
-        <Login />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<AdminPageSkeleton showSidebar={false} />}>
+          <Login />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
