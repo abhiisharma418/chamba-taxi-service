@@ -85,19 +85,33 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
   }, [user]);
 
   const createBooking = async (bookingData: { pickup: Booking['pickup']; destination: Booking['destination']; vehicleType: 'car'|'bike' }) => {
-    const res = await RidesAPI.create({ pickup: bookingData.pickup, destination: bookingData.destination, vehicleType: bookingData.vehicleType, regionType: 'city' });
-    const ride = res.data;
-    setCurrentBooking(ride);
-    try { await LiveAPI.startDispatch(ride.id, { coordinates: bookingData.pickup.coordinates }); } catch {}
-    await getBookingHistory();
+    try {
+      const res = await RidesAPI.create({ pickup: bookingData.pickup, destination: bookingData.destination, vehicleType: bookingData.vehicleType, regionType: 'city' });
+      if (res.success && res.data) {
+        const ride = res.data;
+        setCurrentBooking(ride);
+        try { await LiveAPI.startDispatch(ride.id, { coordinates: bookingData.pickup.coordinates }); } catch {}
+        await getBookingHistory();
+      }
+    } catch (error) {
+      console.error('Failed to create booking:', error);
+      throw error; // Re-throw so component can handle it
+    }
   };
 
   const updateBookingStatus = async (bookingId: string, status: Booking['status']) => {
-    await RidesAPI.updateStatus(bookingId, status);
-    await getBookingHistory();
-    if (currentBooking?.id === bookingId) {
-      const r = await RidesAPI.get(bookingId);
-      setCurrentBooking(r.data);
+    try {
+      await RidesAPI.updateStatus(bookingId, status);
+      await getBookingHistory();
+      if (currentBooking?.id === bookingId) {
+        const r = await RidesAPI.get(bookingId);
+        if (r.success && r.data) {
+          setCurrentBooking(r.data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update booking status:', error);
+      throw error; // Re-throw so component can handle it
     }
   };
 
