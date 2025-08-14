@@ -121,7 +121,7 @@ const AdminRouter: React.FC = () => {
 };
 
 // Route preloader for hover effects
-export const preloadRoute = (routePath: string) => {
+const preloadRoute = (routePath: string) => {
   const route = adminRoutes.find(r => r.path === routePath);
   if (route) {
     // Trigger component preload
@@ -129,4 +129,5 @@ export const preloadRoute = (routePath: string) => {
   }
 };
 
+export { AdminRouter, preloadRoute };
 export default AdminRouter;
