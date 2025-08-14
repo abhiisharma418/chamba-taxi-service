@@ -88,9 +88,9 @@ const Navigation: React.FC = () => {
       <div className={`${patterns.navigation.inner} relative z-10`}>
         <div className={patterns.navigation.content}>
           <div className="flex items-center">
-            <Link to={getHomePath()} className="group flex items-center transition-transform duration-300 hover:scale-105">
-              <div className="p-2 bg-white/50 dark:bg-dark-card/50 backdrop-blur-xl rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 border border-white/40">
-                <Logo size="md" enableRotation={true} />
+            <Link to={getHomePath()} className="group flex items-center ">
+              <div className="p-2 bg-white/50 dark:bg-dark-card/50 backdrop-blur-xl rounded-2xl ">
+                <Logo size="md" />
               </div>
             </Link>
           </div>
@@ -120,13 +120,13 @@ const Navigation: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <Link
                     to="/customer/profile"
-                    className="group flex items-center space-x-3 px-4 py-2 bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl rounded-2xl border border-white/40 shadow-lg hover:shadow-xl hover:bg-white/80 dark:hover:bg-dark-card/80 transition-all duration-300 cursor-pointer"
+                    className="group flex items-center space-x-3 px-4 py-2   cursor-pointer"
                   >
                     <div className="relative">
                       <img
                         src="https://cdn.builder.io/api/v1/image/assets%2Fcf4880cbfa8e44669fa8a9aa80d0be2a%2F550f118337114807a09b6e102244467d?format=webp&width=800"
                         alt={user.name}
-                        className="h-10 w-10 rounded-2xl border-2 border-white shadow-lg object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="h-10 w-10 rounded-2xl  object-cover "
                       />
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
                     </div>

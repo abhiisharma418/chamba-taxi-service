@@ -51,12 +51,6 @@ const LandingPage: React.FC = () => {
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto text-center">
-          {/* Premium Badge */}
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/70 backdrop-blur-xl border border-white/40 rounded-full shadow-xl mb-8">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-bold text-slate-700 tracking-wide uppercase">Your Trusted Ride Partner</span>
-          </div>
-
           <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-slate-900 mb-8 leading-none tracking-tight">
             Your{' '}
             <span className="relative inline-block">
