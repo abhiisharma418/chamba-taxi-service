@@ -5,14 +5,14 @@ import { AdminRouteLoading } from './AdminLoading';
 
 // Create lazy components with error boundaries
 const LazyDashboard = React.lazy(() => import('../pages/Dashboard'));
-const LazyUserManagement = createLazyComponent(() => import('../pages/UserManagement'));
-const LazyLiveRideMonitoring = createLazyComponent(() => import('../pages/LiveRideMonitoring'));
-const LazyFinancialManagement = createLazyComponent(() => import('../pages/FinancialManagement'));
-const LazySupportManagement = createLazyComponent(() => import('../pages/SupportManagement'));
-const LazyFinancialReporting = createLazyComponent(() => import('../pages/FinancialReporting'));
-const LazyPromoCodeManagement = createLazyComponent(() => import('../pages/PromoCodeManagement'));
-const LazyEmergencyManagement = createLazyComponent(() => import('../pages/EmergencyManagement'));
-const LazyScheduledRidesManagement = createLazyComponent(() => import('../pages/ScheduledRidesManagement'));
+const LazyUserManagement = React.lazy(() => import('../pages/UserManagement'));
+const LazyLiveRideMonitoring = React.lazy(() => import('../pages/LiveRideMonitoring'));
+const LazyFinancialManagement = React.lazy(() => import('../pages/FinancialManagement'));
+const LazySupportManagement = React.lazy(() => import('../pages/SupportManagement'));
+const LazyFinancialReporting = React.lazy(() => import('../pages/FinancialReporting'));
+const LazyPromoCodeManagement = React.lazy(() => import('../pages/PromoCodeManagement'));
+const LazyEmergencyManagement = React.lazy(() => import('../pages/EmergencyManagement'));
+const LazyScheduledRidesManagement = React.lazy(() => import('../pages/ScheduledRidesManagement'));
 
 // Route configuration for better organization
 const adminRoutes = [
