@@ -1,5 +1,5 @@
 const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://chamba-taxi-service-2.onrender.com';
-const USE_DEMO_MODE = true; // Enable demo mode for better development experience
+const USE_DEMO_MODE = false; // Disable demo mode to use real API
 
 export function getToken(): string | null {
   try { return localStorage.getItem('token'); } catch { return null; }
@@ -481,11 +481,11 @@ function getDemoResponse(path: string, options: RequestInit) {
 }
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
-  // Enable demo mode by default in development or when offline
-  const shouldUseDemoMode = USE_DEMO_MODE || import.meta.env?.DEV || !navigator.onLine;
+  // Only use demo mode if explicitly enabled or offline
+  const shouldUseDemoMode = USE_DEMO_MODE || !navigator.onLine;
 
   if (shouldUseDemoMode) {
-    console.log(`Frontend API: Using demo data for ${path} (${USE_DEMO_MODE ? 'demo mode' : import.meta.env?.DEV ? 'development' : 'offline'})`);
+    console.log(`Frontend API: Using demo data for ${path} (${USE_DEMO_MODE ? 'demo mode enabled' : 'offline'})`);
     return getDemoResponse(path, options);
   }
 
@@ -513,6 +513,11 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
       clearTimeout(timeoutId);
 
       if (!res.ok) {
+        // For auth failures, return proper error instead of demo data
+        if (path === '/api/auth/login' && (res.status === 401 || res.status === 403)) {
+          const errorData = await res.json().catch(() => ({ message: 'Invalid credentials' }));
+          throw new Error(errorData.message || 'Invalid credentials');
+        }
         throw new Error(`Request failed: ${res.status}`);
       }
 
@@ -527,6 +532,12 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     })
     .catch((error) => {
       clearTimeout(timeoutId);
+
+      // For login, throw the error instead of returning demo data
+      if (path === '/api/auth/login') {
+        throw error;
+      }
+
       console.warn(`Frontend API call failed for ${path}, using demo data:`, error.message || error);
       resolve(getDemoResponse(path, options));
     });

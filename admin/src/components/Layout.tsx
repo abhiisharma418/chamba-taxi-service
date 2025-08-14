@@ -85,7 +85,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-white dark:bg-dark-surface transition-colors duration-300">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300" />
+        <div
+          className="fixed inset-0 bg-black/50 z-[50] lg:hidden transition-opacity duration-300"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
       )}
 
       {/* Desktop Sidebar - Hidden on mobile */}
@@ -103,9 +106,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       {/* Mobile Sidebar */}
-      <div className={`mobile-sidebar fixed inset-y-0 left-0 w-72 z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${
+      <div className={`mobile-sidebar fixed inset-y-0 left-0 w-72 z-[60] lg:hidden transform transition-transform duration-300 ease-in-out ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      } overflow-y-auto`}>
         <div className="h-full bg-white dark:bg-dark-card shadow-2xl dark:shadow-dark-2xl border-r border-gray-200 dark:border-dark-border overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
           <SidebarContent 
@@ -121,7 +124,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main Content */}
       <div className="lg:ml-72">
         {/* Mobile Header */}
-        <header className="lg:hidden relative bg-white/95 dark:bg-dark-card/95 backdrop-blur-2xl shadow-lg dark:shadow-dark-lg border-b border-white/30 dark:border-dark-border px-4 py-4">
+        <header className="lg:hidden relative bg-white/95 dark:bg-dark-card/95 backdrop-blur-2xl shadow-lg dark:shadow-dark-lg border-b border-white/30 dark:border-dark-border px-4 py-4 z-30">
           <div className="flex items-center justify-between">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
