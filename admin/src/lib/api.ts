@@ -207,8 +207,17 @@ function getMockResponse(path: string) {
 }
 
 export const AdminAPI = {
-  login: (payload: { email: string; password: string }) => apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
-  logout: () => apiFetch('/api/auth/logout', { method: 'POST', body: JSON.stringify({}) }),
+  login: (payload: { email: string; password: string }) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const result = await apiFetch('/api/admin/auth/login', { method: 'POST', body: JSON.stringify(payload) });
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+  logout: () => apiFetch('/api/admin/auth/logout', { method: 'POST', body: JSON.stringify({}) }),
   
   // Dashboard stats
   getStats: () => apiFetch('/api/admin/stats'),
