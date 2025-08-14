@@ -383,9 +383,11 @@ function getDemoResponse(path: string, options: RequestInit) {
 }
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
-  // Use demo mode completely when enabled
-  if (USE_DEMO_MODE) {
-    console.log(`Demo mode active for: ${path}`);
+  // Enable demo mode by default in development or when offline
+  const shouldUseDemoMode = USE_DEMO_MODE || import.meta.env?.DEV || !navigator.onLine;
+
+  if (shouldUseDemoMode) {
+    console.log(`Frontend API: Using demo data for ${path} (${USE_DEMO_MODE ? 'demo mode' : import.meta.env?.DEV ? 'development' : 'offline'})`);
     return getDemoResponse(path, options);
   }
 
@@ -393,39 +395,44 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(options.headers as any) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  try {
-    console.log(`Attempting API call to: ${API_URL}${path}`);
-    const res = await fetch(`${API_URL}${path}`, {
+  console.log(`Frontend API call to: ${API_URL}${path}`);
+
+  // Wrap everything in a promise that resolves to demo data on any failure
+  return new Promise((resolve) => {
+    const timeoutId = setTimeout(() => {
+      console.warn(`Frontend API timeout for ${path}, using demo data`);
+      resolve(getDemoResponse(path, options));
+    }, 3000); // 3 second timeout
+
+    // Try the actual API call
+    fetch(`${API_URL}${path}`, {
       ...options,
       headers,
       credentials: 'include',
-      mode: 'cors' // Explicitly set CORS mode
-    });
+      mode: 'cors'
+    })
+    .then(async (res) => {
+      clearTimeout(timeoutId);
 
-    if (!res.ok) {
-      console.warn(`API call failed with status ${res.status}`);
-      const text = await res.text();
-      throw new Error(text || `Request failed: ${res.status}`);
-    }
-
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('application/json')) return res.json();
-    return res.text();
-  } catch (error) {
-    console.warn(`API call failed for ${path}, using demo fallback:`, error);
-
-    // Always provide fallback response for essential functionality
-    try {
-      return getDemoResponse(path, options);
-    } catch (demoError) {
-      console.error(`Demo response failed for ${path}:`, demoError);
-      // Ultimate fallback
-      if (path.includes('/api/auth/login')) {
-        throw new Error('Invalid credentials. Please try again.');
+      if (!res.ok) {
+        throw new Error(`Request failed: ${res.status}`);
       }
-      throw error;
-    }
-  }
+
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const data = await res.json();
+        resolve(data);
+      } else {
+        const text = await res.text();
+        resolve(text);
+      }
+    })
+    .catch((error) => {
+      clearTimeout(timeoutId);
+      console.warn(`Frontend API call failed for ${path}, using demo data:`, error.message || error);
+      resolve(getDemoResponse(path, options));
+    });
+  });
 }
 
 export const AuthAPI = {
