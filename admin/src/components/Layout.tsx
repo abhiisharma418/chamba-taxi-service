@@ -249,8 +249,8 @@ const SidebarContent: React.FC<{
               onClick={() => onNavigate(item.path)}
               className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-300 font-medium ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white shadow-lg dark:shadow-dark-lg border border-blue-300/50 dark:border-blue-400/50'
-                  : 'text-slate-700 dark:text-dark-600 hover:bg-white/70 dark:hover:bg-dark-100/70 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md dark:hover:shadow-dark-md backdrop-blur-sm border border-transparent hover:border-blue-200/50 dark:hover:border-blue-400/30'
+                  ? 'bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white shadow-lg dark:shadow-dark-lg border border-blue-300 dark:border-blue-400'
+                  : 'text-slate-700 dark:text-dark-600 hover:bg-gray-100 dark:hover:bg-dark-100 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md dark:hover:shadow-dark-md border border-transparent hover:border-blue-200 dark:hover:border-blue-400'
               }`}
             >
               <div className={`p-2 rounded-lg transition-all duration-300 ${
