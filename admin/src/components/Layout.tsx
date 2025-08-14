@@ -273,10 +273,10 @@ const SidebarContent: React.FC<{
       </nav>
 
       {/* Bottom Section */}
-      <div className="p-4 lg:p-6 border-t border-white/20 dark:border-dark-border">
+      <div className="p-4 lg:p-6 border-t border-gray-200 dark:border-dark-border">
         <div className="mb-4">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 dark:text-dark-600 hover:bg-white/70 dark:hover:bg-dark-100/70 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 font-medium backdrop-blur-sm border border-transparent hover:border-blue-200/50 dark:hover:border-blue-400/30 hover:shadow-md dark:hover:shadow-dark-md">
-            <div className="p-2 rounded-lg bg-slate-100 dark:bg-dark-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-all duration-300">
+          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 dark:text-dark-600 hover:bg-gray-100 dark:hover:bg-dark-100 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 font-medium border border-transparent hover:border-blue-200 dark:hover:border-blue-400 hover:shadow-md dark:hover:shadow-dark-md">
+            <div className="p-2 rounded-lg bg-slate-100 dark:bg-dark-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900 transition-all duration-300">
               <Settings className="h-4 w-4" />
             </div>
             <span className="font-medium tracking-wide text-sm">Settings</span>
@@ -284,8 +284,7 @@ const SidebarContent: React.FC<{
         </div>
 
         {/* User Info */}
-        <div className="relative bg-gradient-to-br from-white/80 via-white/60 to-slate-50/80 backdrop-blur-xl rounded-xl p-4 border border-white/40 shadow-lg overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20"></div>
+        <div className="relative bg-gray-50 dark:bg-dark-card rounded-xl p-4 border border-gray-200 dark:border-dark-border shadow-lg overflow-hidden">
 
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-3">
