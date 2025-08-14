@@ -227,12 +227,12 @@ const SidebarContent: React.FC<{
   return (
     <div className="relative z-10 flex flex-col h-full">
       {/* Logo Section */}
-      <div className="p-6 lg:p-8 border-b border-white/20 dark:border-dark-border">
+      <div className="p-6 lg:p-8 border-b border-gray-200 dark:border-dark-border">
         <button
           onClick={() => onNavigate('/dashboard')}
           className="w-full hover:scale-105 transition-all duration-300 group"
         >
-          <div className="p-3 bg-gradient-to-br from-white/60 to-white/40 dark:from-dark-card/60 dark:to-dark-card/40 backdrop-blur-xl rounded-xl border border-white/40 dark:border-dark-border group-hover:shadow-lg dark:group-hover:shadow-dark-lg transition-all duration-300">
+          <div className="p-3 bg-gray-50 dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border group-hover:shadow-lg dark:group-hover:shadow-dark-lg transition-all duration-300">
             <Logo size="md" enableRotation={true} />
           </div>
         </button>
