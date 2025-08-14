@@ -104,20 +104,23 @@ const Navigation: React.FC = () => {
                 <ThemeToggle />
 
                 <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-3 px-4 py-2 bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl rounded-2xl border border-white/40 shadow-lg">
+                  <Link
+                    to="/customer/profile"
+                    className="group flex items-center space-x-3 px-4 py-2 bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl rounded-2xl border border-white/40 shadow-lg hover:shadow-xl hover:bg-white/80 dark:hover:bg-dark-card/80 transition-all duration-300 cursor-pointer"
+                  >
                     <div className="relative">
                       <img
-                        src={user.avatar}
+                        src="https://cdn.builder.io/api/v1/image/assets%2Fcf4880cbfa8e44669fa8a9aa80d0be2a%2F550f118337114807a09b6e102244467d?format=webp&width=800"
                         alt={user.name}
-                        className="h-10 w-10 rounded-2xl border-2 border-white shadow-lg"
+                        className="h-10 w-10 rounded-2xl border-2 border-white shadow-lg object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-gray-900 dark:text-white">{user.name}</span>
+                      <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors duration-300">{user.name}</span>
                       <span className="text-xs text-slate-600 dark:text-slate-400 capitalize">{user.type}</span>
                     </div>
-                  </div>
+                  </Link>
 
                   <button
                     onClick={handleLogout}
