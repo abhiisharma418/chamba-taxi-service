@@ -129,7 +129,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
 }
 
 function getMockResponse(path: string) {
-  if (path === '/api/auth/login') {
+  if (path === '/api/admin/auth/login') {
     return {
       success: true,
       data: {
