@@ -90,8 +90,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Desktop Sidebar - Hidden on mobile */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-72 lg:block">
-        <div className="h-full bg-white/95 dark:bg-dark-card/95 backdrop-blur-2xl shadow-xl dark:shadow-dark-2xl border-r border-white/30 dark:border-dark-border overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-slate-50/20 dark:from-dark-100/10 dark:to-dark-200/20"></div>
+        <div className="h-full bg-white dark:bg-dark-card shadow-xl dark:shadow-dark-2xl border-r border-gray-200 dark:border-dark-border overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"></div>
           <SidebarContent 
             menuItems={menuItems}
