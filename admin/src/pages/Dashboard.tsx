@@ -191,7 +191,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Performance Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
         {/* Ride Statistics */}
         <div className="group relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30 hover:bg-white/95 transition-all duration-500 overflow-hidden">
           <div className="relative z-10">
