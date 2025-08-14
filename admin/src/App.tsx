@@ -5,6 +5,7 @@ import { AdminPageSkeleton } from './components/LoadingSkeletons';
 import { AdminRouter } from './components/AdminRouter';
 import { useCodeSplitting, usePerformanceMonitoring } from './hooks/useCodeSplitting';
 import { useRoutePreloading } from './utils/routeManifest';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy load login page
 const Login = React.lazy(() => import('./pages/Login'));
