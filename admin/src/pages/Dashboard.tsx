@@ -74,7 +74,7 @@ const Dashboard: React.FC = () => {
     bgColor: string;
     change?: string;
   }) => (
-    <div className="group relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20 hover:bg-white/90 transition-all duration-500 hover:scale-105 hover:shadow-3xl overflow-hidden">
+    <div className="group relative bg-white/80 backdrop-blur-xl rounded-2xl lg:rounded-3xl shadow-2xl p-4 lg:p-8 border border-white/20 hover:bg-white/90 transition-all duration-500 hover:scale-105 hover:shadow-3xl overflow-hidden">
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
