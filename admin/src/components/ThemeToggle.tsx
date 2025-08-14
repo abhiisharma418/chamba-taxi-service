@@ -33,12 +33,13 @@ const ThemeToggle: React.FC = () => {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[9998]"
+            className="fixed inset-0 z-[99998] bg-transparent"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-44 bg-white/95 dark:bg-dark-card/95 backdrop-blur-xl rounded-xl shadow-2xl dark:shadow-dark-2xl border border-white/40 dark:border-dark-border z-[9999] animate-fadeInDown">
+          <div className="absolute right-0 mt-2 w-44 bg-white/98 dark:bg-dark-card/98 backdrop-blur-xl rounded-xl shadow-2xl dark:shadow-dark-2xl border border-white/40 dark:border-dark-border z-[99999] animate-fadeInDown"
+               style={{ position: 'absolute', zIndex: 99999 }}>
             <div className="p-2">
               {themes.map((themeOption) => {
                 const Icon = themeOption.icon;
