@@ -1,5 +1,31 @@
 const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000';
 
+// API status tracking
+let apiStatus = {
+  isOnline: false,
+  lastChecked: 0,
+  consecutiveFailures: 0
+};
+
+// Check API status periodically
+function updateApiStatus(success: boolean) {
+  apiStatus.lastChecked = Date.now();
+  if (success) {
+    apiStatus.isOnline = true;
+    apiStatus.consecutiveFailures = 0;
+  } else {
+    apiStatus.consecutiveFailures++;
+    if (apiStatus.consecutiveFailures >= 3) {
+      apiStatus.isOnline = false;
+    }
+  }
+}
+
+// Get current API status
+export function getApiStatus() {
+  return { ...apiStatus };
+}
+
 // Mock data for when backend is not available
 const mockData = {
   stats: {
