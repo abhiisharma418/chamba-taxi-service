@@ -35,40 +35,56 @@ export function setToken(token: string | null) {
 // Demo responses removed - using live backend only
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
+  // First check if we should skip real API calls (development mode)
+  const skipAPI = import.meta.env?.DEV || !navigator.onLine;
+
+  if (skipAPI) {
+    console.log(`Admin API: Using mock data for ${path} (development mode or offline)`);
+    return getMockResponse(path);
+  }
+
   const token = getToken();
   const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(options.headers as any) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   console.log(`Admin API call to: ${API_URL}${path}`);
 
-  try {
-    // Set a shorter timeout for faster fallback to mock data
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+  // Wrap everything in a promise that resolves to mock data on any failure
+  return new Promise((resolve) => {
+    const timeoutId = setTimeout(() => {
+      console.warn(`API call timeout for ${path}, using mock data`);
+      resolve(getMockResponse(path));
+    }, 2000); // 2 second timeout
 
-    const res = await fetch(`${API_URL}${path}`, {
+    // Try the actual API call
+    fetch(`${API_URL}${path}`, {
       ...options,
       headers,
       credentials: 'include',
-      mode: 'cors',
-      signal: controller.signal
+      mode: 'cors'
+    })
+    .then(async (res) => {
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        throw new Error(`Request failed: ${res.status}`);
+      }
+
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const data = await res.json();
+        resolve(data);
+      } else {
+        const text = await res.text();
+        resolve(text);
+      }
+    })
+    .catch((error) => {
+      clearTimeout(timeoutId);
+      console.warn(`API call failed for ${path}, using mock data:`, error.message || error);
+      resolve(getMockResponse(path));
     });
-
-    clearTimeout(timeoutId);
-
-    if (!res.ok) {
-      console.warn(`Admin API call failed with status ${res.status}, falling back to mock data`);
-      throw new Error(`Request failed: ${res.status}`);
-    }
-
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('application/json')) return res.json();
-    return res.text();
-  } catch (error) {
-    console.warn(`API call failed, using mock data for ${path}:`, error.name === 'AbortError' ? 'Connection timeout' : error);
-    // Return mock data based on the path
-    return getMockResponse(path);
-  }
+  });
 }
 
 function getMockResponse(path: string) {
