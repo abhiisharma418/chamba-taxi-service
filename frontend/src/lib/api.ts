@@ -378,6 +378,104 @@ function getDemoResponse(path: string, options: RequestInit) {
     };
   }
 
+  // Rides API endpoints
+  if (path === '/api/rides/history') {
+    return {
+      success: true,
+      data: [
+        {
+          id: '1',
+          customerId: '1',
+          driverId: 'driver1',
+          pickup: { address: 'Mall Road, Shimla', coordinates: [77.1734, 31.1048] },
+          destination: { address: 'The Ridge, Shimla', coordinates: [77.1722, 31.1033] },
+          vehicleType: 'car',
+          status: 'completed',
+          fare: { estimated: 150, actual: 150 },
+          paymentStatus: 'captured',
+          createdAt: new Date('2024-03-01T10:30:00Z'),
+          completedAt: new Date('2024-03-01T10:45:00Z'),
+          rating: 5
+        },
+        {
+          id: '2',
+          customerId: '1',
+          driverId: 'driver2',
+          pickup: { address: 'Bus Stand, Shimla', coordinates: [77.1700, 31.1050] },
+          destination: { address: 'Jakhu Temple, Shimla', coordinates: [77.1800, 31.1100] },
+          vehicleType: 'car',
+          status: 'completed',
+          fare: { estimated: 200, actual: 200 },
+          paymentStatus: 'captured',
+          createdAt: new Date('2024-02-28T14:20:00Z'),
+          completedAt: new Date('2024-02-28T14:40:00Z'),
+          rating: 4
+        }
+      ]
+    };
+  }
+
+  if (path.startsWith('/api/rides/') && path !== '/api/rides/history') {
+    // Individual ride details
+    return {
+      success: true,
+      data: {
+        id: path.split('/')[3],
+        customerId: '1',
+        driverId: 'driver1',
+        pickup: { address: 'Mall Road, Shimla', coordinates: [77.1734, 31.1048] },
+        destination: { address: 'The Ridge, Shimla', coordinates: [77.1722, 31.1033] },
+        vehicleType: 'car',
+        status: 'completed',
+        fare: { estimated: 150, actual: 150 },
+        paymentStatus: 'captured',
+        createdAt: new Date(),
+        completedAt: new Date()
+      }
+    };
+  }
+
+  if (path === '/api/rides' && options.method === 'POST') {
+    // Create new ride
+    return {
+      success: true,
+      data: {
+        id: 'ride_' + Date.now(),
+        customerId: '1',
+        pickup: JSON.parse(options.body as string).pickup,
+        destination: JSON.parse(options.body as string).destination,
+        vehicleType: JSON.parse(options.body as string).vehicleType,
+        status: 'requested',
+        fare: { estimated: 150 },
+        paymentStatus: 'none',
+        createdAt: new Date()
+      }
+    };
+  }
+
+  if (path === '/api/rides/estimate' && options.method === 'POST') {
+    // Fare estimate
+    return {
+      success: true,
+      data: {
+        estimatedFare: 150,
+        estimatedTime: 15,
+        distance: 5.2,
+        basefare: 50,
+        distanceRate: 10,
+        timeRate: 5
+      }
+    };
+  }
+
+  // Live API endpoints
+  if (path.startsWith('/api/live/')) {
+    return {
+      success: true,
+      data: { message: 'Success' }
+    };
+  }
+
   // Default demo response
   return { success: true, data: {} };
 }
