@@ -52,8 +52,13 @@ const ThemeToggle: React.FC = () => {
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-44 bg-white/98 dark:bg-dark-card/98 backdrop-blur-xl rounded-xl shadow-2xl dark:shadow-dark-2xl border border-white/40 dark:border-dark-border z-[99999] animate-fadeInDown"
-               style={{ position: 'absolute', zIndex: 99999 }}>
+          <div
+            className="fixed w-44 bg-white/98 dark:bg-dark-card/98 backdrop-blur-xl rounded-xl shadow-2xl dark:shadow-dark-2xl border border-white/40 dark:border-dark-border z-[99999] animate-fadeInDown"
+            style={{
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+              zIndex: 99999
+            }}>
             <div className="p-2">
               {themes.map((themeOption) => {
                 const Icon = themeOption.icon;
