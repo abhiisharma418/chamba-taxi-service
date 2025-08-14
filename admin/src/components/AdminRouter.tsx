@@ -93,7 +93,7 @@ const RouteWrapper: React.FC<{
 };
 
 // Main admin router component
-export const AdminRouter: React.FC = () => {
+const AdminRouter: React.FC = () => {
   return (
     <Suspense fallback={<AdminRouteLoading />}>
       <Routes>
