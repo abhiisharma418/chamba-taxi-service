@@ -61,11 +61,11 @@ export function setToken(token: string | null) {
 // Demo responses removed - using live backend only
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
-  // First check if we should skip real API calls (development mode)
-  const skipAPI = import.meta.env?.DEV || !navigator.onLine;
+  // First check if we should skip real API calls (development mode or offline)
+  const skipAPI = import.meta.env?.DEV || !navigator.onLine || (!apiStatus.isOnline && apiStatus.consecutiveFailures >= 3);
 
   if (skipAPI) {
-    console.log(`Admin API: Using mock data for ${path} (development mode or offline)`);
+    console.log(`Admin API: Using mock data for ${path} (${import.meta.env?.DEV ? 'development mode' : !navigator.onLine ? 'offline' : 'API unavailable'})`);
     return getMockResponse(path);
   }
 
