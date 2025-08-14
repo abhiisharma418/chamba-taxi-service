@@ -2,7 +2,6 @@ import { Ride } from '../models/rideModel.js';
 import { User } from '../models/userModel.js';
 import { Payment } from '../models/paymentModel.js';
 import { UserActivity } from '../models/adminUserModel.js';
-import TrackingData from '../models/trackingModel.js';
 
 // Get comprehensive analytics dashboard
 const getAnalyticsDashboard = async (req, res) => {
