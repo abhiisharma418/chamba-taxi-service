@@ -42,12 +42,19 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   console.log(`Admin API call to: ${API_URL}${path}`);
 
   try {
+    // Set a shorter timeout for faster fallback to mock data
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
     const res = await fetch(`${API_URL}${path}`, {
       ...options,
       headers,
       credentials: 'include',
-      mode: 'cors'
+      mode: 'cors',
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       console.warn(`Admin API call failed with status ${res.status}, falling back to mock data`);
@@ -58,7 +65,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     if (ct.includes('application/json')) return res.json();
     return res.text();
   } catch (error) {
-    console.warn(`API call failed, using mock data for ${path}:`, error);
+    console.warn(`API call failed, using mock data for ${path}:`, error.name === 'AbortError' ? 'Connection timeout' : error);
     // Return mock data based on the path
     return getMockResponse(path);
   }
